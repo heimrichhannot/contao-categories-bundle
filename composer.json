@@ -7,6 +7,7 @@
   "require": {
     "php": ">=7.0.0",
     "contao/core-bundle": "^4.4",
+    "contao/contao-haste_plus": "^1.7",
     "codefog/contao-widget_tree_picker": "^2.0"
   },
   "require-dev": {
