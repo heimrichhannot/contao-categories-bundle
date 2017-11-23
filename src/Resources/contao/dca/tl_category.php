@@ -19,8 +19,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
                 'pid'   => 'index',
                 'alias' => 'index',
             ]
-        ],
-        'backlink'          => 'do=news'
+        ]
     ],
     'list'     => [
         'sorting'           => [

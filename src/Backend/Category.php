@@ -39,9 +39,24 @@ class Category extends Backend
         ];
     }
 
-    public static function getCategoriesFieldDca($label = null)
+    public static function getCategoriesFieldDca($label = null, $evalOverride = null)
     {
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categories'];
+        $eval = [
+            'tl_class' => 'w50 autoheight',
+            'multiple' => true,
+            'mandatory' => true,
+            'fieldType' => 'checkbox',
+            'foreignTable' => 'tl_category',
+            'selectParents' => true,
+            'titleField' => 'title',
+            'searchField' => 'title',
+            'managerHref' => 'do=categories',
+        ];
+
+        if (is_array($evalOverride)) {
+            $eval = array_merge($eval, $evalOverride);
+        }
 
         return [
             'label' => &$label,
@@ -49,14 +64,7 @@ class Category extends Backend
             'filter' => true,
             'inputType' => 'treePicker',
             'foreignKey' => 'tl_category.title',
-            'eval' => [
-                'multiple' => true,
-                'fieldType' => 'checkbox',
-                'foreignTable' => 'tl_category',
-                'titleField' => 'title',
-                'searchField' => 'title',
-                'managerHref' => 'do=categories',
-            ],
+            'eval' => $eval,
             'sql' => 'blob NULL',
         ];
     }
@@ -108,11 +116,11 @@ class Category extends Backend
         $imagePasteInto = Image::getHtml('pasteinto.gif', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? Image::getHtml('pasteafter_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1],
+            $return = $disablePA ? Image::getHtml('pasteafter_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp=rt='.\RequestToken::get().'&amp;pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1],
                     $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return.($disablePI ? Image::getHtml('pasteinto_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1],
+        return $return.($disablePI ? Image::getHtml('pasteinto_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=2&amp;rt='.\RequestToken::get().'&amp;pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1],
                     $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
@@ -128,7 +136,7 @@ class Category extends Backend
      */
     public function generateLabel($arrRow, $strLabel, $objDca, $strAttributes)
     {
-        return \Image::getHtml('/files/bundles/categories/icon_root_category.svg', '', $strAttributes).' '.$strLabel;
+        return \Image::getHtml('iconPLAIN.gif', '', $strAttributes).' '.$strLabel;
     }
 
     /**
@@ -150,7 +158,7 @@ class Category extends Backend
             \Controller::redirect(\Controller::getReferer());
         }
 
-        $href .= '&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
+        $href .= 'tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
 
         if (!$row['published']) {
             $icon = 'invisible.gif';
