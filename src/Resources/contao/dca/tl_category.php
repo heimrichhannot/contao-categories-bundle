@@ -93,9 +93,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         '__selector__' => [
             'type'
         ],
-        'default' => '{general_legend},type,title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;{publish_legend},published',
-        \HeimrichHannot\CategoriesBundle\Backend\Category::TYPE_ROOT =>
-            '{general_legend},type,title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;{publish_legend},published',
+        'default' => '{general_legend},title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;{publish_legend},published',
     ],
     'fields'   => [
         'id'            => [
@@ -116,16 +114,6 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'flag'    => 6,
             'eval'    => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql'     => "int(10) unsigned NOT NULL default '0'"
-        ],
-        'type'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_category']['type'],
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'select',
-            'options'   => \HeimrichHannot\CategoriesBundle\Backend\Category::TYPES,
-            'reference' => &$GLOBALS['TL_LANG']['tl_category']['reference'],
-            'eval'      => ['tl_class' => 'w50', 'mandatory' => true, 'submitOnChange' => true],
-            'sql'       => "varchar(16) NOT NULL default 'default'"
         ],
         'title'         => [
             'label'     => &$GLOBALS['TL_LANG']['tl_category']['title'],

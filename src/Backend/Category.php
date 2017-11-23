@@ -18,29 +18,41 @@ use HeimrichHannot\Haste\Dca\General;
 
 class Category extends Backend
 {
-    const TYPE_DEFAULT = 'default';
-    const TYPE_ROOT = 'root';
-
-    const TYPES = [
-        self::TYPE_DEFAULT,
-        self::TYPE_ROOT,
-    ];
-
-    public static function getCategoryFieldDca()
+    public static function getCategoryFieldDca($evalOverride = null, $label = null)
     {
+        \System::loadLanguageFile('tl_category');
+
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
+        $eval = [
+            'tl_class' => 'w50 autoheight',
+            'multiple' => true,
+            'mandatory' => true,
+            'fieldType' => 'radio',
+            'foreignTable' => 'tl_category',
+            'titleField' => 'title',
+            'searchField' => 'title',
+            'managerHref' => 'do=categories',
+        ];
+
+        if (is_array($evalOverride)) {
+            $eval = array_merge($eval, $evalOverride);
+        }
+
         return [
-            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
+            'label' => &$label,
             'exclude' => true,
             'filter' => true,
             'inputType' => 'treePicker',
-            'foreignKey' => 'tl_news_category.title',
-            'eval' => ['multiple' => true, 'fieldType' => 'checkbox', 'foreignTable' => 'tl_news_category', 'titleField' => 'title', 'searchField' => 'title', 'managerHref' => 'do=news&table=tl_news_category'],
-            'sql' => 'blob NULL',
+            'foreignKey' => 'tl_category.title',
+            'eval' => $eval,
+            'sql' => "varchar(255) NOT NULL default ''",
         ];
     }
 
     public static function getCategoriesFieldDca($label = null, $evalOverride = null)
     {
+        \System::loadLanguageFile('tl_category');
+
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categories'];
         $eval = [
             'tl_class' => 'w50 autoheight',
@@ -48,7 +60,6 @@ class Category extends Backend
             'mandatory' => true,
             'fieldType' => 'checkbox',
             'foreignTable' => 'tl_category',
-            'selectParents' => true,
             'titleField' => 'title',
             'searchField' => 'title',
             'managerHref' => 'do=categories',

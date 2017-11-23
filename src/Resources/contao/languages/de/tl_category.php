@@ -10,7 +10,9 @@ $lang['frontendTitle'] = ['Frontend Titel', 'Titel, der im Frontend angezeigt wi
 $lang['alias']         = ['Kategorie-Alias', 'Der Kategorie-Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $lang['cssClass']      = ['CSS-Klasse', 'Hier kann eine CSS-Klasse vergeben werden, welche zur Kategorie im Front-End hinzugefügt wird.'];
 $lang['jumpTo']        = ['Weiterleitungsseite', 'Hier kann eine Seite ausgewählt werden, auf diese ein Besucher weitergeleitet wird wenn ein Kategorielink im Template angeklickt wird.'];
-$lang['published']     = ['Kategorie veröffentlichen', 'Kategorie veröffentlichen.'];
+$lang['published']     = ['Kategorie veröffentlichen', 'Wählen Sie diese Option, um die Kategorie zu veröffentlichen.'];
+$lang['category']      = ['Kategorie', 'Bitte wählen Sie hier eine Kategorie aus.'];
+$lang['categories']    = ['Kategorien', 'Bitte wählen Sie hier die gewünschten Kategorien aus.'];
 
 /**
  * Legends
@@ -24,8 +26,6 @@ $lang['publish_legend']  = 'Veröffentlichung';
  * Reference
  */
 $lang['reference'] = [
-    \HeimrichHannot\CategoriesBundle\Backend\Category::TYPE_DEFAULT => 'Standard',
-    \HeimrichHannot\CategoriesBundle\Backend\Category::TYPE_ROOT    => 'Wurzel'
 ];
 
 /**
