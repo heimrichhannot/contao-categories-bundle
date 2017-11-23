@@ -8,7 +8,7 @@
     "php": ">=7.0.0",
     "contao/core-bundle": "^4.4",
     "heimrichhannot/contao-haste_plus": "^1.7",
-    "codefog/contao-widget_tree_picker": "dev-master"
+    "codefog/contao-widget_tree_picker": "^2.0"
   },
   "require-dev": {
     "contao/manager-plugin": "^2.0",
