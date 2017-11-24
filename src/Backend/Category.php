@@ -18,6 +18,10 @@ use HeimrichHannot\Haste\Dca\General;
 
 class Category extends Backend
 {
+    const CATEGORY_FIELD = 'category';
+    const CATEGORIES_FIELD = 'categories';
+    const PRIMARY_CATEGORY_FIELD = 'primaryCategory';
+
     public static function getCategoryFieldDca($evalOverride = null, $label = null)
     {
         \System::loadLanguageFile('tl_category');
@@ -25,13 +29,13 @@ class Category extends Backend
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
         $eval = [
             'tl_class' => 'w50 autoheight',
-            'multiple' => true,
             'mandatory' => true,
             'fieldType' => 'radio',
             'foreignTable' => 'tl_category',
             'titleField' => 'title',
             'searchField' => 'title',
             'managerHref' => 'do=categories',
+            'isCategoryField' => true,
         ];
 
         if (is_array($evalOverride)) {
@@ -45,20 +49,21 @@ class Category extends Backend
             'inputType' => 'treePicker',
             'foreignKey' => 'tl_category.title',
             'eval' => $eval,
-            'sql' => "varchar(255) NOT NULL default ''",
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
     }
 
-    public static function getCategoriesFieldDca($label = null, $evalOverride = null)
+    public static function addPrimaryCategoryFieldToDca($table, $evalOverride = null, $label = null)
     {
+        \Controller::loadDataContainer($table);
+
         \System::loadLanguageFile('tl_category');
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categories'];
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['primaryCategory'];
         $eval = [
             'tl_class' => 'w50 autoheight',
-            'multiple' => true,
             'mandatory' => true,
-            'fieldType' => 'checkbox',
+            'fieldType' => 'radio',
             'foreignTable' => 'tl_category',
             'titleField' => 'title',
             'searchField' => 'title',
@@ -69,7 +74,41 @@ class Category extends Backend
             $eval = array_merge($eval, $evalOverride);
         }
 
-        return [
+        $GLOBALS['TL_DCA'][$table]['fields'][static::PRIMARY_CATEGORY_FIELD] = [
+            'label' => &$label,
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'treePicker',
+            'foreignKey' => 'tl_category.title',
+            'eval' => $eval,
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ];
+    }
+
+    public static function getMultipleCategoriesFieldDca($table, $evalOverride = null, $label = null)
+    {
+        \Controller::loadDataContainer($table);
+
+        \System::loadLanguageFile('tl_category');
+
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
+        $eval = [
+            'tl_class' => 'w50 autoheight',
+            'mandatory' => true,
+            'multiple' => true,
+            'fieldType' => 'checkbox',
+            'foreignTable' => 'tl_category',
+            'titleField' => 'title',
+            'searchField' => 'title',
+            'managerHref' => 'do=categories',
+            'isCategoriesField' => true,
+        ];
+
+        if (is_array($evalOverride)) {
+            $eval = array_merge($eval, $evalOverride);
+        }
+
+        $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORIES_FIELD] = [
             'label' => &$label,
             'exclude' => true,
             'filter' => true,

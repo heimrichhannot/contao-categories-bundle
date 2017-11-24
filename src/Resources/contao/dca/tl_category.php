@@ -39,6 +39,12 @@ $GLOBALS['TL_DCA']['tl_category'] = [
                 'href'  => 'ptg=all',
                 'class' => 'header_toggle'
             ],
+            'sources'     => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_category']['sources'],
+                'href'       => 'table=tl_category_source',
+                'icon'       => 'iconPLAIN.svg',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="c"'
+            ],
             'all'         => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
@@ -51,6 +57,11 @@ $GLOBALS['TL_DCA']['tl_category'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_category']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif'
+            ],
+            'config'     => [
+                'label' => &$GLOBALS['TL_LANG']['tl_category']['config'],
+                'href'  => 'table=tl_category_config',
+                'icon'  => 'modules.gif'
             ],
             'copy'       => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_category']['copy'],
@@ -93,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         '__selector__' => [
             'type'
         ],
-        'default' => '{general_legend},title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;{publish_legend},published',
+        'default'      => '{general_legend},title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;{publish_legend},published',
     ],
     'fields'   => [
         'id'            => [

@@ -1,0 +1,5 @@
+services:
+    huh.categories.manager:
+        class: HeimrichHannot\CategoriesBundle\Manager\CategoryManager
+        arguments:
+            - "@contao.framework"
