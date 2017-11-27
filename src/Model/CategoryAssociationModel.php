@@ -8,7 +8,7 @@
 
 namespace HeimrichHannot\CategoriesBundle\Model;
 
-class CategoryAssocModel extends \Model
+class CategoryAssociationModel extends \Model
 {
-    protected static $strTable = 'tl_category_assoc';
+    protected static $strTable = 'tl_category_association';
 }

@@ -1,6 +1,6 @@
 <?php
 
-$GLOBALS['TL_DCA']['tl_category_assoc'] = [
+$GLOBALS['TL_DCA']['tl_category_association'] = [
     'config' => [
         'sql' => [
             'keys' => [

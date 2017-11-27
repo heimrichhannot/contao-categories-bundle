@@ -29,8 +29,8 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'panelLayout'           => 'search'
         ],
         'label'             => [
-            'fields'         => ['title', 'frontendTitle'],
-            'format'         => '%s <span style="padding-left:3px;color:#b3b3b3;">[%s]</span>',
+            'fields'         => ['title'],
+            'format'         => '%s',
             'label_callback' => ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'generateLabel']
         ],
         'global_operations' => [

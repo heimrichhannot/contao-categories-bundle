@@ -28,6 +28,7 @@ class CategorySource extends Backend
             'eval' => [
                 'tl_class' => 'long clr',
                 'multiColumnEditor' => [
+                    'minRowCount' => 0,
                     'fields' => [
                         'field' => [
                             'label' => &$GLOBALS['TL_LANG']['tl_category_source']['field'],
@@ -38,8 +39,7 @@ class CategorySource extends Backend
                         'source' => [
                             'label' => &$GLOBALS['TL_LANG']['tl_category_source']['source'],
                             'inputType' => 'select',
-                            'foreignKey' => 'tl_category_source.title',
-                            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+                            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getSourcesAsOptions'],
                             'eval' => ['mandatory' => true, 'includeBlankOption' => true],
                         ],
                     ],

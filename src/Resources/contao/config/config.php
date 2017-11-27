@@ -16,6 +16,7 @@ $GLOBALS['TL_PERMISSIONS'][] = 'categoriep';
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_category']        = '\HeimrichHannot\CategoriesBundle\Model\CategoryModel';
-$GLOBALS['TL_MODELS']['tl_category_config'] = '\HeimrichHannot\CategoriesBundle\Model\CategoryConfigModel';
-$GLOBALS['TL_MODELS']['tl_category_source'] = '\HeimrichHannot\CategoriesBundle\Model\CategorySourceModel';
+$GLOBALS['TL_MODELS']['tl_category']             = '\HeimrichHannot\CategoriesBundle\Model\CategoryModel';
+$GLOBALS['TL_MODELS']['tl_category_config']      = '\HeimrichHannot\CategoriesBundle\Model\CategoryConfigModel';
+$GLOBALS['TL_MODELS']['tl_category_source']      = '\HeimrichHannot\CategoriesBundle\Model\CategorySourceModel';
+$GLOBALS['TL_MODELS']['tl_category_association'] = '\HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel';

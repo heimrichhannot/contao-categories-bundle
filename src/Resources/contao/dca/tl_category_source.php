@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_category_source'] = [
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
+            'eval'      => ['mandatory' => true, 'tl_class' => 'w50', 'unique' => true],
             'sql'       => "varchar(255) NOT NULL default ''"
         ]
     ]

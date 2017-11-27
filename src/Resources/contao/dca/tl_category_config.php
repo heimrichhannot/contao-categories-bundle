@@ -82,15 +82,14 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
         'source'    => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_category_config']['source'],
-            'exclude'    => true,
-            'filter'     => true,
-            'inputType'  => 'select',
-            'foreignKey' => 'tl_category_source.title',
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-            'eval'       => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
-            'sql'        => "int(10) unsigned NOT NULL default '0'"
-        ],
+            'label'            => &$GLOBALS['TL_LANG']['tl_category_config']['source'],
+            'exclude'          => true,
+            'filter'           => true,
+            'inputType'        => 'select',
+            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getSourcesAsOptions'],
+            'eval'             => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
+            'sql'              => "varchar(255) NOT NULL default ''"
+        ]
     ]
 ];
 

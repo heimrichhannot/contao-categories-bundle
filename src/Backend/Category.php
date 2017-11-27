@@ -48,8 +48,46 @@ class Category extends Backend
             'filter' => true,
             'inputType' => 'treePicker',
             'foreignKey' => 'tl_category.title',
+            'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
+            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
             'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
+        ];
+    }
+
+    public static function getMultipleCategoriesFieldDca($table, $evalOverride = null, $label = null)
+    {
+        \Controller::loadDataContainer($table);
+
+        \System::loadLanguageFile('tl_category');
+
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
+        $eval = [
+            'tl_class' => 'w50 autoheight',
+            'mandatory' => true,
+            'multiple' => true,
+            'fieldType' => 'checkbox',
+            'foreignTable' => 'tl_category',
+            'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
+            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
+            'titleField' => 'title',
+            'searchField' => 'title',
+            'managerHref' => 'do=categories',
+            'isCategoriesField' => true,
+        ];
+
+        if (is_array($evalOverride)) {
+            $eval = array_merge($eval, $evalOverride);
+        }
+
+        $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORIES_FIELD] = [
+            'label' => &$label,
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'treePicker',
+            'foreignKey' => 'tl_category.title',
+            'eval' => $eval,
+            'sql' => 'blob NULL',
         ];
     }
 
@@ -85,38 +123,38 @@ class Category extends Backend
         ];
     }
 
-    public static function getMultipleCategoriesFieldDca($table, $evalOverride = null, $label = null)
+    public function storeToCategoryAssociations($value, DataContainer $dc)
     {
-        \Controller::loadDataContainer($table);
+        switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
+            case 'radio':
+                \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, [$value]);
+                break;
+            case 'checkbox':
+                \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $value);
+                break;
+        }
+    }
 
-        \System::loadLanguageFile('tl_category');
+    public function loadCategoriesFromAssociations($value, DataContainer $dc)
+    {
+        $categories = \System::getContainer()->get('huh.categories.manager')->findByEntityAndField($dc->id, $dc->field);
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
-        $eval = [
-            'tl_class' => 'w50 autoheight',
-            'mandatory' => true,
-            'multiple' => true,
-            'fieldType' => 'checkbox',
-            'foreignTable' => 'tl_category',
-            'titleField' => 'title',
-            'searchField' => 'title',
-            'managerHref' => 'do=categories',
-            'isCategoriesField' => true,
-        ];
-
-        if (is_array($evalOverride)) {
-            $eval = array_merge($eval, $evalOverride);
+        if (null === $categories) {
+            return null;
         }
 
-        $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORIES_FIELD] = [
-            'label' => &$label,
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'treePicker',
-            'foreignKey' => 'tl_category.title',
-            'eval' => $eval,
-            'sql' => 'blob NULL',
-        ];
+        $categoryIds = $categories->fetchEach('id');
+
+        if (!empty($categoryIds)) {
+            switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
+                case 'radio':
+                    return $categoryIds[0];
+                case 'checkbox':
+                    return $categoryIds;
+            }
+        }
+
+        return null;
     }
 
     public static function generateAlias($varValue, DataContainer $dc)
@@ -184,9 +222,17 @@ class Category extends Backend
      *
      * @return string
      */
-    public function generateLabel($arrRow, $strLabel, $objDca, $strAttributes)
+    public function generateLabel($row, $label, $dca, $attributes)
     {
-        return \Image::getHtml('iconPLAIN.gif', '', $strAttributes).' '.$strLabel;
+        if (isset($row['frontendTitle']) && $row['frontendTitle']) {
+            $label .= '<span style="padding-left:3px;color:#b3b3b3;">['.$row['frontendTitle'].']</span>';
+        }
+
+        if (null !== (\System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
+            $label .= '<span style="padding-left:3px;color:#b3b3b3;">– '.$GLOBALS['TL_LANG']['MSC']['categoriesBundle']['configsAvailable'].'</span>';
+        }
+
+        return \Image::getHtml('iconPLAIN.gif', '', $attributes).' '.$label;
     }
 
     /**

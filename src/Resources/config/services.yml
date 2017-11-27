@@ -3,3 +3,7 @@ services:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryManager
         arguments:
             - "@contao.framework"
+    huh.categories.config_manager:
+        class: HeimrichHannot\CategoriesBundle\Manager\CategoryConfigManager
+        arguments:
+            - "@contao.framework"
