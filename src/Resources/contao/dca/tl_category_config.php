@@ -16,14 +16,14 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
     ],
     'list'     => [
         'label'             => [
-            'fields' => ['source'],
+            'fields' => ['context'],
             'format' => '%s'
         ],
         'sorting'           => [
             'mode'         => 1,
             'flag'         => 1,
-            'fields'       => ['source'],
-            'headerFields' => ['source'],
+            'fields'       => ['context'],
+            'headerFields' => ['context'],
             'panelLayout'  => 'filter;sort,search,limit'
         ],
         'global_operations' => [
@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
         ]
     ],
     'palettes' => [
-        'default' => '{general_legend},source;{redirect_legend},overrideJumpTo;'
+        'default' => '{general_legend},context;{redirect_legend},overrideJumpTo;'
     ],
     'fields'   => [
         'id'        => [
@@ -81,12 +81,12 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
             'eval'    => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
-        'source'    => [
-            'label'            => &$GLOBALS['TL_LANG']['tl_category_config']['source'],
+        'context'    => [
+            'label'            => &$GLOBALS['TL_LANG']['tl_category_config']['context'],
             'exclude'          => true,
             'filter'           => true,
             'inputType'        => 'select',
-            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getSourcesAsOptions'],
+            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getContextsAsOptions'],
             'eval'             => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
             'sql'              => "varchar(255) NOT NULL default ''"
         ]

@@ -1,6 +1,6 @@
 <?php
 
-$GLOBALS['TL_DCA']['tl_category_source'] = [
+$GLOBALS['TL_DCA']['tl_category_context'] = [
     'config'   => [
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
@@ -35,23 +35,23 @@ $GLOBALS['TL_DCA']['tl_category_source'] = [
         ],
         'operations'        => [
             'edit'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_category_source']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_category_context']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif'
             ],
             'copy'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_category_source']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_category_context']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif'
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_category_source']['delete'],
+                'label'      => &$GLOBALS['TL_LANG']['tl_category_context']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_category_source']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_category_context']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.gif'
             ],
@@ -65,7 +65,7 @@ $GLOBALS['TL_DCA']['tl_category_source'] = [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
         'tstamp'    => [
-            'label' => &$GLOBALS['TL_LANG']['tl_category_source']['tstamp'],
+            'label' => &$GLOBALS['TL_LANG']['tl_category_context']['tstamp'],
             'sql'   => "int(10) unsigned NOT NULL default '0'"
         ],
         'dateAdded' => [
@@ -76,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_category_source'] = [
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
         'title'     => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_category_source']['title'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_category_context']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,

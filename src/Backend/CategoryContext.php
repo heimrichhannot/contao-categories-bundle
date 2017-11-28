@@ -10,18 +10,18 @@ namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
 
-class CategorySource extends Backend
+class CategoryContext extends Backend
 {
-    const CATEGORY_FIELD_SOURCE_MAPPING_FIELD = 'categoryFieldSourceMapping';
+    const CATEGORY_FIELD_CONTEXT_MAPPING_FIELD = 'categoryFieldContextMapping';
 
-    public static function addFieldSourceMappingFieldToDca($table, $categoryFieldTable, $label = null)
+    public static function addFieldContextMappingFieldToDca($table, $categoryFieldTable, $label = null)
     {
-        \System::loadLanguageFile('tl_category_source');
+        \System::loadLanguageFile('tl_category_context');
         \Controller::loadDataContainer($table);
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category_source'][static::CATEGORY_FIELD_SOURCE_MAPPING_FIELD];
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category_context'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD];
 
-        $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORY_FIELD_SOURCE_MAPPING_FIELD] = [
+        $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD] = [
             'label' => &$label,
             'exclude' => true,
             'inputType' => 'multiColumnEditor',
@@ -31,15 +31,15 @@ class CategorySource extends Backend
                     'minRowCount' => 0,
                     'fields' => [
                         'field' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_category_source']['field'],
+                            'label' => &$GLOBALS['TL_LANG']['tl_category_context']['field'],
                             'inputType' => 'select',
                             'options' => static::getCategoryFieldsAsOptions($categoryFieldTable),
                             'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
                         ],
-                        'source' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_category_source']['source'],
+                        'context' => [
+                            'label' => &$GLOBALS['TL_LANG']['tl_category_context']['context'],
                             'inputType' => 'select',
-                            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getSourcesAsOptions'],
+                            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getContextsAsOptions'],
                             'eval' => ['mandatory' => true, 'includeBlankOption' => true],
                         ],
                     ],

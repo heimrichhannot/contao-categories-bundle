@@ -11,17 +11,23 @@ namespace HeimrichHannot\CategoriesBundle\Backend;
 use Contao\Backend;
 use Contao\DataContainer;
 use Contao\Image;
-use Contao\Input;
-use Contao\Versions;
+use Contao\StringUtil;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\Haste\Dca\General;
+use HeimrichHannot\Haste\Util\Container;
 
 class Category extends Backend
 {
-    const CATEGORY_FIELD = 'category';
-    const CATEGORIES_FIELD = 'categories';
-    const PRIMARY_CATEGORY_FIELD = 'primaryCategory';
+    const PRIMARY_CATEGORY_SUFFIX = '_primary';
 
+    /**
+     * Shorthand function for adding a single category field to your dca.
+     *
+     * @param array  $evalOverride
+     * @param string $label
+     *
+     * @return array
+     */
     public static function getCategoryFieldDca($evalOverride = null, $label = null)
     {
         \System::loadLanguageFile('tl_category');
@@ -55,46 +61,65 @@ class Category extends Backend
         ];
     }
 
-    public static function getMultipleCategoriesFieldDca($table, $evalOverride = null, $label = null)
+    /**
+     * Shorthand function for adding a multiple categories field to your dca.
+     *
+     * @param array  $evalOverride
+     * @param string $label
+     *
+     * @return array
+     */
+    public static function addMultipleCategoriesFieldToDca($table, $name, $evalOverride = null, $label = null)
     {
-        \Controller::loadDataContainer($table);
-
         \System::loadLanguageFile('tl_category');
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categories'];
         $eval = [
             'tl_class' => 'w50 autoheight',
             'mandatory' => true,
             'multiple' => true,
             'fieldType' => 'checkbox',
             'foreignTable' => 'tl_category',
-            'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
-            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
             'titleField' => 'title',
             'searchField' => 'title',
+            'addPrimaryCategory' => true,
             'managerHref' => 'do=categories',
-            'isCategoriesField' => true,
+            'isCategoryField' => true,
         ];
 
         if (is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
         }
 
-        $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORIES_FIELD] = [
+        \Controller::loadDataContainer($table);
+
+        $GLOBALS['TL_DCA'][$table]['fields'][$name] = [
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
             'inputType' => 'treePicker',
             'foreignKey' => 'tl_category.title',
+            'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
+            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
             'eval' => $eval,
             'sql' => 'blob NULL',
         ];
+
+        $GLOBALS['TL_DCA'][$table]['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ];
     }
 
-    public static function addPrimaryCategoryFieldToDca($table, $evalOverride = null, $label = null)
+    /**
+     * Shorthand function for adding a primary category field to your dca.
+     *
+     * @param array  $evalOverride
+     * @param string $label
+     *
+     * @return array
+     */
+    public static function getPrimaryCategoryFieldDca($evalOverride = null, $label = null)
     {
-        \Controller::loadDataContainer($table);
-
         \System::loadLanguageFile('tl_category');
 
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['primaryCategory'];
@@ -112,7 +137,7 @@ class Category extends Backend
             $eval = array_merge($eval, $evalOverride);
         }
 
-        $GLOBALS['TL_DCA'][$table]['fields'][static::PRIMARY_CATEGORY_FIELD] = [
+        return [
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
@@ -123,6 +148,69 @@ class Category extends Backend
         ];
     }
 
+    /**
+     * Automatically add overridable fields to the dca (including palettes, ...).
+     */
+    public static function addOverridableFieldSelectors()
+    {
+        $dca = &$GLOBALS['TL_DCA']['tl_category'];
+
+        // add overridable fields
+        foreach ($dca['fields'] as $field => $data) {
+            if ($data['eval']['overridable']) {
+                $overrideFieldName = 'override'.ucfirst($field);
+
+                // boolean field
+                $dca['fields'][$overrideFieldName] = [
+                    'label' => &$GLOBALS['TL_LANG']['tl_category'][$overrideFieldName],
+                    'exclude' => true,
+                    'inputType' => 'checkbox',
+                    'eval' => ['tl_class' => 'w50', 'submitOnChange' => true],
+                    'sql' => "char(1) NOT NULL default ''",
+                ];
+
+                // selector
+                $dca['palettes']['__selector__'][] = $overrideFieldName;
+
+                // subpalette
+                $dca['subpalettes'][$overrideFieldName] = $field;
+            }
+        }
+    }
+
+    public function addPrimaryCategoryToWidgetTreePicker($table)
+    {
+        if (!($field = \Input::get('field'))) {
+            return;
+        }
+
+        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
+
+        if ($dcaEval['isCategoryField'] && 'checkbox' === $dcaEval['fieldType']) {
+            $GLOBALS['BE_FFL']['treePicker'] = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreePicker';
+            $GLOBALS['BE_FFL']['treeSelector'] = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreeSelector';
+        }
+    }
+
+    /**
+     * @param DataContainer $dc
+     */
+    public function modifyPalette(DataContainer $dc)
+    {
+        $category = CategoryModel::findByPk($dc->id);
+        $dca = &$GLOBALS['TL_DCA']['tl_category'];
+
+        if ($category) {
+            if ($category->pid) {
+                $dca['palettes']['default'] = str_replace('jumpTo', 'overrideJumpTo', $dca['palettes']['default']);
+            }
+        }
+    }
+
+    /**
+     * @param mixed         $value
+     * @param DataContainer $dc
+     */
     public function storeToCategoryAssociations($value, DataContainer $dc)
     {
         switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
@@ -130,11 +218,17 @@ class Category extends Backend
                 \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, [$value]);
                 break;
             case 'checkbox':
-                \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $value);
+                \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, StringUtil::deserialize($value, true));
                 break;
         }
     }
 
+    /**
+     * @param mixed         $value
+     * @param DataContainer $dc
+     *
+     * @return array|null
+     */
     public function loadCategoriesFromAssociations($value, DataContainer $dc)
     {
         $categories = \System::getContainer()->get('huh.categories.manager')->findByEntityAndField($dc->id, $dc->field);
@@ -157,6 +251,12 @@ class Category extends Backend
         return null;
     }
 
+    /**
+     * @param string        $varValue
+     * @param DataContainer $dc
+     *
+     * @return string
+     */
     public static function generateAlias($varValue, DataContainer $dc)
     {
         if (null === ($category = CategoryModel::findByPk($dc->id))) {
@@ -213,8 +313,6 @@ class Category extends Backend
     }
 
     /**
-     * Add the correct indentation.
-     *
      * @param array
      * @param string
      * @param object
@@ -228,69 +326,12 @@ class Category extends Backend
             $label .= '<span style="padding-left:3px;color:#b3b3b3;">['.$row['frontendTitle'].']</span>';
         }
 
-        if (null !== (\System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
+        if ('edit' !== Container::getGet('act') &&
+            null !== (\System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])
+        ) {
             $label .= '<span style="padding-left:3px;color:#b3b3b3;">– '.$GLOBALS['TL_LANG']['MSC']['categoriesBundle']['configsAvailable'].'</span>';
         }
 
         return \Image::getHtml('iconPLAIN.gif', '', $attributes).' '.$label;
-    }
-
-    /**
-     * Return the "toggle visibility" button.
-     *
-     * @param array
-     * @param string
-     * @param string
-     * @param string
-     * @param string
-     * @param string
-     *
-     * @return string
-     */
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        if (strlen(Input::get('tid'))) {
-            $this->toggleVisibility(Input::get('tid'), (1 === Input::get('state')));
-            \Controller::redirect(\Controller::getReferer());
-        }
-
-        $href .= 'tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
-
-        if (!$row['published']) {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="'.\Controller::addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.\Image::getHtml($icon, $label).'</a> ';
-    }
-
-    /**
-     * Publish/unpublish a category.
-     *
-     * @param int
-     * @param bool
-     */
-    public function toggleVisibility($intId, $blnVisible)
-    {
-        $objVersions = new Versions('tl_category', $intId);
-        $objVersions->initialize();
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_category']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_category']['fields']['published']['save_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $blnVisible = $this->$callback[0]->$callback[1]($blnVisible, $this);
-                } elseif (is_callable($callback)) {
-                    $blnVisible = $callback($blnVisible, $this);
-                }
-            }
-        }
-
-        // Update the database
-        $this->Database->prepare('UPDATE tl_category SET tstamp='.time().", published='".($blnVisible ? 1 : '')."' WHERE id=?")
-            ->execute($intId);
-
-        $objVersions->create();
-        \HeimrichHannot\Haste\Util\Container::log('A new version of record "tl_category.id='.$intId.'" has been created'.$this->getParentEntries('tl_category', $intId), __METHOD__, TL_GENERAL);
     }
 }

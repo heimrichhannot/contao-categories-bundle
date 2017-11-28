@@ -9,16 +9,16 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
-use HeimrichHannot\CategoriesBundle\Model\CategorySourceModel;
+use HeimrichHannot\CategoriesBundle\Model\CategoryContextModel;
 
 class CategoryConfig extends Backend
 {
-    public static function getSourcesAsOptions()
+    public static function getContextsAsOptions()
     {
         $options = [];
 
-        if (null !== ($sources = CategorySourceModel::findAll())) {
-            $options = $sources->fetchEach('title');
+        if (null !== ($contexts = CategoryContextModel::findAll())) {
+            $options = $contexts->fetchEach('title');
         }
 
         asort($options);

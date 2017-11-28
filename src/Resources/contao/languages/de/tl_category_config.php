@@ -6,7 +6,7 @@ $lang = &$GLOBALS['TL_LANG']['tl_category_config'];
  * Fields
  */
 $lang['tstamp']         = ['Änderungsdatum', ''];
-$lang['source']         = ['Kategorie-Quelle', 'Wählen Sie hier eine Kategorie-Quelle aus.'];
+$lang['context']        = ['Kategorie-Kontext', 'Wählen Sie hier einen Kategorie-Kontext aus.'];
 $lang['overrideJumpTo'] = ['Weiterleitungsseite überschreiben', 'Wählen Sie diese Option, um die in der Kategorie festgelegte Weiterleitungsseite zu überschreiben.'];
 
 /**

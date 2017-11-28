@@ -8,7 +8,8 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
         'onload_callback'   => [
-            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'checkPermission']
+            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'checkPermission'],
+            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'modifyPalette']
         ],
         'onsubmit_callback' => [
             ['HeimrichHannot\Haste\Dca\General', 'setDateAdded'],
@@ -39,9 +40,9 @@ $GLOBALS['TL_DCA']['tl_category'] = [
                 'href'  => 'ptg=all',
                 'class' => 'header_toggle'
             ],
-            'sources'     => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_category']['sources'],
-                'href'       => 'table=tl_category_source',
+            'contexts'     => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_category']['contexts'],
+                'href'       => 'table=tl_category_context',
                 'icon'       => 'iconPLAIN.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="c"'
             ],
@@ -91,12 +92,6 @@ $GLOBALS['TL_DCA']['tl_category'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_category']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.gif'
-            ],
-            'toggle'     => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_category']['toggle'],
-                'icon'            => 'visible.gif',
-                'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'toggleIcon']
             ]
         ]
     ],
@@ -104,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         '__selector__' => [
             'type'
         ],
-        'default'      => '{general_legend},title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;{publish_legend},published',
+        'default'      => '{general_legend},title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;',
     ],
     'fields'   => [
         'id'            => [
@@ -164,15 +159,11 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'label'     => &$GLOBALS['TL_LANG']['tl_category']['jumpTo'],
             'exclude'   => true,
             'inputType' => 'pageTree',
-            'eval'      => ['fieldType' => 'radio'],
+            'eval'      => ['fieldType' => 'radio', 'overridable' => true],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
             'relation'  => ['type' => 'hasOne', 'load' => 'eager', 'table' => 'tl_page']
-        ],
-        'published'     => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_category']['published'],
-            'exclude'   => true,
-            'inputType' => 'checkbox',
-            'sql'       => "char(1) NOT NULL default ''"
         ]
     ]
 ];
+
+\HeimrichHannot\CategoriesBundle\Backend\Category::addOverridableFieldSelectors();

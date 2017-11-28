@@ -8,7 +8,7 @@
 
 namespace HeimrichHannot\CategoriesBundle\Model;
 
-class CategorySourceModel extends \Model
+class CategoryContextModel extends \Model
 {
-    protected static $strTable = 'tl_category_source';
+    protected static $strTable = 'tl_category_context';
 }

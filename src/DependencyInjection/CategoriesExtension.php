@@ -21,7 +21,6 @@ class CategoriesExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-//        $loader->load('listener.yml');
         $loader->load('services.yml');
     }
 }

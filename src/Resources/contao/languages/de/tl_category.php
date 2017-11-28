@@ -9,11 +9,10 @@ $lang['title']           = ['Titel', 'Bitte Kategorie-Titel eingeben.'];
 $lang['frontendTitle']   = ['Frontend Titel', 'Titel, der im Frontend angezeigt wird.'];
 $lang['alias']           = ['Kategorie-Alias', 'Der Kategorie-Alias ist eine eindeutige Referenz, die anstelle der numerischen ID aufgerufen werden kann.'];
 $lang['cssClass']        = ['CSS-Klasse', 'Hier kann eine CSS-Klasse vergeben werden, welche zur Kategorie im Front-End hinzugefügt wird.'];
+$lang['overrideJumpTo']  = ['Weiterleitungsseite überschreiben', 'Wählen Sie diese Option, um die in der Eltern-Kategorie festgelegte Weiterleitungsseite zu überschreiben.'];
 $lang['jumpTo']          = ['Weiterleitungsseite', 'Wählen Sie hier eine Seite aus.'];
-$lang['published']       = ['Kategorie veröffentlichen', 'Wählen Sie diese Option, um die Kategorie zu veröffentlichen.'];
 $lang['category']        = ['Kategorie', 'Bitte wählen Sie hier eine Kategorie aus.'];
 $lang['categories']      = ['Kategorien', 'Bitte wählen Sie hier die gewünschten Kategorien aus.'];
-$lang['primaryCategory'] = ['Primäre Kategorie', 'Bitte wählen Sie hier die primäre Kategorie aus.'];
 
 /**
  * Legends
@@ -41,4 +40,4 @@ $lang['delete']     = ['Kategorie löschen', 'Löscht die Kategorie ID %s'];
 $lang['toggle']     = ['Kategorie veröffentlichen/unveröffentlichen', 'Kategorie ID %s veröffentlichen/unveröffentlichen'];
 $lang['pasteafter'] = ['Einfügen nach', 'Nach Kategorie ID %s einfügen'];
 $lang['pasteinto']  = ['Einfügen in', 'In Kategorie ID %s einfügen'];
-$lang['sources']    = ['Kategorie-Quellen', 'Kategorie-Quellen verwalten.'];
+$lang['contexts']   = ['Kategorie-Kontexte', 'Kategorie-Kontexte verwalten.'];
