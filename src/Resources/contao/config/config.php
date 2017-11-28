@@ -15,9 +15,6 @@ if (\HeimrichHannot\Haste\Util\Container::isBackend()) {
         'bundles/categories/js/contao-categories-bundle.be.min.js|static';
 }
 
-$GLOBALS['BE_FFL']['treePicker']   = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreePicker';
-$GLOBALS['BE_FFL']['treeSelector'] = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreeSelector';
-
 /**
  * Models
  */
