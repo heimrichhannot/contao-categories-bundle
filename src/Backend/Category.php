@@ -52,7 +52,7 @@ class Category extends Backend
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
-            'inputType' => 'treePicker',
+            'inputType' => 'categoryTreePicker',
             'foreignKey' => 'tl_category.title',
             'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
             'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
@@ -64,10 +64,10 @@ class Category extends Backend
     /**
      * Shorthand function for adding a multiple categories field to your dca.
      *
+     * @param string $table
+     * @param string $name
      * @param array  $evalOverride
      * @param string $label
-     *
-     * @return array
      */
     public static function addMultipleCategoriesFieldToDca($table, $name, $evalOverride = null, $label = null)
     {
@@ -97,7 +97,7 @@ class Category extends Backend
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
-            'inputType' => 'treePicker',
+            'inputType' => 'categoryTreePicker',
             'foreignKey' => 'tl_category.title',
             'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
             'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
@@ -106,44 +106,6 @@ class Category extends Backend
         ];
 
         $GLOBALS['TL_DCA'][$table]['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ];
-    }
-
-    /**
-     * Shorthand function for adding a primary category field to your dca.
-     *
-     * @param array  $evalOverride
-     * @param string $label
-     *
-     * @return array
-     */
-    public static function getPrimaryCategoryFieldDca($evalOverride = null, $label = null)
-    {
-        \System::loadLanguageFile('tl_category');
-
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['primaryCategory'];
-        $eval = [
-            'tl_class' => 'w50 autoheight',
-            'mandatory' => true,
-            'fieldType' => 'radio',
-            'foreignTable' => 'tl_category',
-            'titleField' => 'title',
-            'searchField' => 'title',
-            'managerHref' => 'do=categories',
-        ];
-
-        if (is_array($evalOverride)) {
-            $eval = array_merge($eval, $evalOverride);
-        }
-
-        return [
-            'label' => &$label,
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'treePicker',
-            'foreignKey' => 'tl_category.title',
-            'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
     }
@@ -175,20 +137,6 @@ class Category extends Backend
                 // subpalette
                 $dca['subpalettes'][$overrideFieldName] = $field;
             }
-        }
-    }
-
-    public function addPrimaryCategoryToWidgetTreePicker($table)
-    {
-        if (!($field = \Input::get('field'))) {
-            return;
-        }
-
-        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
-
-        if ($dcaEval['isCategoryField'] && 'checkbox' === $dcaEval['fieldType']) {
-            $GLOBALS['BE_FFL']['treePicker'] = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreePicker';
-            $GLOBALS['BE_FFL']['treeSelector'] = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreeSelector';
         }
     }
 

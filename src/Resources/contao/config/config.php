@@ -19,11 +19,6 @@ $GLOBALS['BE_FFL']['treePicker']   = 'HeimrichHannot\CategoriesBundle\Widget\Wid
 $GLOBALS['BE_FFL']['treeSelector'] = 'HeimrichHannot\CategoriesBundle\Widget\WidgetTreeSelector';
 
 /**
- * Hooks
- */
-$GLOBALS['TL_HOOKS']['loadDataContainer']['categoriesBundle'] = ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'addPrimaryCategoryToWidgetTreePicker'];
-
-/**
  * Models
  */
 $GLOBALS['TL_MODELS']['tl_category']             = '\HeimrichHannot\CategoriesBundle\Model\CategoryModel';

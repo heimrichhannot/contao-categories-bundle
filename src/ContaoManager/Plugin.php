@@ -23,7 +23,7 @@ class Plugin implements BundlePluginInterface
     {
         return [
             BundleConfig::create(CategoriesBundle::class)
-                ->setLoadAfter([ContaoCoreBundle::class, 'blocks']),
+                ->setLoadAfter([ContaoCoreBundle::class]),
         ];
     }
 }
