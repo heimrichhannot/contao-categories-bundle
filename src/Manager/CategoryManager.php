@@ -35,36 +35,40 @@ class CategoryManager
     /**
      * @param int    $entityId
      * @param string $field
+     * @param array  $options
      *
      * @return \Contao\Model\Collection|null
      */
-    public function findByEntityAndField($entityId, $field)
+    public function findByEntityAndField($entityId, $field, array $options = [])
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
 
-        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.field=?', 'tl_category_association.entity=?'], [$field, $entityId]))) {
+        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.field=?', 'tl_category_association.entity=?'], [$field, $entityId], $options))) {
             return null;
         }
 
         /** @var CategoryModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryModel::class);
 
-        return $adapter->findMultipleByIds($categoryAssociations->fetchEach('category'));
+        return $adapter->findMultipleByIds($categoryAssociations->fetchEach('category'), [
+            'order' => 'sorting ASC',
+        ]);
     }
 
     /**
      * @param int    $entityId
      * @param string $field
+     * @param array  $options
      *
      * @return null|CategoryModel
      */
-    public function findOneByEntityAndField($entityId, $field)
+    public function findOneByEntityAndField($entityId, $field, array $options = [])
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
 
-        if (null === ($categoryAssociations = $adapter->findOneBy(['tl_category_association.entity=?', 'tl_category_association.field=?'], [$entityId, $field]))) {
+        if (null === ($categoryAssociations = $adapter->findOneBy(['tl_category_association.entity=?', 'tl_category_association.field=?'], [$entityId, $field], $options))) {
             return null;
         }
 
@@ -241,5 +245,20 @@ class CategoryManager
             $association->field = $field;
             $association->save();
         }
+    }
+
+    /**
+     * Determines whether a category has children.
+     *
+     * @param int $categoryId
+     *
+     * @return bool
+     */
+    public function hasChildren($categoryId)
+    {
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        return null !== ($categoryAssociations = $adapter->findBy(['tl_category.pid=?'], [$categoryId]));
     }
 }

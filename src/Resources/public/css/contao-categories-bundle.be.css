@@ -1,0 +1,2 @@
+input[name="primaryCategory"]{display:none}input[name="primaryCategory"]+label .icon{display:none;cursor:pointer}input[name="primaryCategory"]+label .icon.unprimarized{display:inline-block}input[name="primaryCategory"]:checked+label .icon.primarized{display:inline-block}input[name="primaryCategory"]:checked+label .icon.unprimarized{display:none}
+/*# sourceMappingURL=contao-categories-bundle.be.css.map */

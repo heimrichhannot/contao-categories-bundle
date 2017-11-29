@@ -54,6 +54,12 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             ],
         ],
         'operations'        => [
+            'primarize' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_category']['primarize'],
+                'href'  => 'act=primarize',
+                'icon'  => 'bundles/categories/img/icon_primarized.png',
+                'button_callback' => ['HeimrichHannot\CategoriesBundle\Backend\Category', 'getPrimarizeOperation']
+            ],
             'edit'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_category']['edit'],
                 'href'  => 'act=edit',

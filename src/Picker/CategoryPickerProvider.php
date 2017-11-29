@@ -102,6 +102,12 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
      */
     protected function getRouteParameters(PickerConfig $config = null)
     {
-        return ['do' => 'categories'];
+        return [
+            'do' => 'categories',
+            'category_field' => \Input::get('category_field'),
+            'category_table' => \Input::get('category_table'),
+            'primaryCategory' => \Input::get('primaryCategory'),
+            'has-primary-category' => 1,
+        ];
     }
 }

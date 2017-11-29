@@ -1,0 +1,24 @@
+input[name="primaryCategory"] {
+  display: none;
+
+  & + label .icon {
+    display: none;
+    cursor: pointer;
+
+    &.unprimarized {
+      display: inline-block;
+    }
+  }
+
+  &:checked + label {
+    .icon {
+      &.primarized {
+        display: inline-block;
+      }
+
+      &.unprimarized {
+        display: none;
+      }
+    }
+  }
+}

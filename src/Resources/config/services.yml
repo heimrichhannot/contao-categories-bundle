@@ -7,3 +7,13 @@ services:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryConfigManager
         arguments:
             - "@contao.framework"
+    huh.categories.picker.category_provider:
+        class: HeimrichHannot\CategoriesBundle\Picker\CategoryPickerProvider
+        public: false
+        arguments:
+            - "@knp_menu.factory"
+            - "@router"
+        calls:
+            - [setTokenStorage, ["@security.token_storage"]]
+        tags:
+            - { name: contao.picker_provider, priority: 512 }

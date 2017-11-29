@@ -9,16 +9,23 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\StringUtil;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
+use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\Container;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Wa72\HtmlPageDom\HtmlPageCrawler;
 
 class Category extends Backend
 {
     const PRIMARY_CATEGORY_SUFFIX = '_primary';
+
+    protected static $defaultPrimaryCategorySet = false;
 
     /**
      * Shorthand function for adding a single category field to your dca.
@@ -37,10 +44,6 @@ class Category extends Backend
             'tl_class' => 'w50 autoheight',
             'mandatory' => true,
             'fieldType' => 'radio',
-            'foreignTable' => 'tl_category',
-            'titleField' => 'title',
-            'searchField' => 'title',
-            'managerHref' => 'do=categories',
             'isCategoryField' => true,
         ];
 
@@ -79,11 +82,8 @@ class Category extends Backend
             'mandatory' => true,
             'multiple' => true,
             'fieldType' => 'checkbox',
-            'foreignTable' => 'tl_category',
-            'titleField' => 'title',
-            'searchField' => 'title',
             'addPrimaryCategory' => true,
-            'managerHref' => 'do=categories',
+            'forcePrimaryCategory' => true,
             'isCategoryField' => true,
         ];
 
@@ -97,17 +97,169 @@ class Category extends Backend
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
-            'inputType' => 'categoryTreePicker',
+            'inputType' => 'categoryTree',
             'foreignKey' => 'tl_category.title',
             'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
-            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
+            'save_callback' => [
+                ['HeimrichHannot\CategoriesBundle\Backend\Category', 'storePrimaryCategory'],
+                ['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations'],
+            ],
             'eval' => $eval,
             'sql' => 'blob NULL',
         ];
 
-        $GLOBALS['TL_DCA'][$table]['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ];
+        if ($eval['addPrimaryCategory']) {
+            $GLOBALS['TL_DCA'][$table]['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
+                'sql' => "int(10) unsigned NOT NULL default '0'",
+            ];
+        }
+    }
+
+    public function reloadCategoryTree($action, DataContainer $dc)
+    {
+        switch ($action) {
+            case 'reloadCategoryTree':
+                $id = \Input::get('id');
+                $field = $dc->inputName = \Input::post('name');
+
+                // Handle the keys in "edit multiple" mode
+                if ('editAll' === \Input::get('act')) {
+                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
+                    $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
+                }
+
+                $dc->field = $field;
+
+                // The field does not exist
+                if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
+                    Container::log('Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', __METHOD__, TL_ERROR);
+                    throw new BadRequestHttpException('Bad request');
+                }
+
+                $row = null;
+                $value = null;
+
+                // Load the value
+                if ('overrideAll' !== \Input::get('act')) {
+                    if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] === 'File') {
+                        $value = \Config::get($field);
+                    } elseif ($id > 0 && $this->Database->tableExists($dc->table)) {
+                        $row = $this->Database->prepare('SELECT * FROM '.$dc->table.' WHERE id=?')
+                            ->execute($id);
+
+                        // The record does not exist
+                        if ($row->numRows < 1) {
+                            Container::log('A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', __METHOD__, TL_ERROR);
+                            throw new BadRequestHttpException('Bad request');
+                        }
+
+                        $value = $row->$field;
+                        $dc->activeRecord = $row;
+                    }
+                }
+
+                // Call the load_callback
+                if (is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'])) {
+                    foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] as $callback) {
+                        if (is_array($callback)) {
+                            $this->import($callback[0]);
+                            $value = $this->{$callback[0]}->{$callback[1]}($value, $dc);
+                        } elseif (is_callable($callback)) {
+                            $value = $callback($value, $dc);
+                        }
+                    }
+                }
+
+                // Set the new value
+                $value = \Input::post('value', true);
+                $key = 'categoryTree';
+
+                // Convert the selected values
+                if ('' !== $value) {
+                    $value = \StringUtil::trimsplit("\t", $value);
+
+                    $value = serialize($value);
+                }
+
+                /** @var CategoryTree $strClass */
+                $strClass = $GLOBALS['BE_FFL'][$key];
+
+                /** @var CategoryTree $objWidget */
+                $objWidget = new $strClass($strClass::getAttributesFromDca($GLOBALS['TL_DCA'][$dc->table]['fields'][$field], $dc->inputName, $value, $field, $dc->table, $dc));
+
+                throw new ResponseException(new Response(\Controller::replaceOldBePaths($objWidget->generate())));
+        }
+    }
+
+    public function getPrimarizeOperation($row, $href, $label, $title, $icon)
+    {
+        $checked = '';
+
+        if (!($field = \Input::get('category_field')) || !($table = \Input::get('category_table'))) {
+            return '';
+        }
+
+        \Controller::loadDataContainer($table);
+
+        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
+
+        if (!$dcaEval['addPrimaryCategory']) {
+            return '';
+        }
+
+        $primaryCategory = \Input::get('primaryCategory');
+
+        $isParentCategory = \System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
+        $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable']) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
+
+        if ($checkAsDefaultPrimaryCategory || $row['id'] === \Input::get('primaryCategory')) {
+            static::$defaultPrimaryCategorySet = true;
+            $checked = ' checked';
+        }
+
+        return '<input type="radio" name="primaryCategory" data-id="'.$row['id'].'" id="primaryCategory_'.$row['id'].'" value="primary_'.$row['id'].'"'.$checked.'>'.
+            '<label style="margin-right: 6px" for="primaryCategory_'.$row['id'].'" title="'.$title.'" class="primarize">'.
+            '<span class="icon primarized">'.\Image::getHtml('bundles/categories/img/icon_primarized.png').'</span>'.
+            '<span class="icon unprimarized">'.\Image::getHtml('bundles/categories/img/icon_unprimarized.png').'</span>'.
+            '</label>';
+    }
+
+    public function adjustCategoryTree($buffer, $template)
+    {
+        if (!\Input::get('picker') || !($field = \Input::get('category_field')) || !($table = \Input::get('category_table'))) {
+            return $buffer;
+        }
+
+        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
+
+        // hide unselectable checkboxes
+        if ($dcaEval['parentsUnselectable']) {
+            $objNode = new HtmlPageCrawler($buffer);
+
+            $objNode->filter('.tree_view input[name="picker[]"]')->each(
+                function ($objElement) {
+                    $category = $objElement->getAttribute('value');
+
+                    if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
+                        $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
+                    }
+                }
+            );
+
+            $objNode->filter('.tree_view input[name="primaryCategory"]')->each(
+                function ($objElement) {
+                    $category = $objElement->getAttribute('data-id');
+
+                    if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
+                        $objElement->removeAttribute('checked');
+
+                        $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
+                    }
+                }
+            );
+        }
+
+        return $objNode->saveHTML();
     }
 
     /**
@@ -153,6 +305,28 @@ class Category extends Backend
                 $dca['palettes']['default'] = str_replace('jumpTo', 'overrideJumpTo', $dca['palettes']['default']);
             }
         }
+
+        // hide primarize operation if not in picker context
+        // show only in picker
+        if (!\Input::get('picker')) {
+            unset($dca['list']['operations']['primarize']);
+        }
+    }
+
+    /**
+     * @param mixed         $value
+     * @param DataContainer $dc
+     */
+    public function storePrimaryCategory($value, DataContainer $dc)
+    {
+        if ($primaryCategory = \Input::post($dc->field.static::PRIMARY_CATEGORY_SUFFIX)) {
+            if (null !== ($entity = General::getModelInstance($dc->table, $dc->id))) {
+                $entity->{$dc->field.static::PRIMARY_CATEGORY_SUFFIX} = $primaryCategory;
+                $entity->save();
+            }
+        }
+
+        return $value;
     }
 
     /**

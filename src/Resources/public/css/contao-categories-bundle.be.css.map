@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,6BAA8B,CAC5B,OAAO,CAAE,IAAI,CAEb,yCAAgB,CACd,OAAO,CAAE,IAAI,CACb,MAAM,CAAE,OAAO,CAEf,sDAAe,CACb,OAAO,CAAE,YAAY,CAMrB,4DAAa,CACX,OAAO,CAAE,YAAY,CAGvB,8DAAe,CACb,OAAO,CAAE,IAAI",
+"sources": ["contao-categories-bundle.be.scss"],
+"names": [],
+"file": "contao-categories-bundle.be.css"
+}
