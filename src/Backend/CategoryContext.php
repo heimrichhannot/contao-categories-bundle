@@ -9,6 +9,9 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
+use Contao\DataContainer;
+use Contao\StringUtil;
+use HeimrichHannot\Haste\Dca\General;
 
 class CategoryContext extends Backend
 {
@@ -25,6 +28,7 @@ class CategoryContext extends Backend
             'label' => &$label,
             'exclude' => true,
             'inputType' => 'multiColumnEditor',
+            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\CategoryContext', 'deleteCachedPropertyValuesByFieldOrContext']],
             'eval' => [
                 'tl_class' => 'long clr',
                 'multiColumnEditor' => [
@@ -34,19 +38,85 @@ class CategoryContext extends Backend
                             'label' => &$GLOBALS['TL_LANG']['tl_category_context']['field'],
                             'inputType' => 'select',
                             'options' => static::getCategoryFieldsAsOptions($categoryFieldTable),
-                            'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
+                            'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'groupStyle' => 'width: 200px'],
                         ],
                         'context' => [
                             'label' => &$GLOBALS['TL_LANG']['tl_category_context']['context'],
                             'inputType' => 'select',
                             'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getContextsAsOptions'],
-                            'eval' => ['mandatory' => true, 'includeBlankOption' => true],
+                            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'groupStyle' => 'width: 200px'],
                         ],
                     ],
                 ],
             ],
             'sql' => 'blob NULL',
         ];
+    }
+
+    public static function deleteCachedPropertyValuesByFieldOrContext($value, DataContainer $dc)
+    {
+        if (null !== ($categoryContext = \System::getContainer()->get('huh.categories.context_manager')->findOneBy('id', $dc->id))) {
+            $valueOld = $categoryContext->{$dc->field};
+
+            if ($value !== $valueOld) {
+                $fields = [];
+                $contexts = [];
+
+                // collect relevant combinations
+                foreach (StringUtil::deserialize($valueOld, true) as $mapping) {
+                    $fields[] = '"'.$mapping['field'].'"';
+                    $contexts[] = '"'.$mapping['context'].'"';
+                }
+
+                foreach (StringUtil::deserialize($value, true) as $mapping) {
+                    $fields[] = '"'.$mapping['field'].'"';
+                    $contexts[] = '"'.$mapping['context'].'"';
+                }
+
+                $fields = array_unique($fields);
+                $contexts = array_unique($contexts);
+
+                \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                    [
+                        'field IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
+                    ], []
+                );
+            }
+        }
+
+        return $value;
+    }
+
+    public static function deleteCachedPropertyValuesByContext($value, DataContainer $dc)
+    {
+        if (General::valueChangedInCallback($value, $dc)) {
+            $fields = [];
+            $contexts = [];
+
+            $valueOld = General::getModelInstancePropertyValue($dc->field, $dc->table, $dc->id);
+
+            // collect relevant combinations
+            foreach (StringUtil::deserialize($valueOld, true) as $mapping) {
+                $fields[] = '"'.$mapping['field'].'"';
+                $contexts[] = '"'.$mapping['context'].'"';
+            }
+
+            foreach (StringUtil::deserialize($value, true) as $mapping) {
+                $fields[] = '"'.$mapping['field'].'"';
+                $contexts[] = '"'.$mapping['context'].'"';
+            }
+
+            $fields = array_unique($fields);
+            $contexts = array_unique($contexts);
+
+            \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                [
+                    'field IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
+                ], []
+            );
+        }
+
+        return $value;
     }
 
     public static function getCategoryFieldsAsOptions($categoryFieldTable)
@@ -65,6 +135,6 @@ class CategoryContext extends Backend
 
         asort($options);
 
-        return $options;
+        return array_combine($options, $options);
     }
 }

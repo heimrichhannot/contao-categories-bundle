@@ -20,7 +20,7 @@ $GLOBALS['TL_DCA']['tl_category_context'] = [
             'format' => '%s'
         ],
         'sorting'           => [
-            'mode'         => 1,
+            'mode'         => 2,
             'fields'       => ['title'],
             'headerFields' => ['title'],
             'panelLayout'  => 'filter;sort,search,limit'

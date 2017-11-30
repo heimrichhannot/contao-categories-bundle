@@ -7,6 +7,14 @@ services:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryConfigManager
         arguments:
             - "@contao.framework"
+    huh.categories.context_manager:
+        class: HeimrichHannot\CategoriesBundle\Manager\CategoryContextManager
+        arguments:
+            - "@contao.framework"
+    huh.categories.property_cache_manager:
+        class: HeimrichHannot\CategoriesBundle\Manager\CategoryPropertyCacheManager
+        arguments:
+            - "@contao.framework"
     huh.categories.picker.category_provider:
         class: HeimrichHannot\CategoriesBundle\Picker\CategoryPickerProvider
         public: false

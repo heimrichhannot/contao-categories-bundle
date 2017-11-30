@@ -9,9 +9,9 @@
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use HeimrichHannot\CategoriesBundle\Model\CategoryConfigModel;
+use HeimrichHannot\CategoriesBundle\Model\CategoryContextModel;
 
-class CategoryConfigManager
+class CategoryContextManager
 {
     /**
      * @var ContaoFrameworkInterface
@@ -35,28 +35,14 @@ class CategoryConfigManager
      * @param mixed $value
      * @param array $options
      *
-     * @return \Contao\Model\Collection|CategoryConfigModel|null
+     * @return \Contao\Model\Collection|CategoryContextModel|null
      */
     public function findBy($column, $value, array $options = [])
     {
-        /** @var CategoryConfigModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryConfigModel::class);
+        /** @var CategoryContextModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryContextModel::class);
 
         return $adapter->findBy($column, $value, $options);
-    }
-
-    /**
-     * @param int    $categoryId
-     * @param string $context
-     *
-     * @return CategoryConfigModel
-     */
-    public function findByCategoryAndContext(int $categoryId, string $context): ?CategoryConfigModel
-    {
-        /** @var CategoryConfigModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryConfigModel::class);
-
-        return $categoryConfig = $adapter->findOneBy(['tl_category_config.pid=?', 'tl_category_config.context=?'], [$categoryId, $context]);
     }
 
     /**
@@ -66,12 +52,12 @@ class CategoryConfigManager
      * @param mixed $value
      * @param array $options
      *
-     * @return CategoryConfigModel|null
+     * @return CategoryContextModel|null
      */
     public function findOneBy($column, $value, array $options = [])
     {
-        /** @var CategoryConfigModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryConfigModel::class);
+        /** @var CategoryContextModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryContextModel::class);
 
         return $adapter->findOneBy($column, $value, $options);
     }

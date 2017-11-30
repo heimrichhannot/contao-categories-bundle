@@ -9,17 +9,12 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
-use Contao\CoreBundle\Exception\ResponseException;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\StringUtil;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
-use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\Container;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Wa72\HtmlPageDom\HtmlPageCrawler;
 
 class Category extends Backend
 {
@@ -55,7 +50,7 @@ class Category extends Backend
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
-            'inputType' => 'categoryTreePicker',
+            'inputType' => 'categoryTree',
             'foreignKey' => 'tl_category.title',
             'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
             'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
@@ -115,80 +110,45 @@ class Category extends Backend
         }
     }
 
-    public function reloadCategoryTree($action, DataContainer $dc)
+    public static function deleteCachedPropertyValuesByCategoryAndProperty($value, DataContainer $dc)
     {
-        switch ($action) {
-            case 'reloadCategoryTree':
-                $id = \Input::get('id');
-                $field = $dc->inputName = \Input::post('name');
+        if (null !== ($instance = General::getModelInstance($dc->table, $dc->id))) {
+            $valueOld = $instance->{$dc->field};
 
-                // Handle the keys in "edit multiple" mode
-                if ('editAll' === \Input::get('act')) {
-                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
-                    $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
-                }
-
-                $dc->field = $field;
-
-                // The field does not exist
-                if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
-                    Container::log('Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', __METHOD__, TL_ERROR);
-                    throw new BadRequestHttpException('Bad request');
-                }
-
-                $row = null;
-                $value = null;
-
-                // Load the value
-                if ('overrideAll' !== \Input::get('act')) {
-                    if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] === 'File') {
-                        $value = \Config::get($field);
-                    } elseif ($id > 0 && $this->Database->tableExists($dc->table)) {
-                        $row = $this->Database->prepare('SELECT * FROM '.$dc->table.' WHERE id=?')
-                            ->execute($id);
-
-                        // The record does not exist
-                        if ($row->numRows < 1) {
-                            Container::log('A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', __METHOD__, TL_ERROR);
-                            throw new BadRequestHttpException('Bad request');
-                        }
-
-                        $value = $row->$field;
-                        $dc->activeRecord = $row;
-                    }
-                }
-
-                // Call the load_callback
-                if (is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'])) {
-                    foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] as $callback) {
-                        if (is_array($callback)) {
-                            $this->import($callback[0]);
-                            $value = $this->{$callback[0]}->{$callback[1]}($value, $dc);
-                        } elseif (is_callable($callback)) {
-                            $value = $callback($value, $dc);
-                        }
-                    }
-                }
-
-                // Set the new value
-                $value = \Input::post('value', true);
-                $key = 'categoryTree';
-
-                // Convert the selected values
-                if ('' !== $value) {
-                    $value = \StringUtil::trimsplit("\t", $value);
-
-                    $value = serialize($value);
-                }
-
-                /** @var CategoryTree $strClass */
-                $strClass = $GLOBALS['BE_FFL'][$key];
-
-                /** @var CategoryTree $objWidget */
-                $objWidget = new $strClass($strClass::getAttributesFromDca($GLOBALS['TL_DCA'][$dc->table]['fields'][$field], $dc->inputName, $value, $field, $dc->table, $dc));
-
-                throw new ResponseException(new Response(\Controller::replaceOldBePaths($objWidget->generate())));
+            if ($value !== $valueOld) {
+                \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                    [
+                        'category=?',
+                        'property=?',
+                    ], [
+                        'tl_category' === $dc->table ? $instance->id : $instance->pid,
+                        $dc->field,
+                    ]
+                );
+            }
         }
+
+        return $value;
+    }
+
+    public static function deleteCachedPropertyValuesByCategoryAndPropertyBool($value, DataContainer $dc)
+    {
+        if (null !== ($instance = General::getModelInstance($dc->table, $dc->id))) {
+            // compute name of the field being overridden
+            $overrideField = lcfirst(str_replace('override', '', $dc->field));
+
+            \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                [
+                    'category=?',
+                    'property=?',
+                ], [
+                    'tl_category' === $dc->table ? $instance->id : $instance->pid,
+                    $overrideField,
+                ]
+            );
+        }
+
+        return $value;
     }
 
     public function getPrimarizeOperation($row, $href, $label, $title, $icon)
@@ -224,44 +184,6 @@ class Category extends Backend
             '</label>';
     }
 
-    public function adjustCategoryTree($buffer, $template)
-    {
-        if (!\Input::get('picker') || !($field = \Input::get('category_field')) || !($table = \Input::get('category_table'))) {
-            return $buffer;
-        }
-
-        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
-
-        // hide unselectable checkboxes
-        if ($dcaEval['parentsUnselectable']) {
-            $objNode = new HtmlPageCrawler($buffer);
-
-            $objNode->filter('.tree_view input[name="picker[]"]')->each(
-                function ($objElement) {
-                    $category = $objElement->getAttribute('value');
-
-                    if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
-                        $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
-                    }
-                }
-            );
-
-            $objNode->filter('.tree_view input[name="primaryCategory"]')->each(
-                function ($objElement) {
-                    $category = $objElement->getAttribute('data-id');
-
-                    if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
-                        $objElement->removeAttribute('checked');
-
-                        $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
-                    }
-                }
-            );
-        }
-
-        return $objNode->saveHTML();
-    }
-
     /**
      * Automatically add overridable fields to the dca (including palettes, ...).
      */
@@ -279,6 +201,7 @@ class Category extends Backend
                     'label' => &$GLOBALS['TL_LANG']['tl_category'][$overrideFieldName],
                     'exclude' => true,
                     'inputType' => 'checkbox',
+                    'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCachedPropertyValuesByCategoryAndPropertyBool']],
                     'eval' => ['tl_class' => 'w50', 'submitOnChange' => true],
                     'sql' => "char(1) NOT NULL default ''",
                 ];

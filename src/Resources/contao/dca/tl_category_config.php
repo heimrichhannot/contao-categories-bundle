@@ -81,16 +81,19 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
             'eval'    => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql'     => "int(10) unsigned NOT NULL default '0'"
         ],
-        'context'    => [
+        'context'   => [
             'label'            => &$GLOBALS['TL_LANG']['tl_category_config']['context'],
             'exclude'          => true,
             'filter'           => true,
             'inputType'        => 'select',
             'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getContextsAsOptions'],
+            'save_callback'    => [['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'deleteCachedPropertyValuesByCategoryAndContext']],
             'eval'             => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
             'sql'              => "varchar(255) NOT NULL default ''"
         ]
     ]
 ];
 
-\HeimrichHannot\Haste\Dca\General::addOverridableFields(['jumpTo'], 'tl_category', 'tl_category_config');
+\HeimrichHannot\Haste\Dca\General::addOverridableFields(['jumpTo'], 'tl_category', 'tl_category_config', [
+    'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCachedPropertyValuesByCategoryAndPropertyBool']],
+]);

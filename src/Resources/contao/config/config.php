@@ -23,8 +23,8 @@ $GLOBALS['BE_FFL']['categoryTree'] = 'HeimrichHannot\CategoriesBundle\Widget\Cat
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree'] = ['HeimrichHannot\CategoriesBundle\Backend\Category', 'reloadCategoryTree'];
-$GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = ['HeimrichHannot\CategoriesBundle\Backend\Category', 'adjustCategoryTree'];
+$GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree']   = ['huh.categories.listener.hooks', 'reloadCategoryTree'];
+$GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = ['huh.categories.listener.hooks', 'adjustCategoryTree'];
 
 /**
  * Assets
@@ -36,10 +36,11 @@ if (\HeimrichHannot\Haste\Util\Container::isBackend()) {
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_category']             = 'HeimrichHannot\CategoriesBundle\Model\CategoryModel';
-$GLOBALS['TL_MODELS']['tl_category_config']      = 'HeimrichHannot\CategoriesBundle\Model\CategoryConfigModel';
-$GLOBALS['TL_MODELS']['tl_category_context']     = 'HeimrichHannot\CategoriesBundle\Model\CategoryContextModel';
-$GLOBALS['TL_MODELS']['tl_category_association'] = 'HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel';
+$GLOBALS['TL_MODELS']['tl_category']                = 'HeimrichHannot\CategoriesBundle\Model\CategoryModel';
+$GLOBALS['TL_MODELS']['tl_category_config']         = 'HeimrichHannot\CategoriesBundle\Model\CategoryConfigModel';
+$GLOBALS['TL_MODELS']['tl_category_context']        = 'HeimrichHannot\CategoriesBundle\Model\CategoryContextModel';
+$GLOBALS['TL_MODELS']['tl_category_association']    = 'HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel';
+$GLOBALS['TL_MODELS']['tl_category_property_cache'] = 'HeimrichHannot\CategoriesBundle\Model\CategoryPropertyCacheModel';
 
 /**
  * Permissions

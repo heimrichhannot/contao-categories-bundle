@@ -1,0 +1,5 @@
+services:
+    huh.categories.listener.hooks:
+        class: HeimrichHannot\CategoriesBundle\EventListener\HookListener
+        arguments:
+            - "@contao.framework"

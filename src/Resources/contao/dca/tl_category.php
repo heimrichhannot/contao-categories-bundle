@@ -40,7 +40,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
                 'href'  => 'ptg=all',
                 'class' => 'header_toggle'
             ],
-            'contexts'     => [
+            'contexts'    => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_category']['contexts'],
                 'href'       => 'table=tl_category_context',
                 'icon'       => 'iconPLAIN.svg',
@@ -54,10 +54,10 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             ],
         ],
         'operations'        => [
-            'primarize' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_category']['primarize'],
-                'href'  => 'act=primarize',
-                'icon'  => 'bundles/categories/img/icon_primarized.png',
+            'primarize'  => [
+                'label'           => &$GLOBALS['TL_LANG']['tl_category']['primarize'],
+                'href'            => 'act=primarize',
+                'icon'            => 'bundles/categories/img/icon_primarized.png',
                 'button_callback' => ['HeimrichHannot\CategoriesBundle\Backend\Category', 'getPrimarizeOperation']
             ],
             'edit'       => [
@@ -162,12 +162,13 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'sql'       => "varchar(128) NOT NULL default ''",
         ],
         'jumpTo'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_category']['jumpTo'],
-            'exclude'   => true,
-            'inputType' => 'pageTree',
-            'eval'      => ['fieldType' => 'radio', 'overridable' => true],
-            'sql'       => "int(10) unsigned NOT NULL default '0'",
-            'relation'  => ['type' => 'hasOne', 'load' => 'eager', 'table' => 'tl_page']
+            'label'         => &$GLOBALS['TL_LANG']['tl_category']['jumpTo'],
+            'exclude'       => true,
+            'inputType'     => 'pageTree',
+            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCachedPropertyValuesByCategoryAndProperty']],
+            'eval'          => ['fieldType' => 'radio', 'overridable' => true],
+            'sql'           => "int(10) unsigned NOT NULL default '0'",
+            'relation'      => ['type' => 'hasOne', 'load' => 'eager', 'table' => 'tl_page']
         ]
     ]
 ];

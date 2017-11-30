@@ -30,20 +30,6 @@ class CategoryTree extends \Widget
     protected $strTemplate = 'be_widget';
 
     /**
-     * Order ID.
-     *
-     * @var string
-     */
-    protected $strOrderId;
-
-    /**
-     * Order name.
-     *
-     * @var string
-     */
-    protected $strOrderName;
-
-    /**
      * Load the database object.
      *
      * @param array $arrAttributes
@@ -63,7 +49,6 @@ class CategoryTree extends \Widget
     {
         $arrSet = [];
         $arrValues = [];
-        $blnHasOrder = ('' !== $this->orderField && is_array($this->{$this->orderField}));
 
         $dca = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strName];
 
@@ -97,39 +82,16 @@ class CategoryTree extends \Widget
                     $arrValues[$objCategories->id] = \Image::getHtml('iconPLAIN.svg').' '.$objCategories->title;
                 }
             }
-
-            // Apply a custom sort order
-            if ($blnHasOrder) {
-                $arrNew = [];
-
-                foreach ((array) $this->{$this->orderField} as $i) {
-                    if (isset($arrValues[$i])) {
-                        $arrNew[$i] = $arrValues[$i];
-                        unset($arrValues[$i]);
-                    }
-                }
-
-                if (!empty($arrValues)) {
-                    foreach ($arrValues as $k => $v) {
-                        $arrNew[$k] = $v;
-                    }
-                }
-
-                $arrValues = $arrNew;
-                unset($arrNew);
-            }
         }
 
-        $return = '<input type="hidden" name="'.$this->strName.'" id="ctrl_'.$this->strId.'" value="'.implode(',', $arrSet).'">'.($blnHasOrder ? '
-  <input type="hidden" name="'.$this->strOrderName.'" id="ctrl_'.$this->strOrderId.'" value="'.$this->{$this->orderField}.'">' : '').'
-  <div class="selector_container">'.(($blnHasOrder && count($arrValues) > 1) ? '
-    <p class="sort_hint">'.$GLOBALS['TL_LANG']['MSC']['dragItemsHint'].'</p>' : '').'
-    <ul id="sort_'.$this->strId.'" class="'.($blnHasOrder ? 'sortable' : '').'">';
+        $return = '<input type="hidden" name="'.$this->strName.'" id="ctrl_'.$this->strId.'" value="'.implode(',', $arrSet).'">
+  <div class="selector_container">
+    <ul id="sort_'.$this->strId.'">';
 
         foreach ($arrValues as $k => $v) {
             $primaryCategoryIndicator = '';
 
-            $return .= '<li'.($k === $primaryCategory ? ' class="tl_green"' : '').' data-id="'.$k.'">'.$v.$primaryCategoryIndicator.'</li>';
+            $return .= '<li'.($k === $primaryCategory && $usePrimaryCategory ? ' class="tl_green"' : '').' data-id="'.$k.'">'.$v.$primaryCategoryIndicator.'</li>';
         }
 
         $return .= '</ul>';
@@ -173,8 +135,7 @@ class CategoryTree extends \Widget
 		  }
 		});
 	  });
-	</script>'.($blnHasOrder ? '
-	<script>Backend.makeMultiSrcSortable("sort_'.$this->strId.'", "ctrl_'.$this->strOrderId.'", "ctrl_'.$this->strId.'")</script>' : '');
+	</script>';
         }
 
         $return = '<div>'.$return.'</div></div>';
@@ -195,23 +156,6 @@ class CategoryTree extends \Widget
 
         if ($this->hasErrors()) {
             return '';
-        }
-
-        // Store the order value
-        if ('' !== $this->orderField) {
-            $arrNew = [];
-
-            if ($order = \Input::post($this->strOrderName)) {
-                $arrNew = explode(',', $order);
-            }
-
-            // Only proceed if the value has changed
-            if ($arrNew !== $this->{$this->orderField}) {
-                $this->Database->prepare("UPDATE {$this->strTable} SET tstamp=?, {$this->orderField}=? WHERE id=?")
-                    ->execute(time(), serialize($arrNew), $this->activeRecord->id);
-
-                $this->objDca->createNewVersion = true; // see #6285
-            }
         }
 
         // Return the value as usual

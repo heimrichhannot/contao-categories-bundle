@@ -9,6 +9,8 @@
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\Model;
+use Contao\Model\Collection;
 use Contao\StringUtil;
 use HeimrichHannot\CategoriesBundle\Backend\CategoryContext;
 use HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel;
@@ -39,7 +41,7 @@ class CategoryManager
      *
      * @return \Contao\Model\Collection|null
      */
-    public function findByEntityAndField($entityId, $field, array $options = [])
+    public function findByEntityAndField(int $entityId, string $field, array $options = [])
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
@@ -63,7 +65,7 @@ class CategoryManager
      *
      * @return null|CategoryModel
      */
-    public function findOneByEntityAndField($entityId, $field, array $options = [])
+    public function findOneByEntityAndField(int $entityId, string $field, array $options = []): ?CategoryModel
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
@@ -96,34 +98,28 @@ class CategoryManager
      * @param object $contextObj        The context object containing the field-context-mapping for deciding which category config is taken into account
      * @param string $categoryField     The field containing the category (categories)
      * @param int    $primaryCategoryId The id of the primary category
+     * @param bool   $skipCache         Skip caching
      *
      * @return mixed|null
      */
-    public function getOverridableProperty($property, $contextObj, $categoryField, $primaryCategoryId)
+    public function getOverridableProperty(string $property, $contextObj, string $categoryField, int $primaryCategoryId, bool $skipCache = false)
     {
         $categoryConfigManager = \System::getContainer()->get('huh.categories.config_manager');
         $relevantEntities = [];
 
         // compute context
-        $context = null;
+        $context = $this->computeContext($contextObj, $categoryField);
+        $cacheManager = \System::getContainer()->get('huh.categories.property_cache_manager');
 
-        $categoryFieldContextMapping = StringUtil::deserialize(
-            $contextObj->{CategoryContext::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD}, true);
-
-        if (!empty($categoryFieldContextMapping)) {
-            foreach ($categoryFieldContextMapping as $mapping) {
-                if (isset($mapping['field']) && $mapping['field'] === $categoryField) {
-                    $context = $mapping['context'];
-                    break;
-                }
-            }
+        if (!$skipCache && null !== $context && $cacheManager->has($property, $categoryField, $primaryCategoryId, $context)) {
+            return $cacheManager->get($property, $categoryField, $primaryCategoryId, $context);
         }
 
         // parent categories
         $parentCategories = $this->getParentCategories($primaryCategoryId);
 
-        if (!empty($parentCategories)) {
-            foreach (array_reverse($parentCategories) as $parentCategory) {
+        if (null !== $parentCategories) {
+            foreach (array_reverse($parentCategories->getModels()) as $parentCategory) {
                 $relevantEntities[] = $parentCategory;
 
                 if (null !== $context) {
@@ -144,7 +140,37 @@ class CategoryManager
             }
         }
 
-        return General::getOverridableProperty($property, $relevantEntities);
+        $value = General::getOverridableProperty($property, $relevantEntities);
+
+        if (!$skipCache && null !== $context) {
+            $cacheManager->add($property, $categoryField, $primaryCategoryId, $context, $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Computes the context string for a given field based on a context object.
+     *
+     * @param $contextObj
+     * @param string $categoryField
+     *
+     * @return null|string
+     */
+    public function computeContext($contextObj, string $categoryField): ?string
+    {
+        $categoryFieldContextMapping = StringUtil::deserialize(
+            $contextObj->{CategoryContext::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD}, true);
+
+        if (!empty($categoryFieldContextMapping)) {
+            foreach ($categoryFieldContextMapping as $mapping) {
+                if (isset($mapping['field']) && $mapping['field'] === $categoryField) {
+                    return $mapping['context'];
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -165,43 +191,66 @@ class CategoryManager
     }
 
     /**
+     * Adapter function for the model's findBy method.
+     *
+     * @param mixed $column
+     * @param mixed $value
+     * @param array $options
+     *
+     * @return CategoryModel|null
+     */
+    public function findOneBy($column, $value, array $options = [])
+    {
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        return $adapter->findOneBy($column, $value, $options);
+    }
+
+    /**
      * Returns the parent categories of the category with the id $categoryId.
      * The order is from closest parent to root parent category.
      *
-     * @param int $categoryId
+     * @param int  $categoryId
+     * @param bool $insertCurrent
      *
-     * @return array
+     * @return Collection
      */
-    public function getParentCategories($categoryId, $insertCurrent = false)
+    public function getParentCategories(int $categoryId, bool $insertCurrent = false): ?Collection
     {
         $categories = [];
 
         if (null === ($category = $this->findBy('id', $categoryId))) {
-            return [];
+            return null;
         }
 
         if (!$category->pid) {
-            return [$category];
+            return new \Contao\Model\Collection([$category], 'tl_category');
         }
 
         if ($insertCurrent) {
             $categories[] = $category;
         }
 
-        $categories = array_merge($categories, $this->getParentCategories($category->pid, true));
+        $parentCategories = $this->getParentCategories($category->pid, true);
 
-        return $categories;
+        if (null !== $parentCategories) {
+            $categories = array_merge($categories, $parentCategories->getModels());
+        }
+
+        return new \Contao\Model\Collection($categories, 'tl_category');
     }
 
     /**
      * Returns the parent categories' ids of the category with the id $categoryId.
      * The order is from closest parent to root parent category.
      *
-     * @param int $categoryId
+     * @param int  $categoryId
+     * @param bool $insertCurrent
      *
      * @return array
      */
-    public function getParentCategoryIds($categoryId)
+    public function getParentCategoryIds(int $categoryId, bool $insertCurrent = false): array
     {
         $categories = [];
 
@@ -213,7 +262,11 @@ class CategoryManager
             return [$categoryId];
         }
 
-        $categories = array_merge($categories, $this->getParentCategories($category->pid));
+        if ($insertCurrent) {
+            $categories[] = $categoryId;
+        }
+
+        $categories = array_merge($categories, $this->getParentCategoryIds($category->pid, true));
 
         return $categories;
     }
@@ -225,7 +278,7 @@ class CategoryManager
      * @param string $field
      * @param array  $categories
      */
-    public function createAssociations($entityId, $field, array $categories)
+    public function createAssociations(int $entityId, string $field, array $categories): void
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
@@ -254,7 +307,7 @@ class CategoryManager
      *
      * @return bool
      */
-    public function hasChildren($categoryId)
+    public function hasChildren(int $categoryId): bool
     {
         /** @var CategoryModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryModel::class);
