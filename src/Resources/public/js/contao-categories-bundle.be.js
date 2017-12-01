@@ -1,6 +1,6 @@
 if (window.MooTools) {
     window.addEvent('domready', function() {
-        var $form = $$('form[action*="has-primary-category=1"]');
+        var $form = $$('form[action*="usePrimaryCategory=1"]');
 
         if ($form.length < 1)
         {

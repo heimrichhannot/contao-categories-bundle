@@ -107,7 +107,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
             'category_field' => \Input::get('category_field'),
             'category_table' => \Input::get('category_table'),
             'primaryCategory' => \Input::get('primaryCategory'),
-            'has-primary-category' => 1,
+            'usePrimaryCategory' => \Input::get('usePrimaryCategory'),
         ];
     }
 }

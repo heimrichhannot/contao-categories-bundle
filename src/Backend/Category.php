@@ -266,6 +266,8 @@ class Category extends Backend
                 \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, StringUtil::deserialize($value, true));
                 break;
         }
+
+        return $value;
     }
 
     /**
@@ -276,6 +278,10 @@ class Category extends Backend
      */
     public function loadCategoriesFromAssociations($value, DataContainer $dc)
     {
+        if (!$dc->id || !$dc->field) {
+            return $value;
+        }
+
         $categories = \System::getContainer()->get('huh.categories.manager')->findByEntityAndField($dc->id, $dc->field);
 
         if (null === $categories) {
@@ -349,11 +355,11 @@ class Category extends Backend
         $imagePasteInto = Image::getHtml('pasteinto.gif', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? Image::getHtml('pasteafter_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp=rt='.\RequestToken::get().'&amp;pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1],
+            $return = $disablePA ? Image::getHtml('pasteafter_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=1&rt='.\RequestToken::get().'&pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1],
                     $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return.($disablePI ? Image::getHtml('pasteinto_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=2&amp;rt='.\RequestToken::get().'&amp;pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1],
+        return $return.($disablePI ? Image::getHtml('pasteinto_.gif').' ' : '<a href="'.\Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=2&rt='.\RequestToken::get().'&pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1],
                     $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
