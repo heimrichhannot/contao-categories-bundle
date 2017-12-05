@@ -89,7 +89,7 @@ class CategoryTree extends \Widget
     <ul id="sort_'.$this->strId.'">';
 
         foreach ($arrValues as $k => $v) {
-            $return .= '<li'.($k === $primaryCategory && $usePrimaryCategory ? ' class="tl_green"' : '').' data-id="'.$k.'">'.$v.'</li>';
+            $return .= '<li'.($k == (int) $primaryCategory && $usePrimaryCategory ? ' class="tl_green"' : '').' data-id="'.$k.'">'.$v.'</li>';
         }
 
         $return .= '</ul>';

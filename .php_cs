@@ -19,7 +19,7 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'psr0' => false,
-        'strict_comparison' => true,
+        'strict_comparison' => false,
         'strict_param' => true,
         'array_syntax' => ['syntax' => 'short'],
         'heredoc_to_nowdoc' => true,
