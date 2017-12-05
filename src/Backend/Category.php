@@ -115,7 +115,7 @@ class Category extends Backend
         if (null !== ($instance = General::getModelInstance($dc->table, $dc->id))) {
             $valueOld = $instance->{$dc->field};
 
-            if ($value !== $valueOld) {
+            if ($value != $valueOld) {
                 \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
                     [
                         'category=?',

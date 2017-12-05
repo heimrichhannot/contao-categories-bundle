@@ -32,7 +32,7 @@ class CategoryConfig extends Backend
         if (null !== ($config = \System::getContainer()->get('huh.categories.config_manager')->findOneBy('id', $dc->id))) {
             $valueOld = $config->context;
 
-            if ($value !== $valueOld) {
+            if ($value != $valueOld) {
                 \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
                     [
                         'category=?',

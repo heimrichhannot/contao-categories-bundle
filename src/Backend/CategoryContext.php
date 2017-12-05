@@ -58,7 +58,7 @@ class CategoryContext extends Backend
         if (null !== ($categoryContext = \System::getContainer()->get('huh.categories.context_manager')->findOneBy('id', $dc->id))) {
             $valueOld = $categoryContext->{$dc->field};
 
-            if ($value !== $valueOld) {
+            if ($value != $valueOld) {
                 $fields = [];
                 $contexts = [];
 

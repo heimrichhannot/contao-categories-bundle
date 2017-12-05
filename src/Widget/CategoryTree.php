@@ -157,7 +157,7 @@ class CategoryTree extends \Widget
         }
 
         // Return the value as usual
-        if ('' === $varInput) {
+        if ('' === (string) $varInput) {
             if ($this->mandatory) {
                 $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mandatory'], $this->strLabel));
             }
@@ -178,7 +178,7 @@ class CategoryTree extends \Widget
      */
     protected function checkValue($varInput)
     {
-        if ('' === $varInput || !is_array($this->rootNodes)) {
+        if ('' === (string) $varInput || !is_array($this->rootNodes)) {
             return;
         }
 
