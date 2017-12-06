@@ -8,7 +8,7 @@ $lang = &$GLOBALS['TL_LANG']['tl_category_context'];
 $lang['tstamp']                                                                                       = ['Änderungsdatum', ''];
 $lang['title']                                                                                        = ['Titel', 'Geben Sie hier bitte den Titel ein.'];
 $lang[\HeimrichHannot\CategoriesBundle\Backend\CategoryContext::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD] = ['Kategorie-Kontexte', 'Weisen Sie hier Feldern Kategorie-Kontexte zu.'];
-$lang['field']                                                                                        = ['Feld', ''];
+$lang['categoryField']                                                                                = ['Kategorie(n)-Feld', ''];
 $lang['context']                                                                                      = ['Kontext', ''];
 
 /**

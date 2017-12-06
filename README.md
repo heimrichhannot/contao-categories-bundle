@@ -42,6 +42,7 @@ tl_category | Contains the *category* instances
 tl_category_association | Association table between tl_category and your DCA's table
 tl_category_context | Defines context keys (simple strings) usable in *category configs*
 tl_category_config | Contains *category configs*. Here you can override properties defined per default in a category linked with a certain *category context*
+tl_category_property_cache | Contains the resolved overridable property values
 
 ## Concepts
 

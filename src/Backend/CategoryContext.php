@@ -34,8 +34,8 @@ class CategoryContext extends Backend
                 'multiColumnEditor' => [
                     'minRowCount' => 0,
                     'fields' => [
-                        'field' => [
-                            'label' => &$GLOBALS['TL_LANG']['tl_category_context']['field'],
+                        'categoryField' => [
+                            'label' => &$GLOBALS['TL_LANG']['tl_category_context']['categoryField'],
                             'inputType' => 'select',
                             'options' => static::getCategoryFieldsAsOptions($categoryFieldTable),
                             'eval' => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true, 'groupStyle' => 'width: 200px'],
@@ -64,13 +64,13 @@ class CategoryContext extends Backend
 
                 // collect relevant combinations
                 foreach (StringUtil::deserialize($valueOld, true) as $mapping) {
-                    $fields[] = '"'.$mapping['field'].'"';
-                    $contexts[] = '"'.$mapping['context'].'"';
+                    $fields[] = '"'.$mapping['categoryField'].'"';
+                    $contexts[] = $mapping['context'];
                 }
 
                 foreach (StringUtil::deserialize($value, true) as $mapping) {
-                    $fields[] = '"'.$mapping['field'].'"';
-                    $contexts[] = '"'.$mapping['context'].'"';
+                    $fields[] = '"'.$mapping['categoryField'].'"';
+                    $contexts[] = $mapping['context'];
                 }
 
                 $fields = array_unique($fields);
@@ -78,7 +78,7 @@ class CategoryContext extends Backend
 
                 \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
                     [
-                        'field IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
+                        'categoryField IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
                     ], []
                 );
             }
@@ -97,13 +97,13 @@ class CategoryContext extends Backend
 
             // collect relevant combinations
             foreach (StringUtil::deserialize($valueOld, true) as $mapping) {
-                $fields[] = '"'.$mapping['field'].'"';
-                $contexts[] = '"'.$mapping['context'].'"';
+                $fields[] = '"'.$mapping['categoryField'].'"';
+                $contexts[] = $mapping['context'];
             }
 
             foreach (StringUtil::deserialize($value, true) as $mapping) {
-                $fields[] = '"'.$mapping['field'].'"';
-                $contexts[] = '"'.$mapping['context'].'"';
+                $fields[] = '"'.$mapping['categoryField'].'"';
+                $contexts[] = $mapping['context'];
             }
 
             $fields = array_unique($fields);
@@ -111,7 +111,7 @@ class CategoryContext extends Backend
 
             \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
                 [
-                    'field IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
+                    'categoryField IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
                 ], []
             );
         }

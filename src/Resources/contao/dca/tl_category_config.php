@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
             'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getContextsAsOptions'],
             'save_callback'    => [['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'deleteCachedPropertyValuesByCategoryAndContext']],
             'eval'             => ['tl_class' => 'w50', 'mandatory' => true, 'includeBlankOption' => true],
-            'sql'              => "varchar(255) NOT NULL default ''"
+            'sql'              => "int(10) unsigned NOT NULL default '0'"
         ]
     ]
 ];

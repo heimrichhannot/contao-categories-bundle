@@ -18,8 +18,7 @@ $GLOBALS['TL_DCA']['tl_category_property_cache'] = [
         'category' => [
             'sql' => "int(10) unsigned NOT NULL default '0'"
         ],
-        // the category/categories field
-        'field'    => [
+        'categoryField'    => [
             'sql' => "varchar(64) NOT NULL default ''"
         ],
         // e.g. jumpTo
@@ -27,7 +26,7 @@ $GLOBALS['TL_DCA']['tl_category_property_cache'] = [
             'sql' => "varchar(64) NOT NULL default ''"
         ],
         'context'  => [
-            'sql' => "varchar(128) NOT NULL default ''"
+            'sql' => "int(10) unsigned NOT NULL default '0'"
         ],
         'value'    => [
             'sql' => "blob NULL"

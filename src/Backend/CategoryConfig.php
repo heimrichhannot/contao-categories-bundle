@@ -19,12 +19,12 @@ class CategoryConfig extends Backend
         $options = [];
 
         if (null !== ($contexts = CategoryContextModel::findAll())) {
-            $options = $contexts->fetchEach('title');
+            $options = array_combine($contexts->fetchEach('id'), $contexts->fetchEach('title'));
         }
 
         asort($options);
 
-        return array_combine($options, $options);
+        return $options;
     }
 
     public static function deleteCachedPropertyValuesByCategoryAndContext($value, DataContainer $dc)

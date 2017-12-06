@@ -9,19 +9,19 @@ $GLOBALS['TL_DCA']['tl_category_association'] = [
         ]
     ],
     'fields' => [
-        'id'       => [
+        'id'            => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ],
-        'tstamp'   => [
+        'tstamp'        => [
             'sql' => "int(10) unsigned NOT NULL default '0'"
         ],
-        'category' => [
+        'category'      => [
             'sql' => "int(10) unsigned NOT NULL default '0'"
         ],
-        'entity'   => [
+        'entity'        => [
             'sql' => "int(10) unsigned NOT NULL default '0'"
         ],
-        'field'    => [
+        'categoryField' => [
             'sql' => "varchar(255) NOT NULL default ''"
         ],
     ]

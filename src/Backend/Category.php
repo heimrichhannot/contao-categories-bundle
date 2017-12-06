@@ -282,7 +282,7 @@ class Category extends Backend
             return $value;
         }
 
-        $categories = \System::getContainer()->get('huh.categories.manager')->findByEntityAndField($dc->id, $dc->field);
+        $categories = \System::getContainer()->get('huh.categories.manager')->findByEntityAndCategoryField($dc->id, $dc->field);
 
         if (null === $categories) {
             return null;

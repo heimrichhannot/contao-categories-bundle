@@ -46,17 +46,17 @@ class CategoryConfigManager
     }
 
     /**
-     * @param int    $categoryId
-     * @param string $context
+     * @param int $category
+     * @param int $context
      *
      * @return CategoryConfigModel
      */
-    public function findByCategoryAndContext(int $categoryId, string $context): ?CategoryConfigModel
+    public function findByCategoryAndContext(int $category, int $context): ?CategoryConfigModel
     {
         /** @var CategoryConfigModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryConfigModel::class);
 
-        return $categoryConfig = $adapter->findOneBy(['tl_category_config.pid=?', 'tl_category_config.context=?'], [$categoryId, $context]);
+        return $categoryConfig = $adapter->findOneBy(['tl_category_config.pid=?', 'tl_category_config.context=?'], [$category, $context]);
     }
 
     /**

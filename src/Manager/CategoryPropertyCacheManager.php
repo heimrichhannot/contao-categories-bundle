@@ -48,15 +48,15 @@ class CategoryPropertyCacheManager
     /**
      * @param string $property
      * @param string $categoryField
-     * @param int    $categoryId
-     * @param string $context
+     * @param int    $category
+     * @param int    $context
      * @param mixed  $value
      *
      * @return CategoryPropertyCacheModel|null
      */
-    public function add(string $property, string $categoryField, int $categoryId, string $context, $value): ?CategoryPropertyCacheModel
+    public function add(string $property, string $categoryField, int $category, int $context, $value): ?CategoryPropertyCacheModel
     {
-        if (null !== ($item = $this->get($property, $categoryField, $categoryId, $context))
+        if (null !== ($item = $this->get($property, $categoryField, $category, $context))
         ) {
             $item->value = $value;
             $item->save();
@@ -64,8 +64,8 @@ class CategoryPropertyCacheManager
             $item = $this->framework->createInstance(CategoryPropertyCacheModel::class);
             $item->tstamp = time();
             $item->property = $property;
-            $item->field = $categoryField;
-            $item->category = $categoryId;
+            $item->categoryField = $categoryField;
+            $item->category = $category;
             $item->context = $context;
             $item->value = $value;
             $item->save();
@@ -77,19 +77,19 @@ class CategoryPropertyCacheManager
     /**
      * @param string $property
      * @param string $categoryField
-     * @param int    $categoryId
-     * @param string $context
+     * @param int    $category
+     * @param int    $context
      *
      * @return \Contao\Model\Collection|CategoryPropertyCacheModel|null
      */
-    public function get(string $property, string $categoryField, int $categoryId, string $context)
+    public function get(string $property, string $categoryField, int $category, int $context)
     {
-        if (!$categoryField || !$categoryId || !$context) {
+        if (!$categoryField || !$category || !$context) {
             return null;
         }
 
-        if (null !== ($item = $this->findBy(['property=?', 'field=?', 'category=?', 'context=?'],
-                [$property, $categoryField, $categoryId, $context]))
+        if (null !== ($item = $this->findBy(['property=?', 'categoryField=?', 'category=?', 'context=?'],
+                [$property, $categoryField, $category, $context]))
         ) {
             return $item->value;
         }
@@ -100,19 +100,19 @@ class CategoryPropertyCacheManager
     /**
      * @param string $property
      * @param string $categoryField
-     * @param int    $categoryId
-     * @param string $context
+     * @param int    $category
+     * @param int    $context
      *
      * @return bool
      */
-    public function has(string $property, string $categoryField, int $categoryId, string $context): bool
+    public function has(string $property, string $categoryField, int $category, int $context): bool
     {
-        if (!$property || !$categoryField || !$categoryId || !$context) {
+        if (!$property || !$categoryField || !$category || !$context) {
             return false;
         }
 
-        return null !== $this->findBy(['property=?', 'field=?', 'category=?', 'context=?'],
-                [$property, $categoryField, $categoryId, $context]);
+        return null !== $this->findBy(['property=?', 'categoryField=?', 'category=?', 'context=?'],
+                [$property, $categoryField, $category, $context]);
     }
 
     /**
