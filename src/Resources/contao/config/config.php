@@ -4,15 +4,23 @@
  * Backend modules
  */
 $GLOBALS['BE_MOD']['content']['categories'] = [
-    'tables' => ['tl_category', 'tl_category_config', 'tl_category_context']
+    'tables' => ['tl_category', 'tl_category_config', 'tl_category_context'],
 ];
+
+/**
+ * Front end modules
+ */
+array_insert($GLOBALS['FE_MOD'], 2, [
+    'categoriesBundle' => [
+        'categoriesMenu' => 'HeimrichHannot\CategoriesBundle\Module\ModuleCategoriesMenu',
+    ],
+]);
 
 /**
  * JavaScript
  */
 if (\HeimrichHannot\Haste\Util\Container::isBackend()) {
-    $GLOBALS['TL_JAVASCRIPT']['contao-categories-bundle'] =
-        'bundles/categories/js/contao-categories-bundle.be.min.js|static';
+    $GLOBALS['TL_JAVASCRIPT']['contao-categories-bundle'] = 'bundles/categories/js/contao-categories-bundle.be.min.js|static';
 }
 
 /**

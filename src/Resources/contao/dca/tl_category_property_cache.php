@@ -4,32 +4,35 @@ $GLOBALS['TL_DCA']['tl_category_property_cache'] = [
     'config' => [
         'sql' => [
             'keys' => [
-                'id' => 'primary'
-            ]
-        ]
+                'id' => 'primary',
+            ],
+        ],
     ],
     'fields' => [
-        'id'       => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+        'id'            => [
+            'sql' => "int(10) unsigned NOT NULL auto_increment",
         ],
-        'tstamp'   => [
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+        'tstamp'        => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'category' => [
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+        'category'      => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'categoryField'    => [
-            'sql' => "varchar(64) NOT NULL default ''"
+        'parentTable'   => [
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'categoryField' => [
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
         // e.g. jumpTo
-        'property' => [
-            'sql' => "varchar(64) NOT NULL default ''"
+        'property'      => [
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
-        'context'  => [
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+        'context'       => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'value'    => [
-            'sql' => "blob NULL"
+        'value'         => [
+            'sql' => "blob NULL",
         ],
-    ]
+    ],
 ];

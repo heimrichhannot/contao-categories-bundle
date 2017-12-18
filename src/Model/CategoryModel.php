@@ -8,7 +8,7 @@
 
 namespace HeimrichHannot\CategoriesBundle\Model;
 
-class CategoryModel extends \Model
+class CategoryModel extends \Contao\Model
 {
     protected static $strTable = 'tl_category';
 }

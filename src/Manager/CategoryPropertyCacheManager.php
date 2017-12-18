@@ -56,18 +56,17 @@ class CategoryPropertyCacheManager
      */
     public function add(string $property, string $categoryField, int $category, int $context, $value): ?CategoryPropertyCacheModel
     {
-        if (null !== ($item = $this->get($property, $categoryField, $category, $context))
-        ) {
+        if (null !== ($item = $this->get($property, $categoryField, $category, $context))) {
             $item->value = $value;
             $item->save();
         } else {
-            $item = $this->framework->createInstance(CategoryPropertyCacheModel::class);
-            $item->tstamp = time();
-            $item->property = $property;
+            $item                = $this->framework->createInstance(CategoryPropertyCacheModel::class);
+            $item->tstamp        = time();
+            $item->property      = $property;
             $item->categoryField = $categoryField;
-            $item->category = $category;
-            $item->context = $context;
-            $item->value = $value;
+            $item->category      = $category;
+            $item->context       = $context;
+            $item->value         = $value;
             $item->save();
         }
 
@@ -88,9 +87,7 @@ class CategoryPropertyCacheManager
             return null;
         }
 
-        if (null !== ($item = $this->findBy(['property=?', 'categoryField=?', 'category=?', 'context=?'],
-                [$property, $categoryField, $category, $context]))
-        ) {
+        if (null !== ($item = $this->findBy(['property=?', 'categoryField=?', 'category=?', 'context=?'], [$property, $categoryField, $category, $context]))) {
             return $item->value;
         }
 
@@ -111,8 +108,7 @@ class CategoryPropertyCacheManager
             return false;
         }
 
-        return null !== $this->findBy(['property=?', 'categoryField=?', 'category=?', 'context=?'],
-                [$property, $categoryField, $category, $context]);
+        return null !== $this->findBy(['property=?', 'categoryField=?', 'category=?', 'context=?'], [$property, $categoryField, $category, $context]);
     }
 
     /**

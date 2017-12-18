@@ -32,27 +32,23 @@ class HookListener
         if ($dcaEval['parentsUnselectable']) {
             $objNode = new HtmlPageCrawler($buffer);
 
-            $objNode->filter('.tree_view input[name="picker[]"]')->each(
-                function ($objElement) {
-                    $category = $objElement->getAttribute('value');
+            $objNode->filter('.tree_view input[name="picker[]"]')->each(function ($objElement) {
+                $category = $objElement->getAttribute('value');
 
-                    if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
-                        $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
-                    }
+                if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
+                    $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
                 }
-            );
+            });
 
-            $objNode->filter('.tree_view input[name="primaryCategory"]')->each(
-                function ($objElement) {
-                    $category = $objElement->getAttribute('data-id');
+            $objNode->filter('.tree_view input[name="primaryCategory"]')->each(function ($objElement) {
+                $category = $objElement->getAttribute('data-id');
 
-                    if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
-                        $objElement->removeAttribute('checked');
+                if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
+                    $objElement->removeAttribute('checked');
 
-                        $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
-                    }
+                    $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
                 }
-            );
+            });
 
             return $objNode->saveHTML();
         }
@@ -64,12 +60,12 @@ class HookListener
     {
         switch ($action) {
             case 'reloadCategoryTree':
-                $id = \Input::get('id');
+                $id    = \Input::get('id');
                 $field = $dc->inputName = \Input::post('name');
 
                 // Handle the keys in "edit multiple" mode
                 if ('editAll' === \Input::get('act')) {
-                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
+                    $id    = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
                     $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
                 }
 
@@ -77,11 +73,11 @@ class HookListener
 
                 // The field does not exist
                 if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
-                    Container::log('Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', __METHOD__, TL_ERROR);
+                    Container::log('Field "' . $field . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
                     throw new BadRequestHttpException('Bad request');
                 }
 
-                $row = null;
+                $row   = null;
                 $value = null;
 
                 // Load the value
@@ -89,16 +85,15 @@ class HookListener
                     if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] === 'File') {
                         $value = \Config::get($field);
                     } elseif ($id > 0 && Database::getInstance()->tableExists($dc->table)) {
-                        $row = Database::getInstance()->prepare('SELECT * FROM '.$dc->table.' WHERE id=?')
-                            ->execute($id);
+                        $row = Database::getInstance()->prepare('SELECT * FROM ' . $dc->table . ' WHERE id=?')->execute($id);
 
                         // The record does not exist
                         if ($row->numRows < 1) {
-                            Container::log('A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', __METHOD__, TL_ERROR);
+                            Container::log('A record with the ID "' . $id . '" does not exist in table "' . $dc->table . '"', __METHOD__, TL_ERROR);
                             throw new BadRequestHttpException('Bad request');
                         }
 
-                        $value = $row->$field;
+                        $value            = $row->$field;
                         $dc->activeRecord = $row;
                     }
                 }
@@ -108,7 +103,7 @@ class HookListener
                     foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] as $callback) {
                         if (is_array($callback)) {
                             $callbackObj = System::importStatic($callback[0]);
-                            $value = $callbackObj->{$callback[1]}($value, $dc);
+                            $value       = $callbackObj->{$callback[1]}($value, $dc);
                         } elseif (is_callable($callback)) {
                             $value = $callback($value, $dc);
                         }
@@ -117,7 +112,7 @@ class HookListener
 
                 // Set the new value
                 $value = \Input::post('value', true);
-                $key = 'categoryTree';
+                $key   = 'categoryTree';
 
                 // Convert the selected values
                 if ('' !== $value) {
@@ -148,16 +143,16 @@ class HookListener
         };
 
         $arrMapper = [
-            'contao/confirm.php' => $generate('contao_backend_confirm'),
-            'contao/file.php' => $generate('contao_backend_file'),
-            'contao/help.php' => $generate('contao_backend_help'),
-            'contao/index.php' => $generate('contao_backend_login'),
-            'contao/main.php' => $generate('contao_backend'),
-            'contao/page.php' => $generate('contao_backend_page'),
+            'contao/confirm.php'  => $generate('contao_backend_confirm'),
+            'contao/file.php'     => $generate('contao_backend_file'),
+            'contao/help.php'     => $generate('contao_backend_help'),
+            'contao/index.php'    => $generate('contao_backend_login'),
+            'contao/main.php'     => $generate('contao_backend'),
+            'contao/page.php'     => $generate('contao_backend_page'),
             'contao/password.php' => $generate('contao_backend_password'),
-            'contao/popup.php' => $generate('contao_backend_popup'),
-            'contao/preview.php' => $generate('contao_backend_preview'),
-            'contao/switch.php' => $generate('contao_backend_switch'),
+            'contao/popup.php'    => $generate('contao_backend_popup'),
+            'contao/preview.php'  => $generate('contao_backend_preview'),
+            'contao/switch.php'   => $generate('contao_backend_switch'),
         ];
 
         return str_replace(array_keys($arrMapper), array_values($arrMapper), $strContext);

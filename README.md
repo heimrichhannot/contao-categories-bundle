@@ -196,3 +196,29 @@ This automatically adds a boolean field for overriding the field in sub categori
 ## Caching
 
 The bundle comes with integrated caching for overridable properties. It's a simple database cache (see `tl_category_property_cache`) getting in place when calling `\System::getContainer()->get('huh.categories.manager')->getOverridableProperty()`.
+
+## Module
+
+Name | Description
+----- | -----------
+categoriesMenu | Creates a Menu from categories
+
+### Filter a list by categories
+
+Add the categories filter field to you dca:
+
+```
+$GLOBALS['TL_DCA']['tl_my_dca']['fields']['my_field'] = \HeimrichHannot\CategoriesBundle\Backend\Category::getCategoryFieldDca($eval, $label);
+```
+
+Add this code to your List to get the category and find all entities with the given category and table
+
+```
+$strParam = Category::getUrlParameterName();
+
+// Try to find by category
+if ($this->module->news_filterCategories && Request::getGet($strParam)) {
+	$arrEntityIds = \System::getContainer()->get('huh.categories.manager')->getEntityIdsByCategoryAndParentTable(Request::getGet($strParam), $your_table);
+	// do something e.g. NewsModel::findByMultipleIds($arrEntityIds)
+}
+```

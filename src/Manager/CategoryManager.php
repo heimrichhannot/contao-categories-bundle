@@ -41,12 +41,12 @@ class CategoryManager
      *
      * @return \Contao\Model\Collection|null
      */
-    public function findByEntityAndCategoryField(int $entity, string $categoryField, array $options = [])
+    public function findByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = [])
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
 
-        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.categoryField=?', 'tl_category_association.entity=?'], [$categoryField, $entity], $options))) {
+        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.categoryField=?', 'tl_category_association.entity=?', 'tl_category_association.parentTable=?'], [$categoryField, $entity, $table], $options))) {
             return null;
         }
 
@@ -65,12 +65,12 @@ class CategoryManager
      *
      * @return null|CategoryModel
      */
-    public function findOneByEntityAndCategoryField(int $entity, string $categoryField, array $options = []): ?CategoryModel
+    public function findOneByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = []): ?CategoryModel
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
 
-        if (null === ($categoryAssociations = $adapter->findOneBy(['tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$entity, $categoryField], $options))) {
+        if (null === ($categoryAssociations = $adapter->findOneBy(['tl_category_association.entity=?', 'tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$entity, $categoryField, $table], $options))) {
             return null;
         }
 
@@ -105,10 +105,10 @@ class CategoryManager
     public function getOverridableProperty(string $property, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
     {
         $categoryConfigManager = \System::getContainer()->get('huh.categories.config_manager');
-        $relevantEntities = [];
+        $relevantEntities      = [];
 
         // compute context
-        $context = $this->computeContext($contextObj, $categoryField);
+        $context      = $this->computeContext($contextObj, $categoryField);
         $cacheManager = \System::getContainer()->get('huh.categories.property_cache_manager');
 
         if (!$skipCache && null !== $context && $cacheManager->has($property, $categoryField, $primaryCategory, $context)) {
@@ -152,20 +152,19 @@ class CategoryManager
     /**
      * Computes the context string for a given field based on a context object.
      *
-     * @param $contextObj
+     * @param        $contextObj
      * @param string $categoryField
      *
      * @return null|int
      */
     public function computeContext($contextObj, string $categoryField): ?int
     {
-        $categoryFieldContextMapping = StringUtil::deserialize(
-            $contextObj->{CategoryContext::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD}, true);
+        $categoryFieldContextMapping = StringUtil::deserialize($contextObj->{CategoryContext::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD}, true);
 
         if (!empty($categoryFieldContextMapping)) {
             foreach ($categoryFieldContextMapping as $mapping) {
                 if (isset($mapping['categoryField']) && $mapping['categoryField'] === $categoryField) {
-                    return (int) $mapping['context'];
+                    return (int)$mapping['context'];
                 }
             }
         }
@@ -188,6 +187,37 @@ class CategoryManager
         $adapter = $this->framework->getAdapter(CategoryModel::class);
 
         return $adapter->findBy($column, $value, $options);
+    }
+
+    /**
+     * Adapter function for the model's findAll method.
+     *
+     * @param array $options
+     *
+     * @return \Contao\Model\Collection|CategoryModel|null
+     */
+    public function findAll(array $options = [])
+    {
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        return $adapter->findAll($options);
+    }
+
+    /**
+     * Adapter function for the model's findMultipleByIds method.
+     *
+     * @param array $ids
+     * @param array $options
+     *
+     * @return \Contao\Model\Collection|CategoryModel|null
+     */
+    public function findMultipleByIds(array $ids, array $options = [])
+    {
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        return $adapter->findMultipleByIds($ids, $options);
     }
 
     /**
@@ -278,23 +308,24 @@ class CategoryManager
      * @param string $categoryField
      * @param array  $categories
      */
-    public function createAssociations(int $entity, string $categoryField, array $categories): void
+    public function createAssociations(int $entity, string $categoryField, string $table, array $categories): void
     {
         /** @var CategoryAssociationModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
 
         // clean up beforehands
-        if (null !== ($categoryAssociations = $adapter->findBy(['tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$entity, $categoryField]))) {
+        if (null !== ($categoryAssociations = $adapter->findBy(['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
             while ($categoryAssociations->next()) {
                 $categoryAssociations->delete();
             }
         }
 
         foreach ($categories as $category) {
-            $association = $this->framework->createInstance(CategoryAssociationModel::class);
-            $association->tstamp = time();
-            $association->category = $category;
-            $association->entity = $entity;
+            $association                = $this->framework->createInstance(CategoryAssociationModel::class);
+            $association->tstamp        = time();
+            $association->category      = $category;
+            $association->entity        = $entity;
+            $association->parentTable   = $table;
             $association->categoryField = $categoryField;
             $association->save();
         }
@@ -313,5 +344,97 @@ class CategoryManager
         $adapter = $this->framework->getAdapter(CategoryModel::class);
 
         return null !== ($categoryAssociations = $adapter->findBy(['tl_category.pid=?'], [$category]));
+    }
+
+    /**
+     * @param string $parentTable
+     * @param int    $categoryId
+     *
+     * @return array
+     */
+    public function getAssociationsByParentTableAndCategory(int $categoryId, string $parentTable)
+    {
+        $result = [];
+
+        $categoriesAssociations = $this->findAssociationsByParentTableAndCategory($categoryId, $parentTable);
+
+        if (null === $categoriesAssociations) {
+            return $result;
+        }
+
+        foreach ($categoriesAssociations as $categoriesAssociation) {
+            $result[] = $categoriesAssociation->entity;
+        }
+
+        return $result;
+    }
+
+    public function findAssociationsByParentTableAndCategory(int $categoryId, string $parentTable)
+    {
+        /** @var CategoryAssociationModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
+
+        return $adapter->findBy(['category=?', 'parentTable=?'], [$categoryId, $parentTable]);
+    }
+
+    /**
+     * find category by id or alias
+     *
+     * @param int   $id
+     * @param array $arrOptions
+     *
+     * @return CategoryModel|null
+     */
+    public function findByIdOrAlias($param, array $arrOptions = [])
+    {
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        return $adapter->findByIdOrAlias($param, $arrOptions);
+    }
+
+    /**
+     * Find category and subcategory news categories by parent ID and IDs
+     *
+     * @param integer $intPid The parent ID
+     * @param array   $arrIds An array of categories
+     *
+     * @return \Model\Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
+     */
+    public function findCategoryAndSubcategoryByPidAndIds(int $pid, array $arrIds)
+    {
+        if (!is_array($arrIds) || empty($arrIds)) {
+            return null;
+        }
+
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        $objCategories = \Database::getInstance()->prepare("SELECT c1.*, (SELECT COUNT(*) FROM " . $adapter->getTable() . "  c2 WHERE c2.pid=c1.id AND c2.id IN (" . implode(',', array_map('intval', $arrIds)) . ")) AS subcategories FROM " . $adapter->getTable() . " c1 WHERE c1.pid=? AND c1.id IN (" . implode(',', array_map('intval', $arrIds)) . ")")->execute($pid);
+
+        if ($objCategories->numRows < 1) {
+            return null;
+        }
+
+        return \Model\Collection::createFromDbResult($objCategories, $adapter->getTable());
+    }
+
+    /**
+     * gets all entity ids by category and parent table
+     *
+     * @param string $category
+     * @param string $parenTable
+     *
+     * @return array|null
+     */
+    public function getEntityIdsByCategoryAndParentTable(string $category, string $parenTable)
+    {
+        $objCategory = $this->findByIdOrAlias($category);
+
+        if ($objCategory === null) {
+            return null;
+        }
+
+        return $this->getAssociationsByParentTableAndCategory($objCategory->id, $parenTable);
     }
 }
