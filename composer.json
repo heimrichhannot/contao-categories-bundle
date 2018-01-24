@@ -2,7 +2,7 @@
   "name": "heimrichhannot/contao-categories-bundle",
   "type": "contao-bundle",
   "description": "This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.",
-  "license": "LGPL-3.0+",
+  "license": "LGPL-3.0-or-later",
   "require": {
     "php": ">=7.0.0",
     "contao/core-bundle": "^4.4",

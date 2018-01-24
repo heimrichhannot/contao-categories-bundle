@@ -55,7 +55,7 @@ class ModuleCategoriesMenu extends \Contao\Module
             $objTemplate->title    = $this->headline;
             $objTemplate->id       = $this->id;
             $objTemplate->link     = $this->name;
-            $objTemplate->href     = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->href     = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
 
             return $objTemplate->parse();
         }
@@ -84,14 +84,14 @@ class ModuleCategoriesMenu extends \Contao\Module
         /** @var $objPage \Contao\PageModel */
         global $objPage;
         $strParam = Category::getUrlParameterName();
-        $strUrl   = $objPage->getFrontendUrl('/' . $strParam . '/%s');
+        $strUrl   = $objPage->getFrontendUrl('/'.$strParam.'/%s');
 
         // Get the jumpTo page
         if ($this->jumpTo > 0 && $objPage->id != $this->jumpTo) {
             $objJump = \Contao\PageModel::findByPk($this->jumpTo);
 
             if ($objJump !== null) {
-                $strUrl = $objPage->getFrontendUrl($objPage->row() . '/' . $strParam . '/%s');
+                $strUrl = $objPage->getFrontendUrl($objPage->row().'/'.$strParam.'/%s');
             }
         }
 
@@ -155,7 +155,7 @@ class ModuleCategoriesMenu extends \Contao\Module
         $objTemplate               = new \FrontendTemplate($this->navigationTpl);
         $objTemplate->type         = get_class($this);
         $objTemplate->cssID        = $this->cssID;
-        $objTemplate->level        = 'level_' . $intLevel;
+        $objTemplate->level        = 'level_'.$intLevel;
         $objTemplate->showQuantity = $this->cm_showQuantity;
 
         $count = 0;
@@ -169,11 +169,11 @@ class ModuleCategoriesMenu extends \Contao\Module
             $arrCategories[] = [
                 'isActive'  => empty($this->activeCategories) && $blnActive,
                 'subitems'  => '',
-                'class'     => 'reset first' . (($total == 1) ? ' last' : '') . ' even' . ($blnActive ? ' active' : ''),
+                'class'     => 'reset first'.(($total == 1) ? ' last' : '').' even'.($blnActive ? ' active' : ''),
                 'title'     => specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
                 'linkTitle' => specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
                 'link'      => $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][0],
-                'href'      => ampersand(str_replace('/' . $strParam . '/%s', '', $strUrl)),
+                'href'      => ampersand(str_replace('/'.$strParam.'/%s', '', $strUrl)),
             ];
 
             $count = 1;
@@ -192,10 +192,15 @@ class ModuleCategoriesMenu extends \Contao\Module
             }
 
             $blnActive = ($this->objActiveCategory !== null) && ($this->objActiveCategory->id == $category->id);
-            $strClass  =
-                ('cm_category_' . $category->id) . ($category->cssClass ? (' ' . $category->cssClass) : '') . ((++$count == 1) ? ' first' : '') . (($count == $total) ? ' last' : '') . ((($count % 2) == 0) ? ' odd' : ' even') . ($blnActive ? ' active' : '') . (($strSubcategories != '') ? ' submenu' : '') . (in_array($category->id, $this->arrCategoryTrail) ? ' trail' : '') . (in_array($category->id,
-                    $this->activeCategories) ? ' cm_trail' : '');
+            $strClass  = ('cm_category_'.$category->id).($category->cssClass ? (' '.$category->cssClass) : '').((++$count == 1) ? ' first' : '').(($count == $total) ? ' last' : '').((($count % 2) == 0) ? ' odd' : ' even').($blnActive ? ' active' : '').(($strSubcategories != '') ? ' submenu' : '').(in_array($category->id, $this->arrCategoryTrail) ? ' trail' : '').(in_array(
+                    $category->id,
+                    $this->activeCategories
+                ) ? ' cm_trail' : '');
             $strTitle  = $category->frontendTitle ?: $category->title;
+
+            if (\System::getContainer()->get('translator')->getCatalogue()->has($strTitle)) {
+                $strTitle = \System::getContainer()->get('translator')->trans($strTitle);
+            }
 
             $arrRow              = $category->row();
             $arrRow['isActive']  = $blnActive;

@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta3] - 2017-01-24
+
+### Added
+- translation support for `title` and `frontendTitle` with symfony translation service
+
+### Changed
+- licence LGPL-3.0+ is now LGPL-3.0-or-later
+
 ## [1.0.0-beta2] - 2017-12-18
 
 ### Added
