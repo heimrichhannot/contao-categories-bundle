@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta4] - 2017-02-05
+
+#### Fixed
+- alias genaration for new categories
+
 ## [1.0.0-beta3] - 2017-01-24
 
 ### Added
