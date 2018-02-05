@@ -117,7 +117,7 @@ Do this using one of the following calls:
 $GLOBALS['TL_DCA']['tl_my_dca']['fields']['category'] = \HeimrichHannot\CategoriesBundle\Backend\Category::getCategoryFieldDca(
     [
         'addPrimaryCategory' => false, // default false for single category widgets
-        'forcePrimaryCategory' => false // default false for single category widgets
+        'forcePrimaryCategory' => false, // default false for single category widgets
         'parentsUnselectable' => true // default false
     ]
 );

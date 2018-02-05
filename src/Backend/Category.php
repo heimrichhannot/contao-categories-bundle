@@ -307,7 +307,9 @@ class Category extends Backend
             return '';
         }
 
-        return General::generateAlias($varValue, $dc->id, 'tl_category', $category->title);
+        $title = $category->title ?: $dc->activeRecord->title;
+
+        return General::generateAlias($varValue, $dc->id, 'tl_category', $title);
     }
 
     public function checkPermission()
