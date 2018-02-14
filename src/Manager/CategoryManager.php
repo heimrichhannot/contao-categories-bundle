@@ -59,6 +59,29 @@ class CategoryManager
     }
 
     /**
+     * @param string $categoryField
+     * @param array  $options
+     *
+     * @return \Contao\Model\Collection|null
+     */
+    public function findByCategoryFieldAndTable(string $categoryField, string $table, array $options = [])
+    {
+        /** @var CategoryAssociationModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
+
+        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
+            return null;
+        }
+
+        /** @var CategoryModel $adapter */
+        $adapter = $this->framework->getAdapter(CategoryModel::class);
+
+        return $adapter->findMultipleByIds($categoryAssociations->fetchEach('category'), [
+            'order' => 'sorting ASC',
+        ]);
+    }
+
+    /**
      * @param int    $entity
      * @param string $categoryField
      * @param array  $options

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta5] - 2017-02-05
+
+#### Added
+- `CategoryManager::findByCategoryFieldAndTable` 
+
 ## [1.0.0-beta4] - 2017-02-05
 
 #### Fixed
