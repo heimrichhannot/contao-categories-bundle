@@ -20,6 +20,7 @@ class CategoryExtension extends AbstractExtension
     {
         return [
             new TwigFilter('category', [$this, 'getCategory']),
+            new TwigFilter('contextualCategory', [$this, 'getContextualCategory']),
             new TwigFilter('categories', [$this, 'getCategories']),
         ];
     }
@@ -31,11 +32,38 @@ class CategoryExtension extends AbstractExtension
      */
     public function getCategory($id)
     {
-        $category = System::getContainer()->get('huh.categories.manager')->findByIdOrAlias($id);
+        $manager = System::getContainer()->get('huh.categories.manager');
+
+        $category = $manager->findByIdOrAlias($id);
 
         if (null === $category) {
             return null;
         }
+
+        return $category->row();
+    }
+
+    /**
+     * Get the category for a given category id taking into account the contextual (overridable) properties -> see README.md for more detail.
+     *
+     * @param $id
+     * @param $contextObj
+     * @param string $categoryField
+     * @param int $primaryCategory
+     * @param bool $skipCache
+     * @return array|null
+     */
+    public function getContextualCategory($id, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
+    {
+        $manager = System::getContainer()->get('huh.categories.manager');
+
+        $category = $manager->findByIdOrAlias($id);
+
+        if (null === $category) {
+            return null;
+        }
+
+        $manager->addOverridablePropertiesToCategory($category, $contextObj, $categoryField, $primaryCategory, $skipCache);
 
         return $category->row();
     }

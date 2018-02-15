@@ -16,6 +16,7 @@ use HeimrichHannot\CategoriesBundle\Backend\CategoryContext;
 use HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\Haste\Dca\General;
+use HeimrichHannot\MailDrum\Controller;
 
 class CategoryManager
 {
@@ -193,6 +194,28 @@ class CategoryManager
         }
 
         return null;
+    }
+
+    /**
+     * Adds all overridable property to $category.
+     *
+     * @param CategoryModel $category
+     * @param $contextObj
+     * @param string $categoryField
+     * @param int $primaryCategory
+     * @param bool $skipCache
+     */
+    public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
+    {
+        Controller::loadDataContainer('tl_category');
+
+        foreach ($GLOBALS['TL_DCA']['tl_category']['fields'] as $field => $data)
+        {
+            if (isset($data['eval']['overridable']) && $data['eval']['overridable'])
+            {
+                $category->{$field} = $this->getOverridableProperty($field, $contextObj, $categoryField, $primaryCategory, $skipCache);
+            }
+        }
     }
 
     /**

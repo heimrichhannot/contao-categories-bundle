@@ -227,23 +227,36 @@ if ($this->module->news_filterCategories && Request::getGet($strParam)) {
 
 For usage inside a twig template we provide filters that will return the category/categories itself by given ids:
 
-### multiple categories filter
-
-```
-{% if raw.categories is defined %}
-    <div class="category {{ raw.type|default('') }}">
-        {% for category in raw.categories|categories %}
-            <span class="category-icon {{ category.alias }}" title="{{ category.title }}"></span>
-        {% endfor %}
-    </div>
-{% endif %}
-```
-
 ### single category filter
 
 ```
-{% if raw.category is defined %}
+{% if raw.category|default() %}
     {% set category = raw.category|category %}
-    <span class="category-icon {{ category.alias }}" title="{{ category.title }}"></span>
+    <span class="{{ category.alias }}">
+        {{ category.title }}
+    </span>
+{% endif %}
+```
+
+```
+{% if raw.category|default() %}
+    {% set category = raw.category|contextualCategory(<context object>, <category field name>, <primary category id>, <skipCache>) %}
+    <span class="{{ category.alias }}">
+        {{ category.title }}
+    </span>
+{% endif %}
+```
+
+### multiple categories filter
+
+```
+{% if raw.categories|default() %}
+    <div class="category {{ raw.type|default('') }}">
+        {% for category in raw.categories|categories %}
+            <span class="{{ category.alias }}">
+                {{ category.title }}
+            </span>
+        {% endfor %}
+    </div>
 {% endif %}
 ```

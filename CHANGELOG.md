@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta7] - 2017-02-15
+
+#### Added
+- `contextualCategory` twig filter
+
 ## [1.0.0-beta6] - 2017-02-15
 
 #### Added
