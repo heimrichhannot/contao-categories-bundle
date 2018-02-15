@@ -222,3 +222,28 @@ if ($this->module->news_filterCategories && Request::getGet($strParam)) {
 	// do something e.g. NewsModel::findByMultipleIds($arrEntityIds)
 }
 ```
+
+## Twig filters
+
+For usage inside a twig template we provide filters that will return the category/categories itself by given ids:
+
+### multiple categories filter
+
+```
+{% if raw.categories is defined %}
+    <div class="category {{ raw.type|default('') }}">
+        {% for category in raw.categories|categories %}
+            <span class="category-icon {{ category.alias }}" title="{{ category.title }}"></span>
+        {% endfor %}
+    </div>
+{% endif %}
+```
+
+### single category filter
+
+```
+{% if raw.category is defined %}
+    {% set category = raw.category|category %}
+    <span class="category-icon {{ category.alias }}" title="{{ category.title }}"></span>
+{% endif %}
+```

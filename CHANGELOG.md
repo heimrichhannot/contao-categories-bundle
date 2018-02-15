@@ -1,7 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.0.0-beta5] - 2017-02-05
+## [1.0.0-beta6] - 2017-02-15
+
+#### Added
+- `category` and `categories` twig filters
+
+## [1.0.0-beta5] - 2017-02-14
 
 #### Added
 - `CategoryManager::findByCategoryFieldAndTable` 

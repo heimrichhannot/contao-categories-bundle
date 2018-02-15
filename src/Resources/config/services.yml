@@ -25,3 +25,8 @@ services:
             - [setTokenStorage, ["@security.token_storage"]]
         tags:
             - { name: contao.picker_provider, priority: 512 }
+    huh.categories.twig_extension:
+        class: HeimrichHannot\CategoriesBundle\Twig\CategoryExtension
+        public: false
+        tags:
+            - {name: twig.extension}
