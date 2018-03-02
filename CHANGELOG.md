@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta8] - 2017-02-15
+
+#### Changed
+- `tl_category.alias` prevent from being copied `doNotCopy` 
+
 ## [1.0.0-beta7] - 2017-02-15
 
 #### Added

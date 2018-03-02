@@ -307,7 +307,7 @@ class Category extends Backend
             return '';
         }
 
-        $title = $category->title ?: $dc->activeRecord->title;
+        $title = $dc->activeRecord->title ?: $category->title;
 
         return General::generateAlias($varValue, $dc->id, 'tl_category', $title);
     }
