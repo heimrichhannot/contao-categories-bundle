@@ -9,7 +9,8 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         'enableVersioning'  => true,
         'onload_callback'   => [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'checkPermission'],
-            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'modifyPalette']
+            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'modifyPalette'],
+            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'addBreadcrumb']
         ],
         'onsubmit_callback' => [
             ['HeimrichHannot\Haste\Dca\General', 'setDateAdded'],

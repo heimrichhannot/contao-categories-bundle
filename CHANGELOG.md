@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta9] - 2017-03-05
+
+#### Added
+- `tl_category` breadcrumb, to limit current tree view 
+
 ## [1.0.0-beta8] - 2017-02-15
 
 #### Changed

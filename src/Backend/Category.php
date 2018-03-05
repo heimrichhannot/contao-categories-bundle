@@ -9,18 +9,134 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\StringUtil;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\Container;
+use HeimrichHannot\Request\Request;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 
 class Category extends Backend
 {
     const PRIMARY_CATEGORY_SUFFIX = '_primary';
 
     protected static $defaultPrimaryCategorySet = false;
+
+    /**
+     * Add a breadcrumb menu to the page tree
+     *
+     * @throws AccessDeniedException
+     * @throws \RuntimeException
+     */
+    public function addBreadcrumb()
+    {
+        $strKey='tl_category_node';
+
+        /** @var AttributeBagInterface $objSession */
+        $objSession = \System::getContainer()->get('session')->getBag('contao_backend');
+
+        // Set a new node
+        if (Request::hasGet('cn'))
+        {
+            // Check the path
+            if (\Validator::isInsecurePath(Request::getGet('cn', true)))
+            {
+                throw new \RuntimeException('Insecure path ' . Request::getGet('cn', true));
+            }
+
+            $objSession->set($strKey, Request::getGet('cn', true));
+            \Controller::redirect(preg_replace('/&cn=[^&]*/', '', \Environment::get('request')));
+        }
+
+        $intNode = $objSession->get($strKey);
+
+        if ($intNode < 1)
+        {
+            return;
+        }
+
+        // Check the path (thanks to Arnaud Buchoux)
+        if (\Validator::isInsecurePath($intNode))
+        {
+            throw new \RuntimeException('Insecure path ' . $intNode);
+        }
+
+        $arrIds   = array();
+        $arrLinks = array();
+        $objUser  = \BackendUser::getInstance();
+
+        // Generate breadcrumb trail
+        if ($intNode)
+        {
+            $intId = $intNode;
+            $objDatabase = \Database::getInstance();
+
+            do
+            {
+                $objCategory = $objDatabase->prepare("SELECT * FROM tl_category WHERE id=?")
+                    ->limit(1)
+                    ->execute($intId);
+
+                if ($objCategory->numRows < 1)
+                {
+                    // Currently selected page does not exist
+                    if ($intId == $intNode)
+                    {
+                        $objSession->set($strKey, 0);
+
+                        return;
+                    }
+
+                    break;
+                }
+
+                $arrIds[] = $intId;
+
+                // No link for the active page
+                if ($objCategory->id == $intNode)
+                {
+                    $arrLinks[] = \Backend::addPageIcon($objCategory->row(), '', null, '', true) . ' ' . $objCategory->title;
+                }
+                else
+                {
+                    $arrLinks[] = \Backend::addPageIcon($objCategory->row(), '', null, '', true) . ' <a href="' . \Backend::addToUrl('cn='.$objCategory->id) . '" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">' . $objCategory->title . '</a>';
+                }
+
+                // FIXME: Implement permission check
+//                if (!$objUser->isAdmin && $objUser->hasAccess($objCategory->id, 'categories'))
+//                {
+//                    break;
+//                }
+
+                $intId = $objCategory->pid;
+            }
+            while ($intId > 0);
+        }
+
+        // FIXME: implement permission check
+//        if (!$objUser->hasAccess($arrIds, 'categories'))
+//        {
+//            $objSession->set($strKey, 0);
+//            throw new AccessDeniedException('Categories ID ' . $intNode . ' is not available.');
+//        }
+
+        // Limit tree
+        $GLOBALS['TL_DCA']['tl_category']['list']['sorting']['root'] = array($intNode);
+
+        // Add root link
+        $arrLinks[] = \Image::getHtml('pagemounts.svg') . ' <a href="' . \Backend::addToUrl('cn=0') . '" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">' . $GLOBALS['TL_LANG']['MSC']['filterAll'] . '</a>';
+        $arrLinks = array_reverse($arrLinks);
+
+        // Insert breadcrumb menu
+        $GLOBALS['TL_DCA']['tl_category']['list']['sorting']['breadcrumb'] .= '
+
+<ul id="tl_breadcrumb">
+  <li>' . implode(' › </li><li>', $arrLinks) . '</li>
+</ul>';
+    }
 
     /**
      * Shorthand function for adding a single category field to your dca.
@@ -372,6 +488,9 @@ class Category extends Backend
         if (isset($row['frontendTitle']) && $row['frontendTitle']) {
             $label .= '<span style="padding-left:3px;color:#b3b3b3;">[' . $row['frontendTitle'] . ']</span>';
         }
+
+        // add category breadcrumb link
+        $label = ' <a href="' . \Backend::addToUrl('cn='.$this->urlEncode($row['id'])) . '" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$label.'</a>';
 
         if ('edit' !== Container::getGet('act') && null !== (\System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
             $label .= '<span style="padding-left:3px;color:#b3b3b3;">– ' . $GLOBALS['TL_LANG']['MSC']['categoriesBundle']['configsAvailable'] . '</span>';
