@@ -334,7 +334,13 @@ class Category extends Backend
 
         if ($category) {
             if ($category->pid) {
-                $dca['palettes']['default'] = str_replace('jumpTo', 'overrideJumpTo', $dca['palettes']['default']);
+                foreach ($dca['fields'] as $field => $data)
+                {
+                    if (isset($data['eval']['overridable']) && $data['eval']['overridable'])
+                    {
+                        $dca['palettes']['default'] = str_replace($field, 'override' . ucfirst($field), $dca['palettes']['default']);
+                    }
+                }
             }
         }
 
