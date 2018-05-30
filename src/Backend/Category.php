@@ -13,6 +13,7 @@ use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\StringUtil;
+use Contao\System;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\Container;
@@ -271,6 +272,11 @@ class Category extends Backend
             return '';
         }
 
+        if (null === ($category = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_category', $row['id'])))
+        {
+            return '';
+        }
+
         \Controller::loadDataContainer($table);
 
         $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
@@ -282,7 +288,7 @@ class Category extends Backend
         $primaryCategory = \Input::get('primaryCategory');
 
         $isParentCategory              = \System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
-        $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable']) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
+        $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable'] || $category->selectable) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
 
         if ($checkAsDefaultPrimaryCategory || $row['id'] === \Input::get('primaryCategory')) {
             static::$defaultPrimaryCategorySet = true;
@@ -327,7 +333,7 @@ class Category extends Backend
     /**
      * @param DataContainer $dc
      */
-    public function modifyPalette(DataContainer $dc)
+    public function modifyDca(DataContainer $dc)
     {
         $category = CategoryModel::findByPk($dc->id);
         $dca      = &$GLOBALS['TL_DCA']['tl_category'];
@@ -342,8 +348,13 @@ class Category extends Backend
                     }
                 }
             }
-        }
 
+            if (!System::getContainer()->get('huh.categories.manager')->hasChildren($category->id))
+            {
+                unset($dca['fields']['selectable']);
+            }
+        }
+        
         // hide primarize operation if not in picker context
         // show only in picker
         if (!\Input::get('picker')) {

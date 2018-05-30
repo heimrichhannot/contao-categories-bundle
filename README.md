@@ -116,18 +116,22 @@ Do this using one of the following calls:
 ```
 $GLOBALS['TL_DCA']['tl_my_dca']['fields']['category'] = \HeimrichHannot\CategoriesBundle\Backend\Category::getCategoryFieldDca(
     [
-        'addPrimaryCategory' => false, // default false for single category widgets
+        'addPrimaryCategory'   => false, // default false for single category widgets
         'forcePrimaryCategory' => false, // default false for single category widgets
-        'parentsUnselectable' => true // default false
+        'parentsUnselectable'  => true, // default false; you can alternatively set "selectable" via Contao backend for single parent categories
+        // you can also set optional Contao DCA picker options here:
+        'rootNodes'            => [77] // if set, the available categories are limited to the children categories of the category defined here
     ]
 );
 
 // this call automatically adds the field "<categoriesFieldname>_primary" which is a simple integer field that contains the reference to the category marked as primary
 \HeimrichHannot\CategoriesBundle\Backend\Category::addMultipleCategoriesFieldToDca('tl_seminar', 'categories',
     [
-        'addPrimaryCategory' => true, // default true for multiple category widgets
+        'addPrimaryCategory'   => true, // default true for multiple category widgets
         'forcePrimaryCategory' => true, // default true for multiple category widgets
-        'parentsUnselectable' => true // default false
+        'parentsUnselectable'  => true, // default false; you can alternatively set "selectable" via Contao backend for single parent categories
+        // you can also set optional Contao DCA picker options here:
+        'rootNodes'            => [77] // if set, the available categories are limited to the children categories of the category defined here
     ]
 );
 ```

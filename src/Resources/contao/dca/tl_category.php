@@ -9,7 +9,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         'enableVersioning'  => true,
         'onload_callback'   => [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'checkPermission'],
-            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'modifyPalette'],
+            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'modifyDca'],
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'addBreadcrumb']
         ],
         'onsubmit_callback' => [
@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         '__selector__' => [
             'type'
         ],
-        'default'      => '{general_legend},title,alias,frontendTitle,cssClass;{redirect_legend:hide},jumpTo;',
+        'default'      => '{general_legend},title,alias,frontendTitle,cssClass,selectable;{redirect_legend},jumpTo;',
     ],
     'fields'   => [
         'id'            => [
@@ -170,7 +170,14 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'eval'          => ['fieldType' => 'radio', 'overridable' => true],
             'sql'           => "int(10) unsigned NOT NULL default '0'",
             'relation'      => ['type' => 'hasOne', 'load' => 'eager', 'table' => 'tl_page']
-        ]
+        ],
+        'selectable' => [
+            'label'                   => &$GLOBALS['TL_LANG']['tl_category']['selectable'],
+            'exclude'                 => true,
+            'inputType'               => 'checkbox',
+            'eval'                    => ['tl_class' => 'w50'],
+            'sql'                     => "char(1) NOT NULL default ''"
+        ],
     ]
 ];
 

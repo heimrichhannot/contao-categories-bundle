@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta11] - 2017-05-30
+
+#### Added
+- selectable option support
+- documentation for rootNodes
+
 ## [1.0.0-beta10] - 2017-03-15
 
 #### Fixed

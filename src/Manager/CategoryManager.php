@@ -207,7 +207,7 @@ class CategoryManager
      */
     public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
     {
-        Controller::loadDataContainer('tl_category');
+        \Contao\Controller::loadDataContainer('tl_category');
 
         foreach ($GLOBALS['TL_DCA']['tl_category']['fields'] as $field => $data)
         {
@@ -389,7 +389,7 @@ class CategoryManager
         /** @var CategoryModel $adapter */
         $adapter = $this->framework->getAdapter(CategoryModel::class);
 
-        return null !== ($categoryAssociations = $adapter->findBy(['tl_category.pid=?'], [$category]));
+        return null !== $adapter->findBy(['tl_category.pid=?'], [$category]);
     }
 
     /**

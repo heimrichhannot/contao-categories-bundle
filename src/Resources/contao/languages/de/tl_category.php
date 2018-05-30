@@ -14,6 +14,7 @@ $lang['jumpTo']             = ['Weiterleitungsseite', 'Wählen Sie hier eine Sei
 $lang['category']           = ['Kategorie', 'Bitte wählen Sie hier eine Kategorie aus.'];
 $lang['categories']         = ['Kategorien', 'Bitte wählen Sie hier die gewünschten Kategorien aus.'];
 $lang['categoryFilterList'] = ['Nach Kategorien filtern', 'Filtert die Liste nach Kategorien.'];
+$lang['selectable']         = ['Selektierbar', 'Wählen Sie diese Option, wenn diese Kategorie in Kategorie-Pickern auswählbar sein soll, obwohl es eine Elternkategorie ist.'];
 
 /**
  * Legends

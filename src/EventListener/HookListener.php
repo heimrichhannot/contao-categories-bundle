@@ -30,30 +30,42 @@ class HookListener
 
         // hide unselectable checkboxes
         if ($dcaEval['parentsUnselectable']) {
-            $objNode = new HtmlPageCrawler($buffer);
+            $selectedableCategories = [];
 
-            $objNode->filter('.tree_view input[name="picker[]"]')->each(function ($objElement) {
-                $category = $objElement->getAttribute('value');
+            if (null !== ($categories = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['selectable=?'], [true])))
+            {
+                $selectedableCategories = $categories->fetchEach('id');
+            }
 
-                if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
-                    $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
-                }
-            });
-
-            $objNode->filter('.tree_view input[name="primaryCategory"]')->each(function ($objElement) {
-                $category = $objElement->getAttribute('data-id');
-
-                if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
-                    $objElement->removeAttribute('checked');
-
-                    $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
-                }
-            });
-
-            return $objNode->saveHTML();
+            $buffer = $this->hideUnselectableCheckboxes($buffer, $selectedableCategories);
         }
 
         return $buffer;
+    }
+
+    protected function hideUnselectableCheckboxes(string $buffer, array $selectableCategories = [])
+    {
+        $objNode = new HtmlPageCrawler($buffer);
+
+        $objNode->filter('.tree_view input[name="picker[]"]')->each(function ($objElement) use ($selectableCategories) {
+            $categoryId = $objElement->getAttribute('value');
+
+            if (\System::getContainer()->get('huh.categories.manager')->hasChildren($categoryId) && !in_array($categoryId, $selectableCategories)) {
+                $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
+            }
+        });
+
+        $objNode->filter('.tree_view input[name="primaryCategory"]')->each(function ($objElement) {
+            $category = $objElement->getAttribute('data-id');
+
+            if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
+                $objElement->removeAttribute('checked');
+
+                $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
+            }
+        });
+
+        return $objNode->saveHTML();
     }
 
     public function reloadCategoryTree($action, DataContainer $dc)
