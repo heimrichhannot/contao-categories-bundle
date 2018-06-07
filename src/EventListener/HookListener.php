@@ -8,12 +8,16 @@
 
 namespace HeimrichHannot\CategoriesBundle\EventListener;
 
+use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
+use Contao\Environment;
+use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
-use HeimrichHannot\Haste\Util\Container;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Wa72\HtmlPageDom\HtmlPageCrawler;
@@ -22,7 +26,7 @@ class HookListener
 {
     public function adjustCategoryTree($buffer, $template)
     {
-        if (!\Input::get('picker') || !($field = \Input::get('category_field')) || !($table = \Input::get('category_table'))) {
+        if (!System::getContainer()->get('huh.request')->getGet('picker') || !($field = System::getContainer()->get('huh.request')->getGet('category_field')) || !($table = System::getContainer()->get('huh.request')->getGet('category_table'))) {
             return $buffer;
         }
 
@@ -72,11 +76,11 @@ class HookListener
     {
         switch ($action) {
             case 'reloadCategoryTree':
-                $id    = \Input::get('id');
-                $field = $dc->inputName = \Input::post('name');
+                $id    = System::getContainer()->get('huh.request')->getGet('id');
+                $field = $dc->inputName = System::getContainer()->get('huh.request')->getPost('name');
 
                 // Handle the keys in "edit multiple" mode
-                if ('editAll' === \Input::get('act')) {
+                if ('editAll' === System::getContainer()->get('huh.request')->getGet('act')) {
                     $id    = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
                     $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
                 }
@@ -85,7 +89,7 @@ class HookListener
 
                 // The field does not exist
                 if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
-                    Container::log('Field "' . $field . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
+                    System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'Field "' . $field . '" does not exist in DCA "' . $dc->table . '"', ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]);
                     throw new BadRequestHttpException('Bad request');
                 }
 
@@ -93,15 +97,15 @@ class HookListener
                 $value = null;
 
                 // Load the value
-                if ('overrideAll' !== \Input::get('act')) {
+                if ('overrideAll' !== System::getContainer()->get('huh.request')->getGet('act')) {
                     if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] === 'File') {
-                        $value = \Config::get($field);
+                        $value = Config::get($field);
                     } elseif ($id > 0 && Database::getInstance()->tableExists($dc->table)) {
                         $row = Database::getInstance()->prepare('SELECT * FROM ' . $dc->table . ' WHERE id=?')->execute($id);
 
                         // The record does not exist
                         if ($row->numRows < 1) {
-                            Container::log('A record with the ID "' . $id . '" does not exist in table "' . $dc->table . '"', __METHOD__, TL_ERROR);
+                            System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'A record with the ID "' . $id . '" does not exist in table "' . $dc->table . '"', ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]);
                             throw new BadRequestHttpException('Bad request');
                         }
 
@@ -123,12 +127,12 @@ class HookListener
                 }
 
                 // Set the new value
-                $value = \Input::post('value', true);
+                $value = System::getContainer()->get('huh.request')->getPost('value', true);
                 $key   = 'categoryTree';
 
                 // Convert the selected values
                 if ('' !== $value) {
-                    $value = \StringUtil::trimsplit("\t", $value);
+                    $value = StringUtil::trimsplit("\t", $value);
 
                     $value = serialize($value);
                 }
@@ -148,10 +152,10 @@ class HookListener
      */
     protected static function replaceOldBePaths($strContext)
     {
-        $router = \System::getContainer()->get('router');
+        $router = System::getContainer()->get('router');
 
         $generate = function ($route) use ($router) {
-            return substr($router->generate($route), strlen(\Environment::get('path')) + 1);
+            return substr($router->generate($route), strlen(Environment::get('path')) + 1);
         };
 
         $arrMapper = [

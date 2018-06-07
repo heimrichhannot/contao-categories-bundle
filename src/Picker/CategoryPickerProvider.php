@@ -11,6 +11,7 @@ namespace HeimrichHannot\CategoriesBundle\Picker;
 use Contao\CoreBundle\Picker\AbstractPickerProvider;
 use Contao\CoreBundle\Picker\DcaPickerProviderInterface;
 use Contao\CoreBundle\Picker\PickerConfig;
+use Contao\System;
 
 class CategoryPickerProvider extends AbstractPickerProvider implements DcaPickerProviderInterface
 {
@@ -104,10 +105,10 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     {
         return [
             'do' => 'categories',
-            'category_field' => \Input::get('category_field'),
-            'category_table' => \Input::get('category_table'),
-            'primaryCategory' => \Input::get('primaryCategory'),
-            'usePrimaryCategory' => \Input::get('usePrimaryCategory'),
+            'category_field' => System::getContainer()->get('huh.request')->getGet('category_field'),
+            'category_table' => System::getContainer()->get('huh.request')->getGet('category_table'),
+            'primaryCategory' => System::getContainer()->get('huh.request')->getGet('primaryCategory'),
+            'usePrimaryCategory' => System::getContainer()->get('huh.request')->getGet('usePrimaryCategory'),
         ];
     }
 }

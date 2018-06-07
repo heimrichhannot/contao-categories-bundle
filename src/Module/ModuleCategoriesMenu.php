@@ -9,6 +9,7 @@
 namespace HeimrichHannot\CategoriesBundle\Module;
 
 
+use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
 
 class ModuleCategoriesMenu extends \Contao\Module
@@ -107,8 +108,8 @@ class ModuleCategoriesMenu extends \Contao\Module
         }
 
         // Get the active category
-        if (\Input::get($strParam) != '') {
-            $this->objActiveCategory = \System::getContainer()->get('huh.categories.manager')->findByIdOrAlias(\Input::get($strParam));
+        if (System::getContainer()->get('huh.request')->getGet($strParam) != '') {
+            $this->objActiveCategory = \System::getContainer()->get('huh.categories.manager')->findByIdOrAlias(System::getContainer()->get('huh.request')->getGet($strParam));
 
             if ($this->objActiveCategory !== null) {
                 $this->arrCategoryTrail = \System::getContainer()->get('huh.categories.manager')->findBy('pid', $this->objActiveCategory->pid)->fetchEach('id');
@@ -164,7 +165,7 @@ class ModuleCategoriesMenu extends \Contao\Module
         // Add the "reset categories" link
         if ($this->cm_resetCategories && $intLevel == 1) {
 
-            $blnActive = \Input::get($strParam) ? false : true;
+            $blnActive = System::getContainer()->get('huh.request')->getGet($strParam) ? false : true;
 
             $arrCategories[] = [
                 'isActive'  => empty($this->activeCategories) && $blnActive,

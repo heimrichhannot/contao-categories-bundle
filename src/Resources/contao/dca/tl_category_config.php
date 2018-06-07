@@ -94,6 +94,6 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
     ]
 ];
 
-\HeimrichHannot\Haste\Dca\General::addOverridableFields(['jumpTo'], 'tl_category', 'tl_category_config', [
+System::getContainer()->get('huh.utils.dca')->addOverridableFields(['jumpTo'], 'tl_category', 'tl_category_config', [
     'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCachedPropertyValuesByCategoryAndPropertyBool']],
 ]);

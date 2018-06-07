@@ -8,7 +8,9 @@
 
 namespace HeimrichHannot\CategoriesBundle\Model;
 
-class CategoryContextModel extends \Model
+use Contao\Model;
+
+class CategoryContextModel extends Model
 {
     protected static $strTable = 'tl_category_context';
 }

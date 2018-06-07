@@ -9,11 +9,13 @@
 namespace HeimrichHannot\CategoriesBundle\Widget;
 
 use Contao\FormHidden;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Widget;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
-use HeimrichHannot\Haste\Util\StringUtil;
 
-class CategoryTree extends \Widget
+class CategoryTree extends Widget
 {
     /**
      * Submit user input.
@@ -57,11 +59,11 @@ class CategoryTree extends \Widget
 
         if (!empty($this->varValue)) { // can be an array
             if ($usePrimaryCategory) {
-                if ('reloadCategoryTree' === \Input::post('action')) {
+                if ('reloadCategoryTree' === System::getContainer()->get('huh.request')->getPost('action')) {
                     $value = [];
 
                     foreach ($this->varValue as $category) {
-                        if (StringUtil::startsWith($category, 'primary_')) {
+                        if (System::getContainer()->get('huh.utils.string')->startsWith($category, 'primary_')) {
                             $primaryCategory = str_replace('primary_', '', $category);
                         } else {
                             $value[] = $category;
@@ -95,12 +97,12 @@ class CategoryTree extends \Widget
         $return .= '</ul>';
 
         if ($usePrimaryCategory) {
-            $primaryCategoryWidget = new FormHidden(\Widget::getAttributesFromDca($dca, $this->strName.Category::PRIMARY_CATEGORY_SUFFIX, $primaryCategory));
+            $primaryCategoryWidget = new FormHidden(Widget::getAttributesFromDca($dca, $this->strName.Category::PRIMARY_CATEGORY_SUFFIX, $primaryCategory));
 
             $return = $primaryCategoryWidget->parse().$return;
         }
 
-        if (!\System::getContainer()->get('contao.picker.builder')->supportsContext('category')) {
+        if (!System::getContainer()->get('contao.picker.builder')->supportsContext('category')) {
             $return .= '
 	<p><button class="tl_submit" disabled>'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button></p>';
         } else {
@@ -114,13 +116,13 @@ class CategoryTree extends \Widget
             }
 
             $return .= '
-	<p><a href="'.ampersand(\System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a></p>
+	<p><a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a></p>
 	<script>
 	  $("pt_'.$this->strName.'").addEvent("click", function(e) {
 		e.preventDefault();
 		Backend.openModalSelector({
 		  "id": "tl_listing",
-		  "title": "'.\StringUtil::specialchars(str_replace("'", "\\'", $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['label'][0])).'",
+		  "title": "'.StringUtil::specialchars(str_replace("'", "\\'", $GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['label'][0])).'",
 		  "url": this.href + document.getElementById("ctrl_'.$this->strId.'").value + "&category_field='.$this->strField.'&category_table='.$this->strTable.($usePrimaryCategory ? '&primaryCategory='.$primaryCategory : '').($usePrimaryCategory ? '&usePrimaryCategory=1' : '').'",
 		  "callback": function(table, value) {
 			new Request.Contao({
@@ -181,15 +183,5 @@ class CategoryTree extends \Widget
         if ('' === (string) $varInput || !is_array($this->rootNodes)) {
             return;
         }
-
-        if (false === strpos($varInput, ',')) {
-            $arrIds = [(int) $varInput];
-        } else {
-            $arrIds = array_map('intval', array_filter(explode(',', $varInput)));
-        }
-
-//        if (count(array_diff($arrIds, array_merge($this->rootNodes, $this->Database->getChildRecords($this->rootNodes, 'tl_page')))) > 0) {
-//            $this->addError($GLOBALS['TL_LANG']['ERR']['invalidPages']);
-//        }
     }
 }

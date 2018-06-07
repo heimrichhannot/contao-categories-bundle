@@ -1,48 +1,54 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.0.0-beta11] - 2017-05-30
+## [1.0.0-beta12] - 2018-06-07
+
+#### Changed
+- replaced `heimrichhannot/contao-haste_plus` with `heimrichhannot/contao-utils-bundle`
+- removed `heimrichhannot/contao-multi_column_editor` with `heimrichhannot/contao-multi-column-editor-bundle`
+
+## [1.0.0-beta11] - 2018-05-30
 
 #### Added
 - selectable option support
 - documentation for rootNodes
 
-## [1.0.0-beta10] - 2017-03-15
+## [1.0.0-beta10] - 2018-03-15
 
 #### Fixed
 - issue with overridable fields
 
-## [1.0.0-beta9] - 2017-03-05
+## [1.0.0-beta9] - 2018-03-05
 
 #### Added
 - `tl_category` breadcrumb, to limit current tree view 
 
-## [1.0.0-beta8] - 2017-02-15
+## [1.0.0-beta8] - 2018-02-15
 
 #### Changed
 - `tl_category.alias` prevent from being copied `doNotCopy` 
 
-## [1.0.0-beta7] - 2017-02-15
+## [1.0.0-beta7] - 2018-02-15
 
 #### Added
 - `contextualCategory` twig filter
 
-## [1.0.0-beta6] - 2017-02-15
+## [1.0.0-beta6] - 2018-02-15
 
 #### Added
 - `category` and `categories` twig filters
 
-## [1.0.0-beta5] - 2017-02-14
+## [1.0.0-beta5] - 2018-02-14
 
 #### Added
 - `CategoryManager::findByCategoryFieldAndTable` 
 
-## [1.0.0-beta4] - 2017-02-05
+## [1.0.0-beta4] - 2018-02-05
 
 #### Fixed
 - alias genaration for new categories
 
-## [1.0.0-beta3] - 2017-01-24
+## [1.0.0-beta3] - 2018-01-24
 
 ### Added
 - translation support for `title` and `frontendTitle` with symfony translation service

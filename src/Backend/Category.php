@@ -9,15 +9,14 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
+use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DataContainer;
+use Contao\Environment;
 use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
-use HeimrichHannot\Haste\Dca\General;
-use HeimrichHannot\Haste\Util\Container;
-use HeimrichHannot\Request\Request;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 
 class Category extends Backend
@@ -34,58 +33,47 @@ class Category extends Backend
      */
     public function addBreadcrumb()
     {
-        $strKey='tl_category_node';
+        $strKey = 'tl_category_node';
 
         /** @var AttributeBagInterface $objSession */
         $objSession = \System::getContainer()->get('session')->getBag('contao_backend');
 
         // Set a new node
-        if (Request::hasGet('cn'))
-        {
+        if (System::getContainer()->get('huh.request')->hasGet('cn')) {
             // Check the path
-            if (\Validator::isInsecurePath(Request::getGet('cn', true)))
-            {
-                throw new \RuntimeException('Insecure path ' . Request::getGet('cn', true));
+            if (\Validator::isInsecurePath(System::getContainer()->get('huh.request')->getGet('cn', true))) {
+                throw new \RuntimeException('Insecure path '.System::getContainer()->get('huh.request')->getGet('cn', true));
             }
 
-            $objSession->set($strKey, Request::getGet('cn', true));
-            \Controller::redirect(preg_replace('/&cn=[^&]*/', '', \Environment::get('request')));
+            $objSession->set($strKey, System::getContainer()->get('huh.request')->getGet('cn', true));
+            \Controller::redirect(preg_replace('/&cn=[^&]*/', '', Environment::get('request')));
         }
 
         $intNode = $objSession->get($strKey);
 
-        if ($intNode < 1)
-        {
+        if ($intNode < 1) {
             return;
         }
 
         // Check the path (thanks to Arnaud Buchoux)
-        if (\Validator::isInsecurePath($intNode))
-        {
-            throw new \RuntimeException('Insecure path ' . $intNode);
+        if (\Validator::isInsecurePath($intNode)) {
+            throw new \RuntimeException('Insecure path '.$intNode);
         }
 
-        $arrIds   = array();
-        $arrLinks = array();
-        $objUser  = \BackendUser::getInstance();
+        $arrIds   = [];
+        $arrLinks = [];
 
         // Generate breadcrumb trail
-        if ($intNode)
-        {
-            $intId = $intNode;
+        if ($intNode) {
+            $intId       = $intNode;
             $objDatabase = \Database::getInstance();
 
-            do
-            {
-                $objCategory = $objDatabase->prepare("SELECT * FROM tl_category WHERE id=?")
-                    ->limit(1)
-                    ->execute($intId);
+            do {
+                $objCategory = $objDatabase->prepare("SELECT * FROM tl_category WHERE id=?")->limit(1)->execute($intId);
 
-                if ($objCategory->numRows < 1)
-                {
+                if ($objCategory->numRows < 1) {
                     // Currently selected page does not exist
-                    if ($intId == $intNode)
-                    {
+                    if ($intId == $intNode) {
                         $objSession->set($strKey, 0);
 
                         return;
@@ -97,13 +85,10 @@ class Category extends Backend
                 $arrIds[] = $intId;
 
                 // No link for the active page
-                if ($objCategory->id == $intNode)
-                {
-                    $arrLinks[] = \Backend::addPageIcon($objCategory->row(), '', null, '', true) . ' ' . $objCategory->title;
-                }
-                else
-                {
-                    $arrLinks[] = \Backend::addPageIcon($objCategory->row(), '', null, '', true) . ' <a href="' . \Backend::addToUrl('cn='.$objCategory->id) . '" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">' . $objCategory->title . '</a>';
+                if ($objCategory->id == $intNode) {
+                    $arrLinks[] = \Backend::addPageIcon($objCategory->row(), '', null, '', true).' '.$objCategory->title;
+                } else {
+                    $arrLinks[] = \Backend::addPageIcon($objCategory->row(), '', null, '', true).' <a href="'.\Backend::addToUrl('cn='.$objCategory->id).'" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$objCategory->title.'</a>';
                 }
 
                 // FIXME: Implement permission check
@@ -113,8 +98,7 @@ class Category extends Backend
 //                }
 
                 $intId = $objCategory->pid;
-            }
-            while ($intId > 0);
+            } while ($intId > 0);
         }
 
         // FIXME: implement permission check
@@ -125,17 +109,17 @@ class Category extends Backend
 //        }
 
         // Limit tree
-        $GLOBALS['TL_DCA']['tl_category']['list']['sorting']['root'] = array($intNode);
+        $GLOBALS['TL_DCA']['tl_category']['list']['sorting']['root'] = [$intNode];
 
         // Add root link
-        $arrLinks[] = \Image::getHtml('pagemounts.svg') . ' <a href="' . \Backend::addToUrl('cn=0') . '" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">' . $GLOBALS['TL_LANG']['MSC']['filterAll'] . '</a>';
-        $arrLinks = array_reverse($arrLinks);
+        $arrLinks[] = \Image::getHtml('pagemounts.svg').' <a href="'.\Backend::addToUrl('cn=0').'" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">'.$GLOBALS['TL_LANG']['MSC']['filterAll'].'</a>';
+        $arrLinks   = array_reverse($arrLinks);
 
         // Insert breadcrumb menu
         $GLOBALS['TL_DCA']['tl_category']['list']['sorting']['breadcrumb'] .= '
 
 <ul id="tl_breadcrumb">
-  <li>' . implode(' › </li><li>', $arrLinks) . '</li>
+  <li>'.implode(' › </li><li>', $arrLinks).'</li>
 </ul>';
     }
 
@@ -221,7 +205,7 @@ class Category extends Backend
         ];
 
         if ($eval['addPrimaryCategory']) {
-            $GLOBALS['TL_DCA'][$table]['fields'][$name . static::PRIMARY_CATEGORY_SUFFIX] = [
+            $GLOBALS['TL_DCA'][$table]['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
                 'sql' => "int(10) unsigned NOT NULL default '0'",
             ];
         }
@@ -229,17 +213,20 @@ class Category extends Backend
 
     public static function deleteCachedPropertyValuesByCategoryAndProperty($value, DataContainer $dc)
     {
-        if (null !== ($instance = General::getModelInstance($dc->table, $dc->id))) {
+        if (null !== ($instance = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk($dc->table, $dc->id))) {
             $valueOld = $instance->{$dc->field};
 
             if ($value != $valueOld) {
-                \System::getContainer()->get('huh.categories.property_cache_manager')->delete([
-                    'category=?',
-                    'property=?',
-                ], [
-                    'tl_category' === $dc->table ? $instance->id : $instance->pid,
-                    $dc->field,
-                ]);
+                \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                    [
+                        'category=?',
+                        'property=?',
+                    ],
+                    [
+                        'tl_category' === $dc->table ? $instance->id : $instance->pid,
+                        $dc->field,
+                    ]
+                );
             }
         }
 
@@ -248,17 +235,20 @@ class Category extends Backend
 
     public static function deleteCachedPropertyValuesByCategoryAndPropertyBool($value, DataContainer $dc)
     {
-        if (null !== ($instance = General::getModelInstance($dc->table, $dc->id))) {
+        if (null !== ($instance = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk($dc->table, $dc->id))) {
             // compute name of the field being overridden
             $overrideField = lcfirst(str_replace('override', '', $dc->field));
 
-            \System::getContainer()->get('huh.categories.property_cache_manager')->delete([
-                'category=?',
-                'property=?',
-            ], [
-                'tl_category' === $dc->table ? $instance->id : $instance->pid,
-                $overrideField,
-            ]);
+            \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                [
+                    'category=?',
+                    'property=?',
+                ],
+                [
+                    'tl_category' === $dc->table ? $instance->id : $instance->pid,
+                    $overrideField,
+                ]
+            );
         }
 
         return $value;
@@ -272,8 +262,7 @@ class Category extends Backend
             return '';
         }
 
-        if (null === ($category = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_category', $row['id'])))
-        {
+        if (null === ($category = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_category', $row['id']))) {
             return '';
         }
 
@@ -285,9 +274,9 @@ class Category extends Backend
             return '';
         }
 
-        $primaryCategory = \Input::get('primaryCategory');
+        $primaryCategory = System::getContainer()->get('huh.request')->getGet('primaryCategory');
 
-        $isParentCategory              = \System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
+        $isParentCategory              = System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
         $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable'] || $category->selectable) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
 
         if ($checkAsDefaultPrimaryCategory || $row['id'] === \Input::get('primaryCategory')) {
@@ -295,8 +284,7 @@ class Category extends Backend
             $checked                           = ' checked';
         }
 
-        return '<input type="radio" name="primaryCategory" data-id="' . $row['id'] . '" id="primaryCategory_' . $row['id'] . '" value="primary_' . $row['id'] . '"' . $checked . '>' . '<label style="margin-right: 6px" for="primaryCategory_' . $row['id'] . '" title="' . $title . '" class="primarize">' . '<span class="icon primarized">' . \Image::getHtml('bundles/categories/img/icon_primarized.png')
-               . '</span>' . '<span class="icon unprimarized">' . \Image::getHtml('bundles/categories/img/icon_unprimarized.png') . '</span>' . '</label>';
+        return '<input type="radio" name="primaryCategory" data-id="'.$row['id'].'" id="primaryCategory_'.$row['id'].'" value="primary_'.$row['id'].'"'.$checked.'>'.'<label style="margin-right: 6px" for="primaryCategory_'.$row['id'].'" title="'.$title.'" class="primarize">'.'<span class="icon primarized">'.\Image::getHtml('bundles/categories/img/icon_primarized.png').'</span>'.'<span class="icon unprimarized">'.\Image::getHtml('bundles/categories/img/icon_unprimarized.png').'</span>'.'</label>';
     }
 
     /**
@@ -309,7 +297,7 @@ class Category extends Backend
         // add overridable fields
         foreach ($dca['fields'] as $field => $data) {
             if ($data['eval']['overridable']) {
-                $overrideFieldName = 'override' . ucfirst($field);
+                $overrideFieldName = 'override'.ucfirst($field);
 
                 // boolean field
                 $dca['fields'][$overrideFieldName] = [
@@ -340,21 +328,18 @@ class Category extends Backend
 
         if ($category) {
             if ($category->pid) {
-                foreach ($dca['fields'] as $field => $data)
-                {
-                    if (isset($data['eval']['overridable']) && $data['eval']['overridable'])
-                    {
-                        $dca['palettes']['default'] = str_replace($field, 'override' . ucfirst($field), $dca['palettes']['default']);
+                foreach ($dca['fields'] as $field => $data) {
+                    if (isset($data['eval']['overridable']) && $data['eval']['overridable']) {
+                        $dca['palettes']['default'] = str_replace($field, 'override'.ucfirst($field), $dca['palettes']['default']);
                     }
                 }
             }
 
-            if (!System::getContainer()->get('huh.categories.manager')->hasChildren($category->id))
-            {
+            if (!System::getContainer()->get('huh.categories.manager')->hasChildren($category->id)) {
                 unset($dca['fields']['selectable']);
             }
         }
-        
+
         // hide primarize operation if not in picker context
         // show only in picker
         if (!\Input::get('picker')) {
@@ -368,9 +353,9 @@ class Category extends Backend
      */
     public function storePrimaryCategory($value, DataContainer $dc)
     {
-        if ($primaryCategory = \Input::post($dc->field . static::PRIMARY_CATEGORY_SUFFIX)) {
-            if (null !== ($entity = General::getModelInstance($dc->table, $dc->id))) {
-                $entity->{$dc->field . static::PRIMARY_CATEGORY_SUFFIX} = $primaryCategory;
+        if ($primaryCategory = \Input::post($dc->field.static::PRIMARY_CATEGORY_SUFFIX)) {
+            if (null !== ($entity = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk($dc->table, $dc->id))) {
+                $entity->{$dc->field.static::PRIMARY_CATEGORY_SUFFIX} = $primaryCategory;
                 $entity->save();
             }
         }
@@ -408,7 +393,7 @@ class Category extends Backend
             return $value;
         }
 
-        $categories = \System::getContainer()->get('huh.categories.manager')->findByEntityAndCategoryFieldAndTable($dc->id, $dc->field, $dc->table);
+        $categories = System::getContainer()->get('huh.categories.manager')->findByEntityAndCategoryFieldAndTable($dc->id, $dc->field, $dc->table);
 
         if (null === $categories) {
             return null;
@@ -432,6 +417,8 @@ class Category extends Backend
      * @param string        $varValue
      * @param DataContainer $dc
      *
+     * @throws \Exception
+     *
      * @return string
      */
     public static function generateAlias($varValue, DataContainer $dc)
@@ -442,7 +429,7 @@ class Category extends Backend
 
         $title = $dc->activeRecord->title ?: $category->title;
 
-        return General::generateAlias($varValue, $dc->id, 'tl_category', $title);
+        return System::getContainer()->get('huh.utils.dca')->generateAlias($varValue, $dc->id, 'tl_category', $title);
     }
 
     public function checkPermission()
@@ -450,7 +437,7 @@ class Category extends Backend
         $user = \BackendUser::getInstance();
 
         if (!$user->isAdmin && !$user->hasAccess('manage', 'categories')) {
-            \Controller::redirect('contao/main.php?act=error');
+            Controller::redirect('contao/main.php?act=error');
         }
     }
 
@@ -479,17 +466,14 @@ class Category extends Backend
         $return = '';
 
         // Return the buttons
-        $imagePasteAfter = Image::getHtml('pasteafter.gif', sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
-        $imagePasteInto  = Image::getHtml('pasteinto.gif', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
+        $imagePasteAfter = Image::getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
+        $imagePasteInto  = Image::getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? Image::getHtml('pasteafter_.gif') . ' ' : '<a href="' . \Controller::addToUrl('act=' . $arrClipboard['mode'] . '&mode=1&rt=' . \RequestToken::get() . '&pid=' . $row['id'] . (!is_array($arrClipboard['id']) ? '&id=' . $arrClipboard['id'] : '')) . '" title="' . specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']))
-                                                                             . '" onclick="Backend.getScrollOffset()">' . $imagePasteAfter . '</a> ';
+            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=1&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return . ($disablePI
-                ? Image::getHtml('pasteinto_.gif') . ' ' : '<a href="' . \Controller::addToUrl('act=' . $arrClipboard['mode'] . '&mode=2&rt=' . \RequestToken::get() . '&pid=' . $row['id'] . (!is_array($arrClipboard['id']) ? '&id=' . $arrClipboard['id'] : '')) . '" title="' . specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])) . '" onclick="Backend.getScrollOffset()">'
-                                                           . $imagePasteInto . '</a> ');
+        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=2&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
     /**
@@ -503,17 +487,17 @@ class Category extends Backend
     public function generateLabel($row, $label, $dca, $attributes)
     {
         if (isset($row['frontendTitle']) && $row['frontendTitle']) {
-            $label .= '<span style="padding-left:3px;color:#b3b3b3;">[' . $row['frontendTitle'] . ']</span>';
+            $label .= '<span style="padding-left:3px;color:#b3b3b3;">['.$row['frontendTitle'].']</span>';
         }
 
         // add category breadcrumb link
-        $label = ' <a href="' . \Backend::addToUrl('cn='.$this->urlEncode($row['id'])) . '" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$label.'</a>';
+        $label = ' <a href="'.\Backend::addToUrl('cn='.$this->urlEncode($row['id'])).'" title="'.StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$label.'</a>';
 
-        if ('edit' !== Container::getGet('act') && null !== (\System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
-            $label .= '<span style="padding-left:3px;color:#b3b3b3;">– ' . $GLOBALS['TL_LANG']['MSC']['categoriesBundle']['configsAvailable'] . '</span>';
+        if ('edit' !== System::getContainer()->get('huh.request')->getGet('act') && null !== (System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
+            $label .= '<span style="padding-left:3px;color:#b3b3b3;">– '.$GLOBALS['TL_LANG']['MSC']['categoriesBundle']['configsAvailable'].'</span>';
         }
 
-        return \Image::getHtml('iconPLAIN.gif', '', $attributes) . ' ' . $label;
+        return Image::getHtml('iconPLAIN.svg', '', $attributes).' '.$label;
     }
 
     /**
@@ -526,7 +510,7 @@ class Category extends Backend
      */
     public static function getCategoryFilterListFieldDca($evalOverride = null, $label = null)
     {
-        \System::loadLanguageFile('tl_category');
+        System::loadLanguageFile('tl_category');
 
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categoryFilterList'];
         $eval  = [

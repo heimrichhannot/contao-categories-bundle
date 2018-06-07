@@ -221,8 +221,8 @@ Add this code to your List to get the category and find all entities with the gi
 $strParam = Category::getUrlParameterName();
 
 // Try to find by category
-if ($this->module->news_filterCategories && Request::getGet($strParam)) {
-	$arrEntityIds = \System::getContainer()->get('huh.categories.manager')->getEntityIdsByCategoryAndParentTable(Request::getGet($strParam), $your_table);
+if ($this->module->news_filterCategories && \Contao\System::getContainer()->get('huh.request')->getGet($strParam)) {
+	$arrEntityIds = \System::getContainer()->get('huh.categories.manager')->getEntityIdsByCategoryAndParentTable(\Contao\System::getContainer()->get('huh.request')->getGet($strParam), $your_table);
 	// do something e.g. NewsModel::findByMultipleIds($arrEntityIds)
 }
 ```

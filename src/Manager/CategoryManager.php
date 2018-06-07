@@ -8,15 +8,14 @@
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
+use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\Model;
 use Contao\Model\Collection;
 use Contao\StringUtil;
+use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\CategoryContext;
 use HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
-use HeimrichHannot\Haste\Dca\General;
-use HeimrichHannot\MailDrum\Controller;
 
 class CategoryManager
 {
@@ -128,12 +127,12 @@ class CategoryManager
      */
     public function getOverridableProperty(string $property, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
     {
-        $categoryConfigManager = \System::getContainer()->get('huh.categories.config_manager');
+        $categoryConfigManager = System::getContainer()->get('huh.categories.config_manager');
         $relevantEntities      = [];
 
         // compute context
         $context      = $this->computeContext($contextObj, $categoryField);
-        $cacheManager = \System::getContainer()->get('huh.categories.property_cache_manager');
+        $cacheManager = System::getContainer()->get('huh.categories.property_cache_manager');
 
         if (!$skipCache && null !== $context && $cacheManager->has($property, $categoryField, $primaryCategory, $context)) {
             return $cacheManager->get($property, $categoryField, $primaryCategory, $context);
@@ -164,7 +163,7 @@ class CategoryManager
             }
         }
 
-        $value = General::getOverridableProperty($property, $relevantEntities);
+        $value = System::getContainer()->get('huh.utils.dca')->getOverridableProperty($property, $relevantEntities);
 
         if (!$skipCache && null !== $context) {
             $cacheManager->add($property, $categoryField, $primaryCategory, $context, $value);
@@ -207,7 +206,7 @@ class CategoryManager
      */
     public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
     {
-        \Contao\Controller::loadDataContainer('tl_category');
+        Controller::loadDataContainer('tl_category');
 
         foreach ($GLOBALS['TL_DCA']['tl_category']['fields'] as $field => $data)
         {

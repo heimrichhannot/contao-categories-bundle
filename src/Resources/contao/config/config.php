@@ -19,7 +19,7 @@ array_insert($GLOBALS['FE_MOD'], 2, [
 /**
  * JavaScript
  */
-if (\HeimrichHannot\Haste\Util\Container::isBackend()) {
+if (System::getContainer()->get('huh.utils.container')->isBackend()) {
     $GLOBALS['TL_JAVASCRIPT']['contao-categories-bundle'] = 'bundles/categories/js/contao-categories-bundle.be.min.js|static';
 }
 
@@ -37,7 +37,7 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = ['huh.categ
 /**
  * Assets
  */
-if (\HeimrichHannot\Haste\Util\Container::isBackend()) {
+if (System::getContainer()->get('huh.utils.container')->isBackend()) {
     $GLOBALS['TL_CSS']['contao-categories-bundle'] = 'bundles/categories/css/contao-categories-bundle.be.css|static';
 }
 

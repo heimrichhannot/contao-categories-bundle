@@ -8,7 +8,9 @@
 
 namespace HeimrichHannot\CategoriesBundle\Model;
 
-class CategoryPropertyCacheModel extends \Model
+use Contao\Model;
+
+class CategoryPropertyCacheModel extends Model
 {
     protected static $strTable = 'tl_category_property_cache';
 }

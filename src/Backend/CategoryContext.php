@@ -9,9 +9,10 @@
 namespace HeimrichHannot\CategoriesBundle\Backend;
 
 use Contao\Backend;
+use Contao\Controller;
 use Contao\DataContainer;
 use Contao\StringUtil;
-use HeimrichHannot\Haste\Dca\General;
+use Contao\System;
 
 class CategoryContext extends Backend
 {
@@ -19,8 +20,8 @@ class CategoryContext extends Backend
 
     public static function addFieldContextMappingFieldToDca($table, $categoryFieldTable, $label = null)
     {
-        \System::loadLanguageFile('tl_category_context');
-        \Controller::loadDataContainer($table);
+        System::loadLanguageFile('tl_category_context');
+        Controller::loadDataContainer($table);
 
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category_context'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD];
 
@@ -55,7 +56,7 @@ class CategoryContext extends Backend
 
     public static function deleteCachedPropertyValuesByFieldOrContext($value, DataContainer $dc)
     {
-        if (null !== ($categoryContext = \System::getContainer()->get('huh.categories.context_manager')->findOneBy('id', $dc->id))) {
+        if (null !== ($categoryContext = System::getContainer()->get('huh.categories.context_manager')->findOneBy('id', $dc->id))) {
             $valueOld = $categoryContext->{$dc->field};
 
             if ($value != $valueOld) {
@@ -76,7 +77,7 @@ class CategoryContext extends Backend
                 $fields = array_unique($fields);
                 $contexts = array_unique($contexts);
 
-                \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+                System::getContainer()->get('huh.categories.property_cache_manager')->delete(
                     [
                         'categoryField IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
                     ], []
@@ -89,11 +90,11 @@ class CategoryContext extends Backend
 
     public static function deleteCachedPropertyValuesByContext($value, DataContainer $dc)
     {
-        if (General::valueChangedInCallback($value, $dc)) {
+        if (System::getContainer()->get('huh.utils.model')->hasValueChanged($value, $dc)) {
             $fields = [];
             $contexts = [];
 
-            $valueOld = General::getModelInstancePropertyValue($dc->field, $dc->table, $dc->id);
+            $valueOld = System::getContainer()->get('huh.utils.model')->getModelInstanceFieldValue($dc->field, $dc->table, $dc->id);
 
             // collect relevant combinations
             foreach (StringUtil::deserialize($valueOld, true) as $mapping) {
@@ -109,7 +110,7 @@ class CategoryContext extends Backend
             $fields = array_unique($fields);
             $contexts = array_unique($contexts);
 
-            \System::getContainer()->get('huh.categories.property_cache_manager')->delete(
+            System::getContainer()->get('huh.categories.property_cache_manager')->delete(
                 [
                     'categoryField IN ('.implode(',', $fields).') OR context IN ('.implode(',', $contexts).')',
                 ], []
@@ -121,7 +122,7 @@ class CategoryContext extends Backend
 
     public static function getCategoryFieldsAsOptions($categoryFieldTable)
     {
-        \Controller::loadDataContainer($categoryFieldTable);
+        Controller::loadDataContainer($categoryFieldTable);
 
         $options = [];
 
