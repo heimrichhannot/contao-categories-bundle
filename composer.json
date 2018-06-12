@@ -41,5 +41,8 @@
   },
   "extra": {
     "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"
+  },
+  "suggest": {
+    "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle."
   }
 }

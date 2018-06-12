@@ -149,7 +149,14 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'exclude'       => true,
             'search'        => true,
             'inputType'     => 'text',
-            'eval'          => ['rgxp' => 'alias', 'unique' => true, 'spaceToUnderscore' => true, 'maxlength' => 128, 'tl_class' => 'w50', 'doNotCopy' => true],
+            'eval'          => [
+                'rgxp' => 'alias',
+                'unique' => true,
+                'spaceToUnderscore' => true,
+                'maxlength' => 128,
+                'tl_class' => 'w50',
+                'doNotCopy' => true,
+            ],
             'save_callback' => [
                 ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'generateAlias']
             ],

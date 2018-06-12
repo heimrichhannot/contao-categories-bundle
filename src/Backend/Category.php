@@ -16,7 +16,6 @@ use Contao\Environment;
 use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
-use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 
 class Category extends Backend
@@ -323,7 +322,7 @@ class Category extends Backend
      */
     public function modifyDca(DataContainer $dc)
     {
-        $category = CategoryModel::findByPk($dc->id);
+        $category = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_category', $dc->id);
         $dca      = &$GLOBALS['TL_DCA']['tl_category'];
 
         if ($category) {
@@ -423,7 +422,7 @@ class Category extends Backend
      */
     public static function generateAlias($varValue, DataContainer $dc)
     {
-        if (null === ($category = CategoryModel::findByPk($dc->id))) {
+        if (null === ($category = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_category', $dc->id))) {
             return '';
         }
 

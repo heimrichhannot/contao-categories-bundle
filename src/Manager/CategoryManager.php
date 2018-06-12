@@ -43,17 +43,13 @@ class CategoryManager
      */
     public function findByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = [])
     {
-        /** @var CategoryAssociationModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
+        $modelUtil = System::getContainer()->get('huh.utils.model');
 
-        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.categoryField=?', 'tl_category_association.entity=?', 'tl_category_association.parentTable=?'], [$categoryField, $entity, $table], $options))) {
+        if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.entity=?', 'tl_category_association.parentTable=?'], [$categoryField, $entity, $table], $options))) {
             return null;
         }
 
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findMultipleByIds($categoryAssociations->fetchEach('category'), [
+        return $modelUtil->findMultipleModelInstancesByIds('tl_category', $categoryAssociations->fetchEach('category'), [
             'order' => 'sorting ASC',
         ]);
     }
@@ -66,19 +62,17 @@ class CategoryManager
      */
     public function findByCategoryFieldAndTable(string $categoryField, string $table, array $options = [])
     {
-        /** @var CategoryAssociationModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
+        $modelUtil = System::getContainer()->get('huh.utils.model');
 
-        if (null === ($categoryAssociations = $adapter->findBy(['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
+        if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
             return null;
         }
 
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findMultipleByIds($categoryAssociations->fetchEach('category'), [
+        $options = [
             'order' => 'sorting ASC',
-        ]);
+        ];
+
+        return $modelUtil->findMultipleModelInstancesByIds('tl_category', $categoryAssociations->fetchEach('category'), $options);
     }
 
     /**
@@ -90,17 +84,13 @@ class CategoryManager
      */
     public function findOneByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = []): ?CategoryModel
     {
-        /** @var CategoryAssociationModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
+        $modelUtil = System::getContainer()->get('huh.utils.model');
 
-        if (null === ($categoryAssociations = $adapter->findOneBy(['tl_category_association.entity=?', 'tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$entity, $categoryField, $table], $options))) {
+        if (null === ($categoryAssociations = $modelUtil->findOneModelInstanceBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$entity, $categoryField, $table], $options))) {
             return null;
         }
 
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findByPk($categoryAssociations->category);
+        return $modelUtil->findModelInstanceByPk('tl_category', $categoryAssociations->category);
     }
 
     /**
@@ -228,10 +218,7 @@ class CategoryManager
      */
     public function findBy($column, $value, array $options = [])
     {
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findBy($column, $value, $options);
+        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', $column, $value, $options);
     }
 
     /**
@@ -243,10 +230,7 @@ class CategoryManager
      */
     public function findAll(array $options = [])
     {
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findAll($options);
+        return System::getContainer()->get('huh.utils.model')->findAllModelInstances('tl_category', $options);
     }
 
     /**
@@ -259,10 +243,7 @@ class CategoryManager
      */
     public function findMultipleByIds(array $ids, array $options = [])
     {
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findMultipleByIds($ids, $options);
+        return System::getContainer()->get('huh.utils.model')->findMultipleModelInstancesByIds('tl_category', $ids, $options);
     }
 
     /**
@@ -276,10 +257,7 @@ class CategoryManager
      */
     public function findOneBy($column, $value, array $options = [])
     {
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findOneBy($column, $value, $options);
+        return System::getContainer()->get('huh.utils.model')->findOneModelInstanceBy('tl_category', $column, $value, $options);
     }
 
     /**
@@ -355,11 +333,8 @@ class CategoryManager
      */
     public function createAssociations(int $entity, string $categoryField, string $table, array $categories): void
     {
-        /** @var CategoryAssociationModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
-
         // clean up beforehands
-        if (null !== ($categoryAssociations = $adapter->findBy(['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
+        if (null !== ($categoryAssociations = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
             while ($categoryAssociations->next()) {
                 $categoryAssociations->delete();
             }
@@ -385,10 +360,7 @@ class CategoryManager
      */
     public function hasChildren(int $category): bool
     {
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return null !== $adapter->findBy(['tl_category.pid=?'], [$category]);
+        return null !== System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['tl_category.pid=?'], [$category]);
     }
 
     /**
@@ -416,26 +388,20 @@ class CategoryManager
 
     public function findAssociationsByParentTableAndCategory(int $categoryId, string $parentTable)
     {
-        /** @var CategoryAssociationModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryAssociationModel::class);
-
-        return $adapter->findBy(['category=?', 'parentTable=?'], [$categoryId, $parentTable]);
+        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['category=?', 'parentTable=?'], [$categoryId, $parentTable]);
     }
 
     /**
      * find category by id or alias
      *
      * @param int   $id
-     * @param array $arrOptions
+     * @param array $options
      *
      * @return CategoryModel|null
      */
-    public function findByIdOrAlias($param, array $arrOptions = [])
+    public function findByIdOrAlias($idOrAlias, array $options = [])
     {
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        return $adapter->findByIdOrAlias($param, $arrOptions);
+        return System::getContainer()->get('huh.utils.model')->findModelInstanceByIdOrAlias('tl_category', $idOrAlias, $options);
     }
 
     /**
@@ -452,16 +418,13 @@ class CategoryManager
             return null;
         }
 
-        /** @var CategoryModel $adapter */
-        $adapter = $this->framework->getAdapter(CategoryModel::class);
-
-        $objCategories = \Database::getInstance()->prepare("SELECT c1.*, (SELECT COUNT(*) FROM " . $adapter->getTable() . "  c2 WHERE c2.pid=c1.id AND c2.id IN (" . implode(',', array_map('intval', $arrIds)) . ")) AS subcategories FROM " . $adapter->getTable() . " c1 WHERE c1.pid=? AND c1.id IN (" . implode(',', array_map('intval', $arrIds)) . ")")->execute($pid);
+        $objCategories = \Database::getInstance()->prepare("SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN (" . implode(',', array_map('intval', $arrIds)) . ")) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN (" . implode(',', array_map('intval', $arrIds)) . ")")->execute($pid);
 
         if ($objCategories->numRows < 1) {
             return null;
         }
 
-        return \Model\Collection::createFromDbResult($objCategories, $adapter->getTable());
+        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');
     }
 
     /**

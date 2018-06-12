@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta13] - 2018-06-12
+
+#### Added
+- support for heimrichhannot/contao-categories-multilingual-bundle
+
 ## [1.0.0-beta12] - 2018-06-07
 
 #### Changed

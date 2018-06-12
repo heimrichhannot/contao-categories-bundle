@@ -7,6 +7,7 @@ This bundle allows to assign nestable categories to arbitrary entities in Contao
 - the module is done in a generic way, i.e. you can assign category/categories field(s) to arbitrary DCAs
 - conveniently add single category fields (radio button) or multiple categories fields (checkbox) via a simple function call
 - specify overridable properties in categories and compute the correct result depending on the given context easily
+- multilanguage support via [heimrichhannot/contao-categories-multilingual-bundle](https://github.com/heimrichhannot/contao-categories-multilingual-bundle)
 
 ## Impressions
 
