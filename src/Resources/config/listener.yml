@@ -3,3 +3,4 @@ services:
         class: HeimrichHannot\CategoriesBundle\EventListener\HookListener
         arguments:
             - "@contao.framework"
+            - '@huh.request'

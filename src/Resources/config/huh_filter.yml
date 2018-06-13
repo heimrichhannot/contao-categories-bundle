@@ -1,0 +1,4 @@
+huh:
+  filter:
+    types:
+      - {name: category_choice, class: HeimrichHannot\CategoriesBundle\Filter\Type\CategoryChoiceType, type: choice}

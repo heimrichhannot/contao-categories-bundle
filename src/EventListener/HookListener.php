@@ -10,6 +10,7 @@ namespace HeimrichHannot\CategoriesBundle\EventListener;
 
 use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
@@ -17,6 +18,7 @@ use Contao\Environment;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
+use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -24,9 +26,28 @@ use Wa72\HtmlPageDom\HtmlPageCrawler;
 
 class HookListener
 {
+    /**
+     * @var ContaoFrameworkInterface
+     */
+    private $framework;
+    /**
+     * @var Request
+     */
+    private $request;
+
+
+    /**
+     * HookListener constructor.
+     */
+    public function __construct(ContaoFrameworkInterface $framework, Request $request)
+    {
+        $this->framework = $framework;
+        $this->request = $request;
+    }
+
     public function adjustCategoryTree($buffer, $template)
     {
-        if (!System::getContainer()->get('huh.request')->getGet('picker') || !($field = System::getContainer()->get('huh.request')->getGet('category_field')) || !($table = System::getContainer()->get('huh.request')->getGet('category_table'))) {
+        if (!$this->request->getGet('picker') || !($field = $this->request->getGet('category_field')) || !($table = $this->request->getGet('category_table'))) {
             return $buffer;
         }
 
@@ -76,11 +97,11 @@ class HookListener
     {
         switch ($action) {
             case 'reloadCategoryTree':
-                $id    = System::getContainer()->get('huh.request')->getGet('id');
-                $field = $dc->inputName = System::getContainer()->get('huh.request')->getPost('name');
+                $id    = $this->request->getGet('id');
+                $field = $dc->inputName = $this->request->getPost('name');
 
                 // Handle the keys in "edit multiple" mode
-                if ('editAll' === System::getContainer()->get('huh.request')->getGet('act')) {
+                if ('editAll' === $this->request->getGet('act')) {
                     $id    = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
                     $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
                 }
@@ -97,7 +118,7 @@ class HookListener
                 $value = null;
 
                 // Load the value
-                if ('overrideAll' !== System::getContainer()->get('huh.request')->getGet('act')) {
+                if ('overrideAll' !== $this->request->getGet('act')) {
                     if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] === 'File') {
                         $value = Config::get($field);
                     } elseif ($id > 0 && Database::getInstance()->tableExists($dc->table)) {
@@ -127,7 +148,7 @@ class HookListener
                 }
 
                 // Set the new value
-                $value = System::getContainer()->get('huh.request')->getPost('value', true);
+                $value = $this->request->getPost('value', true);
                 $key   = 'categoryTree';
 
                 // Convert the selected values

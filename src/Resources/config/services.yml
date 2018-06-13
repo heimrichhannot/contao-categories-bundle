@@ -30,3 +30,12 @@ services:
         public: false
         tags:
             - {name: twig.extension}
+
+# Filter
+
+    huh.categories.filter.choice:
+        class: HeimrichHannot\CategoriesBundle\Filter\Choice\CategoriesChoice
+        public: true
+        arguments:
+          - "@contao.framework"
+          - '@huh.categories.manager'

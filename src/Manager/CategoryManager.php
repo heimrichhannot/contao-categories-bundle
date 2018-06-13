@@ -76,6 +76,43 @@ class CategoryManager
     }
 
     /**
+     * Get categories by dca field in table filtered by pids
+     *
+     * @param string $categoryField
+     * @param string $table
+     * @param array $pids Ids of parent categories
+     * @param array $options
+     *
+     * @return \Contao\Model\Collection|null
+     */
+    public function findByCategoryFieldAndTableAndPids(string $categoryField, string $table, array $pids = [], array $options = [])
+    {
+        $modelUtil = System::getContainer()->get('huh.utils.model');
+
+        if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
+            return null;
+        }
+
+        $options = [
+            'order' => 'sorting ASC',
+        ];
+
+        $ids = $categoryAssociations->fetchEach('category');
+        $columns = ["tl_category.id IN(".implode(',', array_map('\intval', $ids)).')'];
+        if (!empty($pids))
+        {
+            $columns[] = 'tl_category.pid IN('.implode(',', array_map('\intval', $pids)).')';
+        }
+
+        return $modelUtil->findModelInstancesBy(
+            'tl_category',
+            $columns,
+            [],
+            $options
+        );
+    }
+
+    /**
      * @param int    $entity
      * @param string $categoryField
      * @param array  $options
