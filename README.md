@@ -1,5 +1,8 @@
 # Contao Categories Bundle
 
+[![](https://img.shields.io/packagist/v/heimrichhannot/contao-categories-bundle.svg)](https://packagist.org/packages/heimrichhannot/contao-categories-bundle)
+[![](https://img.shields.io/packagist/dt/heimrichhannot/contao-categories-bundle.svg)](https://packagist.org/packages/heimrichhannot/contao-categories-bundle)
+
 This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.
 
 ## Features
