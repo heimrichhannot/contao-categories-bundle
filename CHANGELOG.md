@@ -1,13 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta15] - 2018-06-14
+
+#### Added 
+- CategoryManager::getOverridablePropertyWithoutContext()
+
+#### Fixed
+- minor styling issues
+
 ## [1.0.0-beta14] - 2018-06-13
 
 #### Added 
-* categories filter for [Contao Filter Bundle](https://github.com/heimrichhannot/contao-filter-bundle)
+- categories filter for [Contao Filter Bundle](https://github.com/heimrichhannot/contao-filter-bundle)
 
 #### Changed
-* more dependency injection for hook listener
+- more dependency injection for hook listener
 
 ## [1.0.0-beta13] - 2018-06-12
 

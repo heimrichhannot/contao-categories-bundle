@@ -8,15 +8,11 @@
 
 namespace HeimrichHannot\CategoriesBundle\Filter\Choice;
 
-use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\StringUtil;
-use Contao\System;
-use Contao\Widget;
 use HeimrichHannot\CategoriesBundle\Manager\CategoryManager;
 use HeimrichHannot\FilterBundle\Choice\FieldOptionsChoice;
 use HeimrichHannot\FilterBundle\Model\FilterConfigElementModel;
-use Symfony\Component\Translation\Translator;
 
 class CategoriesChoice extends FieldOptionsChoice
 {
@@ -49,7 +45,7 @@ class CategoriesChoice extends FieldOptionsChoice
             $element->field,
             $filter['dataContainer'],
             $parentCategories
-            )
+        )
         ) {
             return $options;
         }

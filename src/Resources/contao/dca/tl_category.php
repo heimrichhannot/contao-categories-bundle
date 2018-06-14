@@ -174,7 +174,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'exclude'       => true,
             'inputType'     => 'pageTree',
             'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCachedPropertyValuesByCategoryAndProperty']],
-            'eval'          => ['fieldType' => 'radio', 'overridable' => true],
+            'eval'          => ['fieldType' => 'radio', 'tl_class' => 'w50', 'overridable' => true],
             'sql'           => "int(10) unsigned NOT NULL default '0'",
             'relation'      => ['type' => 'hasOne', 'load' => 'eager', 'table' => 'tl_page']
         ],

@@ -35,9 +35,9 @@ class CategoryManager
     }
 
     /**
-     * @param int    $entity
+     * @param int $entity
      * @param string $categoryField
-     * @param array  $options
+     * @param array $options
      *
      * @return \Contao\Model\Collection|null
      */
@@ -56,7 +56,7 @@ class CategoryManager
 
     /**
      * @param string $categoryField
-     * @param array  $options
+     * @param array $options
      *
      * @return \Contao\Model\Collection|null
      */
@@ -97,11 +97,10 @@ class CategoryManager
             'order' => 'sorting ASC',
         ];
 
-        $ids = $categoryAssociations->fetchEach('category');
-        $columns = ["tl_category.id IN(".implode(',', array_map('\intval', $ids)).')'];
-        if (!empty($pids))
-        {
-            $columns[] = 'tl_category.pid IN('.implode(',', array_map('\intval', $pids)).')';
+        $ids     = $categoryAssociations->fetchEach('category');
+        $columns = ["tl_category.id IN(" . implode(',', array_map('\intval', $ids)) . ')'];
+        if (!empty($pids)) {
+            $columns[] = 'tl_category.pid IN(' . implode(',', array_map('\intval', $pids)) . ')';
         }
 
         return $modelUtil->findModelInstancesBy(
@@ -113,9 +112,9 @@ class CategoryManager
     }
 
     /**
-     * @param int    $entity
+     * @param int $entity
      * @param string $categoryField
-     * @param array  $options
+     * @param array $options
      *
      * @return null|CategoryModel
      */
@@ -144,11 +143,49 @@ class CategoryManager
      *
      * -> see README.md for further info
      *
-     * @param string $property        The property defined in the primary category or an associated category config
-     * @param object $contextObj      The context object containing the field-context-mapping for deciding which category config is taken into account
-     * @param string $categoryField   The field containing the category (categories)
-     * @param int    $primaryCategory The id of the primary category
-     * @param bool   $skipCache       Skip caching
+     * @param string $property The property defined in the category
+     * @param int $category The id of the category
+     *
+     * @return mixed|null
+     */
+    public function getOverridablePropertyWithoutContext(string $property, int $category)
+    {
+        $relevantEntities = [];
+
+        // parent categories
+        $parentCategories = $this->getParentCategories($category);
+
+        if (null !== $parentCategories) {
+            foreach (array_reverse($parentCategories->getModels()) as $parentCategory) {
+                $relevantEntities[] = $parentCategory;
+            }
+        }
+
+        // category
+        $relevantEntities[] = ['tl_category', $category];
+
+        return System::getContainer()->get('huh.utils.dca')->getOverridableProperty($property, $relevantEntities);
+    }
+
+    /**
+     * Retrieves a property value based on a given context situation.
+     *
+     * These values can be defined in the following objects (lower number is lower priority):
+     *
+     * - in one of the parent categories of the category with id $primaryCategory or in a category config linked with the respective category
+     *   (nested categories and their category configs have higher priority than their children categories and configs)
+     * - in the category with id $primaryCategory
+     * - in a category config linked with the category with id $primaryCategory
+     *
+     * Hint: The category config is chosen based on the context value defined in $contextObj for the the field $categoryField
+     *
+     * -> see README.md for further info
+     *
+     * @param string $property The property defined in the primary category or an associated category config
+     * @param object $contextObj The context object containing the field-context-mapping for deciding which category config is taken into account
+     * @param string $categoryField The field containing the category (categories)
+     * @param int $primaryCategory The id of the primary category
+     * @param bool $skipCache Skip caching
      *
      * @return mixed|null
      */
@@ -235,10 +272,8 @@ class CategoryManager
     {
         Controller::loadDataContainer('tl_category');
 
-        foreach ($GLOBALS['TL_DCA']['tl_category']['fields'] as $field => $data)
-        {
-            if (isset($data['eval']['overridable']) && $data['eval']['overridable'])
-            {
+        foreach ($GLOBALS['TL_DCA']['tl_category']['fields'] as $field => $data) {
+            if (isset($data['eval']['overridable']) && $data['eval']['overridable']) {
                 $category->{$field} = $this->getOverridableProperty($field, $contextObj, $categoryField, $primaryCategory, $skipCache);
             }
         }
@@ -301,7 +336,7 @@ class CategoryManager
      * Returns the parent categories of the category with the id $categoryId.
      * The order is from closest parent to root parent category.
      *
-     * @param int  $category
+     * @param int $category
      * @param bool $insertCurrent
      *
      * @return Collection
@@ -335,7 +370,7 @@ class CategoryManager
      * Returns the parent categories' ids of the category with the id $categoryId.
      * The order is from closest parent to root parent category.
      *
-     * @param int  $category
+     * @param int $category
      * @param bool $insertCurrent
      *
      * @return array
@@ -364,9 +399,9 @@ class CategoryManager
     /**
      * Creates the association rows between entities and categories.
      *
-     * @param int    $entity
+     * @param int $entity
      * @param string $categoryField
-     * @param array  $categories
+     * @param array $categories
      */
     public function createAssociations(int $entity, string $categoryField, string $table, array $categories): void
     {
@@ -402,7 +437,7 @@ class CategoryManager
 
     /**
      * @param string $parentTable
-     * @param int    $categoryId
+     * @param int $categoryId
      *
      * @return array
      */
@@ -431,7 +466,7 @@ class CategoryManager
     /**
      * find category by id or alias
      *
-     * @param int   $id
+     * @param int $id
      * @param array $options
      *
      * @return CategoryModel|null
@@ -445,7 +480,7 @@ class CategoryManager
      * Find category and subcategory news categories by parent ID and IDs
      *
      * @param integer $intPid The parent ID
-     * @param array   $arrIds An array of categories
+     * @param array $arrIds An array of categories
      *
      * @return \Model\Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
      */

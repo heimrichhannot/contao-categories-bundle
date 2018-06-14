@@ -16,7 +16,9 @@ use Contao\Environment;
 use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Category extends Backend
 {
@@ -322,7 +324,9 @@ class Category extends Backend
      */
     public function modifyDca(DataContainer $dc)
     {
-        $category = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk('tl_category', $dc->id);
+        $modelUtil = System::getContainer()->get('huh.utils.model');
+
+        $category = $modelUtil->findModelInstanceByPk('tl_category', $dc->id);
         $dca      = &$GLOBALS['TL_DCA']['tl_category'];
 
         if ($category) {
