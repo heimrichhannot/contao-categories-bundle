@@ -372,13 +372,16 @@ class Category extends Backend
      */
     public function storeToCategoryAssociations($value, DataContainer $dc)
     {
-        switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
-            case 'radio':
-                \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, [$value]);
-                break;
-            case 'checkbox':
-                \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true));
-                break;
+        if ($value)
+        {
+            switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
+                case 'radio':
+                    \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, [$value]);
+                    break;
+                case 'checkbox':
+                    \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true));
+                    break;
+            }
         }
 
         return $value;

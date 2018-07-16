@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta16] - 2018-07-16
+
+#### Fixed
+- Category::storeToCategoryAssociations()
+
 ## [1.0.0-beta15] - 2018-06-14
 
 #### Added 
