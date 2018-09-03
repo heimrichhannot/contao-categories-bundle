@@ -380,11 +380,14 @@ class Category extends Backend
                     break;
                 case 'checkbox':
                     \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true));
+
+                    // transform from int to string so that contao backend list filtering works
+                    $value = serialize(array_map('strval', StringUtil::deserialize($value, true)));
                     break;
             }
         }
 
-        return serialize(array_map('strval', StringUtil::deserialize($value, true)));
+        return $value;
     }
 
     /**

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta18] - 2018-09-03
+
+#### Fixed
+- Category::storeToCategoryAssociations() -> fix for radio fields
+
 ## [1.0.0-beta17] - 2018-09-03
 
 #### Fixed
