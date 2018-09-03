@@ -384,7 +384,7 @@ class Category extends Backend
             }
         }
 
-        return $value;
+        return serialize(array_map('strval', StringUtil::deserialize($value, true)));
     }
 
     /**

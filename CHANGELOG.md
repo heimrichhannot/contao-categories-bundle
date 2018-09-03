@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta17] - 2018-09-03
+
+#### Fixed
+- Category::storeToCategoryAssociations() -> categories are now stored as strings in case of a multiple field so that contao backend list filtering works
+
 ## [1.0.0-beta16] - 2018-07-16
 
 #### Fixed
