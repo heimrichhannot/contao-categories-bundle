@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta19] - 2018-11-12
+
+#### Fixed
+- removal of categories already set wasn't possible
+
 ## [1.0.0-beta18] - 2018-09-03
 
 #### Fixed

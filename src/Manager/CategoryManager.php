@@ -397,13 +397,13 @@ class CategoryManager
     }
 
     /**
-     * Creates the association rows between entities and categories.
+     * Removes all associations for a specific entity.
      *
      * @param int $entity
      * @param string $categoryField
-     * @param array $categories
+     * @param string $table
      */
-    public function createAssociations(int $entity, string $categoryField, string $table, array $categories): void
+    public function removeAllAssociations(int $entity, string $categoryField, string $table): void
     {
         // clean up beforehands
         if (null !== ($categoryAssociations = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
@@ -411,6 +411,20 @@ class CategoryManager
                 $categoryAssociations->delete();
             }
         }
+    }
+
+    /**
+     * Creates the association rows between entities and categories.
+     *
+     * @param int $entity
+     * @param string $categoryField
+     * @param string $table
+     * @param array $categories
+     */
+    public function createAssociations(int $entity, string $categoryField, string $table, array $categories): void
+    {
+        // clean up beforehands
+        $this->removeAllAssociations($entity, $categoryField, $table);
 
         foreach ($categories as $category) {
             $association                = $this->framework->createInstance(CategoryAssociationModel::class);

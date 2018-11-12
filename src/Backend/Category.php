@@ -372,19 +372,25 @@ class Category extends Backend
      */
     public function storeToCategoryAssociations($value, DataContainer $dc)
     {
+        $manager = \System::getContainer()->get('huh.categories.manager');
+
         if ($value)
         {
             switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
                 case 'radio':
-                    \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, [$value]);
+                    $manager->createAssociations($dc->id, $dc->field, $dc->table, [$value]);
                     break;
                 case 'checkbox':
-                    \System::getContainer()->get('huh.categories.manager')->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true));
+                    $manager->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true));
 
                     // transform from int to string so that contao backend list filtering works
                     $value = serialize(array_map('strval', StringUtil::deserialize($value, true)));
                     break;
             }
+        }
+        else
+        {
+            $manager->removeAllAssociations($dc->id, $dc->field, $dc->table);
         }
 
         return $value;
