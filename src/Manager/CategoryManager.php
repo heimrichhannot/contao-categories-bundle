@@ -405,7 +405,7 @@ class CategoryManager
      */
     public function removeAllAssociations(int $entity, string $categoryField, string $table): void
     {
-        // clean up beforehands
+        // clean up beforehand
         if (null !== ($categoryAssociations = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
             while ($categoryAssociations->next()) {
                 $categoryAssociations->delete();
@@ -420,11 +420,15 @@ class CategoryManager
      * @param string $categoryField
      * @param string $table
      * @param array $categories
+     * @param bool $cleanBeforehand
      */
-    public function createAssociations(int $entity, string $categoryField, string $table, array $categories): void
+    public function createAssociations(int $entity, string $categoryField, string $table, array $categories, bool $cleanBeforehand = false): void
     {
-        // clean up beforehands
-        $this->removeAllAssociations($entity, $categoryField, $table);
+        // clean up beforehand
+        if ($cleanBeforehand)
+        {
+            $this->removeAllAssociations($entity, $categoryField, $table);
+        }
 
         foreach ($categories as $category) {
             $association                = $this->framework->createInstance(CategoryAssociationModel::class);
@@ -475,6 +479,11 @@ class CategoryManager
     public function findAssociationsByParentTableAndCategory(int $categoryId, string $parentTable)
     {
         return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['category=?', 'parentTable=?'], [$categoryId, $parentTable]);
+    }
+
+    public function findAssociationsByParentTableAndEntityAndField(string $parentTable, int $entityId, string $field)
+    {
+        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.parentTable=?', 'tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$parentTable, $entityId, $field]);
     }
 
     /**

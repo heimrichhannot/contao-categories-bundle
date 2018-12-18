@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta20] - 2018-12-18
+
+#### Changed
+- category manager functions
+
 ## [1.0.0-beta19] - 2018-11-12
 
 #### Fixed
