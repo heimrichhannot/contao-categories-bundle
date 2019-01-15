@@ -378,10 +378,10 @@ class Category extends Backend
         {
             switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
                 case 'radio':
-                    $manager->createAssociations($dc->id, $dc->field, $dc->table, [$value]);
+                    $manager->createAssociations($dc->id, $dc->field, $dc->table, [$value], true);
                     break;
                 case 'checkbox':
-                    $manager->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true));
+                    $manager->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true), true);
 
                     // transform from int to string so that contao backend list filtering works
                     $value = serialize(array_map('strval', StringUtil::deserialize($value, true)));

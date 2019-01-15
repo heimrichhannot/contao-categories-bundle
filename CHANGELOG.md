@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta21] - 2018-01-15
+
+#### Fixed
+- uncheck categories now properly works again 
+
 ## [1.0.0-beta20] - 2018-12-18
 
 #### Changed
