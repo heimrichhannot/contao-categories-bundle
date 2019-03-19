@@ -1,7 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.0.0-beta21] - 2018-01-15
+## [1.0.0-beta22] - 2019-03-19
+
+#### Changed
+- version 2 of `heimrichhannot/contao-multi-column-editor-bundle` as dependency
+
+## [1.0.0-beta21] - 2019-01-15
 
 #### Fixed
 - uncheck categories now properly works again 
