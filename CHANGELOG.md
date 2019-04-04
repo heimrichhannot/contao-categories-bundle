@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta23] - 2019-04-04
+
+#### Fixed
+- symfony 4 compatibility
+
 ## [1.0.0-beta22] - 2019-03-19
 
 #### Changed

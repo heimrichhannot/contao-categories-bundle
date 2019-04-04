@@ -1,18 +1,22 @@
 services:
     huh.categories.manager:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryManager
+        public: true
         arguments:
             - "@contao.framework"
     huh.categories.config_manager:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryConfigManager
+        public: true
         arguments:
             - "@contao.framework"
     huh.categories.context_manager:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryContextManager
+        public: true
         arguments:
             - "@contao.framework"
     huh.categories.property_cache_manager:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryPropertyCacheManager
+        public: true
         arguments:
             - "@contao.framework"
     huh.categories.picker.category_provider:
