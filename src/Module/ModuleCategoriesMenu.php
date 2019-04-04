@@ -9,6 +9,10 @@
 namespace HeimrichHannot\CategoriesBundle\Module;
 
 
+use Contao\BackendTemplate;
+use Contao\FrontendTemplate;
+use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
 
@@ -50,13 +54,13 @@ class ModuleCategoriesMenu extends \Contao\Module
     public function generate()
     {
         if (TL_MODE == 'BE') {
-            $objTemplate = new \BackendTemplate('be_wildcard');
+            $objTemplate = new BackendTemplate('be_wildcard');
 
             $objTemplate->wildcard = '### CATEGORIES MENU ###';
             $objTemplate->title    = $this->headline;
             $objTemplate->id       = $this->id;
             $objTemplate->link     = $this->name;
-            $objTemplate->href     = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
+            $objTemplate->href     = 'contao?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
 
             return $objTemplate->parse();
         }
@@ -69,10 +73,12 @@ class ModuleCategoriesMenu extends \Contao\Module
      */
     protected function compile()
     {
+        $categoriesManager = System::getContainer()->get('huh.categories.manager');
+
         if ($this->cm_customCategories) {
-            $categories = \System::getContainer()->get('huh.categories.manager')->findMultipleByIds(deserialize($this->cm_categories, true));
+            $categories = $categoriesManager->findMultipleByIds(StringUtil::deserialize($this->cm_categories, true));
         } else {
-            $categories = \System::getContainer()->get('huh.categories.manager')->findAll();
+            $categories = $categoriesManager->findAll();
         }
 
         // Return if no categories are found
@@ -82,14 +88,14 @@ class ModuleCategoriesMenu extends \Contao\Module
             return;
         }
 
-        /** @var $objPage \Contao\PageModel */
+        /** @var $objPage PageModel */
         global $objPage;
         $strParam = Category::getUrlParameterName();
         $strUrl   = $objPage->getFrontendUrl('/'.$strParam.'/%s');
 
         // Get the jumpTo page
         if ($this->jumpTo > 0 && $objPage->id != $this->jumpTo) {
-            $objJump = \Contao\PageModel::findByPk($this->jumpTo);
+            $objJump = PageModel::findByPk($this->jumpTo);
 
             if ($objJump !== null) {
                 $strUrl = $objPage->getFrontendUrl($objPage->row().'/'.$strParam.'/%s');
@@ -103,16 +109,16 @@ class ModuleCategoriesMenu extends \Contao\Module
             if ($this->cm_customCategories) {
                 $arrIds[] = $category->id;
             } else {
-                $arrIds = array_merge($arrIds, \System::getContainer()->get('huh.categories.manager')->findBy('pid', $category->pid)->fetchEach('id'));
+                $arrIds = array_merge($arrIds, $categoriesManager->findBy('pid', $category->pid)->fetchEach('id'));
             }
         }
 
         // Get the active category
         if (System::getContainer()->get('huh.request')->getGet($strParam) != '') {
-            $this->objActiveCategory = \System::getContainer()->get('huh.categories.manager')->findByIdOrAlias(System::getContainer()->get('huh.request')->getGet($strParam));
+            $this->objActiveCategory = $categoriesManager->findByIdOrAlias(System::getContainer()->get('huh.request')->getGet($strParam));
 
             if ($this->objActiveCategory !== null) {
-                $this->arrCategoryTrail = \System::getContainer()->get('huh.categories.manager')->findBy('pid', $this->objActiveCategory->pid)->fetchEach('id');
+                $this->arrCategoryTrail = $categoriesManager->findBy('pid', $this->objActiveCategory->pid)->fetchEach('id');
 
                 // Remove the current category from the trail
                 unset($this->arrCategoryTrail[array_search($this->objActiveCategory->id, $this->arrCategoryTrail)]);
@@ -139,7 +145,7 @@ class ModuleCategoriesMenu extends \Contao\Module
      */
     protected function renderCategories($intPid, $arrIds, $strUrl, $intLevel = 1)
     {
-        $categories = \System::getContainer()->get('huh.categories.manager')->findCategoryAndSubcategoryByPidAndIds($intPid, $arrIds);
+        $categories = System::getContainer()->get('huh.categories.manager')->findCategoryAndSubcategoryByPidAndIds($intPid, $arrIds);
 
         if ($categories === null) {
             return '';
@@ -153,7 +159,7 @@ class ModuleCategoriesMenu extends \Contao\Module
             $this->navigationTpl = 'nav_default';
         }
 
-        $objTemplate               = new \FrontendTemplate($this->navigationTpl);
+        $objTemplate               = new FrontendTemplate($this->navigationTpl);
         $objTemplate->type         = get_class($this);
         $objTemplate->cssID        = $this->cssID;
         $objTemplate->level        = 'level_'.$intLevel;
@@ -171,8 +177,8 @@ class ModuleCategoriesMenu extends \Contao\Module
                 'isActive'  => empty($this->activeCategories) && $blnActive,
                 'subitems'  => '',
                 'class'     => 'reset first'.(($total == 1) ? ' last' : '').' even'.($blnActive ? ' active' : ''),
-                'title'     => specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
-                'linkTitle' => specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
+                'title'     => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
+                'linkTitle' => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
                 'link'      => $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][0],
                 'href'      => ampersand(str_replace('/'.$strParam.'/%s', '', $strUrl)),
             ];
@@ -207,8 +213,8 @@ class ModuleCategoriesMenu extends \Contao\Module
             $arrRow['isActive']  = $blnActive;
             $arrRow['subitems']  = $strSubcategories;
             $arrRow['class']     = $strClass;
-            $arrRow['title']     = specialchars($strTitle, true);
-            $arrRow['linkTitle'] = specialchars($strTitle, true);
+            $arrRow['title']     = StringUtil::specialchars($strTitle, true);
+            $arrRow['linkTitle'] = StringUtil::specialchars($strTitle, true);
             $arrRow['link']      = $strTitle;
             $arrRow['href']      = ampersand(sprintf($strUrl, ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias)));
 

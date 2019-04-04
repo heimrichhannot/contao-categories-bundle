@@ -5,7 +5,7 @@ $GLOBALS['TL_DCA']['tl_category_context'] = [
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
         'onsubmit_callback' => [
-            ['HeimrichHannot\Haste\Dca\General', 'setDateAdded'],
+            ['huh.utils.dca', 'setDateAdded'],
         ],
         'sql'               => [
             'keys' => [

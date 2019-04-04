@@ -13,7 +13,7 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'addBreadcrumb']
         ],
         'onsubmit_callback' => [
-            ['HeimrichHannot\Haste\Dca\General', 'setDateAdded'],
+            ['huh.utils.dca', 'setDateAdded'],
         ],
         'sql'               => [
             'keys' => [
