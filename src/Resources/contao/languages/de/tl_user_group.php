@@ -8,4 +8,4 @@
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_user_group']['newscategories_legend'] = $GLOBALS['TL_LANG']['tl_user']['newscategories_legend'];
+$GLOBALS['TL_LANG']['tl_user_group']['categories_legend'] = $GLOBALS['TL_LANG']['tl_user']['categories_legend'];

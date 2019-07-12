@@ -1,11 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta25] - 2019-07-10
+
+#### Fixed
+- filter issues
+- user group legend issue
+
 ## [1.0.0-beta24] - 2019-04-04
 
-* removed haste leftover
-* fixed some deprecation warnings
-* fixed some namespaces
+#### Removed
+- haste leftover
+
+#### Fixed
+- some deprecation warnings
+- some namespaces
 
 ## [1.0.0-beta23] - 2019-04-04
 

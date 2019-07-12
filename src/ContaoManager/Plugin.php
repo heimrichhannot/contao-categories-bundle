@@ -24,12 +24,16 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
      */
     public function getBundles(ParserInterface $parser)
     {
+        $loadAfter = [
+            ContaoCoreBundle::class,
+        ];
+
+        if (class_exists('HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle')) {
+            $loadAfter[] = 'HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle';
+        }
+
         return [
-            BundleConfig::create(CategoriesBundle::class)
-                ->setLoadAfter([
-                    ContaoCoreBundle::class,
-                    'HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle'
-                ]),
+            BundleConfig::create(CategoriesBundle::class)->setLoadAfter($loadAfter),
         ];
     }
 
