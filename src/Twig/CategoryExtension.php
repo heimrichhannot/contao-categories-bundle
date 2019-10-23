@@ -77,6 +77,10 @@ class CategoryExtension extends AbstractExtension
     {
         $ids = StringUtil::deserialize($ids, true);
 
+        if (empty($ids)) {
+            return [];
+        }
+
         $categories = System::getContainer()->get('huh.categories.manager')->findMultipleByIds($ids);
 
         if (null === $categories) {

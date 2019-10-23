@@ -1,10 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.0.0-beta26] - 2019-08-12
+## [1.0.0-beta26] - 2019-10-23
 
 #### Added
 - support for disabled/readonly state of a category/categories field
+
+#### Added
+- null check in twig filter
 
 ## [1.0.0-beta25] - 2019-07-10
 
