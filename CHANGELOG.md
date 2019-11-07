@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta27] - 2019-11-07
+
+* added migration command for contao-news_categories
+
 ## [1.0.0-beta26] - 2019-10-23
 
 #### Added

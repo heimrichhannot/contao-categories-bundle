@@ -43,3 +43,10 @@ services:
         arguments:
           - "@contao.framework"
           - '@huh.categories.manager'
+
+# Commands
+
+    HeimrichHannot\CategoriesBundle\Command\NewsCategoriesMigrationCommand:
+        autowire: true
+        autoconfigure: true
+        public: false
