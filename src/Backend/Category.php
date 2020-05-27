@@ -129,6 +129,8 @@ class Category extends Backend
      * @param string $label
      *
      * @return array
+     *
+     * @deprecated Use Category::addSingleCategoryFieldToDca() instead
      */
     public static function getCategoryFieldDca($evalOverride = null, $label = null)
     {
@@ -146,6 +148,11 @@ class Category extends Backend
             $eval = array_merge($eval, $evalOverride);
         }
 
+        // add the deletion callback on record level
+        $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
+
+        $dca['config']['ondelete_callback']['deleteCategoryAssociations'] = [static::class, 'deleteCategoryAssociations'];
+
         return [
             'label' => &$label,
             'exclude' => true,
@@ -157,6 +164,52 @@ class Category extends Backend
             'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
+    }
+
+    /**
+     * Shorthand function for adding a single category field to your dca.
+     *
+     * @param string $table
+     * @param string $name
+     * @param array  $evalOverride
+     * @param string $label
+     */
+    public static function addSingleCategoryFieldToDca($table, $name, $evalOverride = null, $label = null)
+    {
+        \System::loadLanguageFile('tl_category');
+
+        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
+        $eval = [
+            'tl_class' => 'w50 autoheight clr',
+            'mandatory' => true,
+            'fieldType' => 'radio',
+            'isCategoryField' => true,
+        ];
+
+        if (\is_array($evalOverride)) {
+            $eval = array_merge($eval, $evalOverride);
+        }
+
+        \Controller::loadDataContainer($table);
+
+        $dca = &$GLOBALS['TL_DCA'][$table];
+
+        $dca['fields'][$name] = [
+            'label' => &$label,
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'categoryTree',
+            'foreignKey' => 'tl_category.title',
+            'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
+            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
+            'eval' => $eval,
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ];
+
+        // add the deletion callback on record level
+        $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
+
+        $dca['config']['ondelete_callback']['deleteCategoryAssociations'] = [static::class, 'deleteCategoryAssociations'];
     }
 
     /**
@@ -188,7 +241,9 @@ class Category extends Backend
 
         \Controller::loadDataContainer($table);
 
-        $GLOBALS['TL_DCA'][$table]['fields'][$name] = [
+        $dca = &$GLOBALS['TL_DCA'][$table];
+
+        $dca['fields'][$name] = [
             'label' => &$label,
             'exclude' => true,
             'filter' => true,
@@ -204,10 +259,15 @@ class Category extends Backend
         ];
 
         if ($eval['addPrimaryCategory']) {
-            $GLOBALS['TL_DCA'][$table]['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
+            $dca['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
                 'sql' => "int(10) unsigned NOT NULL default '0'",
             ];
         }
+
+        // add the deletion callback on record level
+        $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
+
+        $dca['config']['ondelete_callback']['deleteCategoryAssociations'] = [static::class, 'deleteCategoryAssociations'];
     }
 
     public static function deleteCachedPropertyValuesByCategoryAndProperty($value, DataContainer $dc)
@@ -345,6 +405,33 @@ class Category extends Backend
         }
     }
 
+    public function deleteCategoryAssociations(DataContainer $dc, $undoId)
+    {
+        $table = $dc->table;
+
+        if (!$table) {
+            return;
+        }
+
+        Controller::loadDataContainer($table);
+
+        // get category fields for this dca
+        $categoryFields = [];
+        $dca = &$GLOBALS['TL_DCA'][$table];
+
+        foreach ($dca['fields'] as $field => $data) {
+            if ('categoryTree' === $data['inputType']) {
+                $categoryFields[] = $field;
+            }
+        }
+
+        foreach ($categoryFields as $field) {
+            System::getContainer()->get('huh.categories.manager')->removeAllAssociations(
+                $dc->id, $field, $table
+            );
+        }
+    }
+
     /**
      * @param mixed $value
      */
@@ -477,10 +564,12 @@ class Category extends Backend
         $imagePasteInto = Image::getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=1&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
+            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=1&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1],
+                    $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=2&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
+        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=2&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1],
+                    $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
     /**

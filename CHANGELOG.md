@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta29] - 2020-05-27
+- deprecated `Category::getCategoryFieldDca()` in favor of `Category::addSingleCategoryFieldToDca()`
+- added association deletion in case of the deletion of the associated entity (e.g. tl_news)
+
 ## [1.0.0-beta28] - 2020-05-27
 - fixed choice option bug (label and value were swapped)
 
