@@ -53,7 +53,7 @@ class CategoriesChoice extends FieldOptionsChoice
         /** @var \HeimrichHannot\CategoriesBundle\Model\CategoryModel $category */
         foreach ($categories as $category)
         {
-            $options[] = ['label' => $category->frontendTitle ?: $category->title, 'value' => $category->id];
+            $options[] = ['label' => ($category->frontendTitle ?: $category->title) . ' (ID ' . $category->id . ')', 'value' => $category->id];
         }
 
         return $options;

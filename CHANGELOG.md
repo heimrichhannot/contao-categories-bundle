@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta28] - 2020-05-27
+- fixed choice option bug (label and value were swapped)
+
 ## [1.0.0-beta27] - 2019-11-07
 
 * added migration command for contao-news_categories
