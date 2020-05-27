@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\ContaoManager;
@@ -41,8 +41,6 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
      * Allows a plugin to override extension configuration.
      *
      * @param string $extensionName
-     * @param array $extensionConfigs
-     * @param ContainerBuilder $container
      *
      * @return array
      */
@@ -52,7 +50,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
             'huh_filter',
             $extensionName,
             $extensionConfigs,
-            __DIR__ .'/../Resources/config/huh_filter.yml'
+            __DIR__.'/../Resources/config/huh_filter.yml'
         );
     }
 }

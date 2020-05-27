@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Widget;
@@ -111,12 +111,12 @@ class CategoryTree extends Widget
                 'source' => $this->strTable.'.'.$this->currentRecord,
             ];
 
-            if (is_array($this->rootNodes)) {
+            if (\is_array($this->rootNodes)) {
                 $extras['rootNodes'] = array_values($this->rootNodes);
             }
 
             $return .= '
-	<p>' . ($dca['eval']['disabled'] || $dca['eval']['readonly'] ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>') . '</p>
+	<p>'.($dca['eval']['disabled'] || $dca['eval']['readonly'] ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
 	<script>
 	  $("pt_'.$this->strName.'").addEvent("click", function(e) {
 		e.preventDefault();
@@ -180,7 +180,7 @@ class CategoryTree extends Widget
      */
     protected function checkValue($varInput)
     {
-        if ('' === (string) $varInput || !is_array($this->rootNodes)) {
+        if ('' === (string) $varInput || !\is_array($this->rootNodes)) {
             return;
         }
     }

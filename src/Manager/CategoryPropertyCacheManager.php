@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
@@ -20,8 +20,6 @@ class CategoryPropertyCacheManager
 
     /**
      * Constructor.
-     *
-     * @param ContaoFrameworkInterface $framework
      */
     public function __construct(ContaoFrameworkInterface $framework)
     {
@@ -33,7 +31,6 @@ class CategoryPropertyCacheManager
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|CategoryPropertyCacheModel|null
      */
@@ -46,13 +43,7 @@ class CategoryPropertyCacheManager
     }
 
     /**
-     * @param string $property
-     * @param string $categoryField
-     * @param int    $category
-     * @param int    $context
-     * @param mixed  $value
-     *
-     * @return CategoryPropertyCacheModel|null
+     * @param mixed $value
      */
     public function add(string $property, string $categoryField, int $category, int $context, $value): ?CategoryPropertyCacheModel
     {
@@ -60,13 +51,13 @@ class CategoryPropertyCacheManager
             $item->value = $value;
             $item->save();
         } else {
-            $item                = $this->framework->createInstance(CategoryPropertyCacheModel::class);
-            $item->tstamp        = time();
-            $item->property      = $property;
+            $item = $this->framework->createInstance(CategoryPropertyCacheModel::class);
+            $item->tstamp = time();
+            $item->property = $property;
             $item->categoryField = $categoryField;
-            $item->category      = $category;
-            $item->context       = $context;
-            $item->value         = $value;
+            $item->category = $category;
+            $item->context = $context;
+            $item->value = $value;
             $item->save();
         }
 
@@ -74,11 +65,6 @@ class CategoryPropertyCacheManager
     }
 
     /**
-     * @param string $property
-     * @param string $categoryField
-     * @param int    $category
-     * @param int    $context
-     *
      * @return \Contao\Model\Collection|CategoryPropertyCacheModel|null
      */
     public function get(string $property, string $categoryField, int $category, int $context)
@@ -94,14 +80,6 @@ class CategoryPropertyCacheManager
         return null;
     }
 
-    /**
-     * @param string $property
-     * @param string $categoryField
-     * @param int    $category
-     * @param int    $context
-     *
-     * @return bool
-     */
     public function has(string $property, string $categoryField, int $category, int $context): bool
     {
         if (!$property || !$categoryField || !$category || !$context) {

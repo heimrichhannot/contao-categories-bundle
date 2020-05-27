@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -30,10 +30,6 @@ class CategoriesChoice extends FieldOptionsChoice
     /**
      * Get category widget options.
      *
-     * @param FilterConfigElementModel $element
-     * @param array                    $filter
-     * @param array                    $dca
-     *
      * @return array
      */
     protected function getCategoryWidgetOptions(FilterConfigElementModel $element, array $filter, array $dca)
@@ -51,9 +47,8 @@ class CategoriesChoice extends FieldOptionsChoice
         }
 
         /** @var \HeimrichHannot\CategoriesBundle\Model\CategoryModel $category */
-        foreach ($categories as $category)
-        {
-            $options[] = ['label' => ($category->frontendTitle ?: $category->title) . ' (ID ' . $category->id . ')', 'value' => $category->id];
+        foreach ($categories as $category) {
+            $options[] = ['label' => ($category->frontendTitle ?: $category->title).' (ID '.$category->id.')', 'value' => $category->id];
         }
 
         return $options;

@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: kwagner
- * Date: 13.12.17
- * Time: 15:18
+
+/*
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
+ *
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Module;
-
 
 use Contao\BackendTemplate;
 use Contao\FrontendTemplate;
@@ -19,35 +18,35 @@ use HeimrichHannot\CategoriesBundle\Backend\Category;
 class ModuleCategoriesMenu extends \Contao\Module
 {
     /**
-     * Template
+     * Template.
      *
      * @var string
      */
     protected $strTemplate = 'mod_categoriesMenu';
 
     /**
-     * Active category
+     * Active category.
      *
      * @var object
      */
     protected $objActiveCategory = null;
 
     /**
-     * Active categories
+     * Active categories.
      *
      * @var array
      */
     protected $activeCategories = [];
 
     /**
-     * Category trail
+     * Category trail.
      *
      * @var array
      */
     protected $arrCategoryTrail = [];
 
     /**
-     * Display a wildcard in the back end
+     * Display a wildcard in the back end.
      *
      * @return string
      */
@@ -57,10 +56,10 @@ class ModuleCategoriesMenu extends \Contao\Module
             $objTemplate = new BackendTemplate('be_wildcard');
 
             $objTemplate->wildcard = '### CATEGORIES MENU ###';
-            $objTemplate->title    = $this->headline;
-            $objTemplate->id       = $this->id;
-            $objTemplate->link     = $this->name;
-            $objTemplate->href     = 'contao?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
+            $objTemplate->title = $this->headline;
+            $objTemplate->id = $this->id;
+            $objTemplate->link = $this->name;
+            $objTemplate->href = 'contao?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
 
             return $objTemplate->parse();
         }
@@ -69,7 +68,7 @@ class ModuleCategoriesMenu extends \Contao\Module
     }
 
     /**
-     * Generate the module
+     * Generate the module.
      */
     protected function compile()
     {
@@ -82,22 +81,22 @@ class ModuleCategoriesMenu extends \Contao\Module
         }
 
         // Return if no categories are found
-        if ($categories === null) {
+        if (null === $categories) {
             $this->Template->categories = '';
 
             return;
         }
 
-        /** @var $objPage PageModel */
+        /* @var $objPage PageModel */
         global $objPage;
         $strParam = Category::getUrlParameterName();
-        $strUrl   = $objPage->getFrontendUrl('/'.$strParam.'/%s');
+        $strUrl = $objPage->getFrontendUrl('/'.$strParam.'/%s');
 
         // Get the jumpTo page
         if ($this->jumpTo > 0 && $objPage->id != $this->jumpTo) {
             $objJump = PageModel::findByPk($this->jumpTo);
 
-            if ($objJump !== null) {
+            if (null !== $objJump) {
                 $strUrl = $objPage->getFrontendUrl($objPage->row().'/'.$strParam.'/%s');
             }
         }
@@ -114,10 +113,10 @@ class ModuleCategoriesMenu extends \Contao\Module
         }
 
         // Get the active category
-        if (System::getContainer()->get('huh.request')->getGet($strParam) != '') {
+        if ('' != System::getContainer()->get('huh.request')->getGet($strParam)) {
             $this->objActiveCategory = $categoriesManager->findByIdOrAlias(System::getContainer()->get('huh.request')->getGet($strParam));
 
-            if ($this->objActiveCategory !== null) {
+            if (null !== $this->objActiveCategory) {
                 $this->arrCategoryTrail = $categoriesManager->findBy('pid', $this->objActiveCategory->pid)->fetchEach('id');
 
                 // Remove the current category from the trail
@@ -136,10 +135,10 @@ class ModuleCategoriesMenu extends \Contao\Module
     }
 
     /**
-     * Recursively compile the  categories and return it as HTML string
+     * Recursively compile the  categories and return it as HTML string.
      *
-     * @param integer
-     * @param integer
+     * @param int
+     * @param int
      *
      * @return string
      */
@@ -147,47 +146,46 @@ class ModuleCategoriesMenu extends \Contao\Module
     {
         $categories = System::getContainer()->get('huh.categories.manager')->findCategoryAndSubcategoryByPidAndIds($intPid, $arrIds);
 
-        if ($categories === null) {
+        if (null === $categories) {
             return '';
         }
 
-        $strParam      = Category::getUrlParameterName();
+        $strParam = Category::getUrlParameterName();
         $arrCategories = [];
 
         // Layout template fallback
-        if ($this->navigationTpl == '') {
+        if ('' == $this->navigationTpl) {
             $this->navigationTpl = 'nav_default';
         }
 
-        $objTemplate               = new FrontendTemplate($this->navigationTpl);
-        $objTemplate->type         = get_class($this);
-        $objTemplate->cssID        = $this->cssID;
-        $objTemplate->level        = 'level_'.$intLevel;
+        $objTemplate = new FrontendTemplate($this->navigationTpl);
+        $objTemplate->type = \get_class($this);
+        $objTemplate->cssID = $this->cssID;
+        $objTemplate->level = 'level_'.$intLevel;
         $objTemplate->showQuantity = $this->cm_showQuantity;
 
         $count = 0;
         $total = $categories->count();
 
         // Add the "reset categories" link
-        if ($this->cm_resetCategories && $intLevel == 1) {
-
+        if ($this->cm_resetCategories && 1 == $intLevel) {
             $blnActive = System::getContainer()->get('huh.request')->getGet($strParam) ? false : true;
 
             $arrCategories[] = [
-                'isActive'  => empty($this->activeCategories) && $blnActive,
-                'subitems'  => '',
-                'class'     => 'reset first'.(($total == 1) ? ' last' : '').' even'.($blnActive ? ' active' : ''),
-                'title'     => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
+                'isActive' => empty($this->activeCategories) && $blnActive,
+                'subitems' => '',
+                'class' => 'reset first'.((1 == $total) ? ' last' : '').' even'.($blnActive ? ' active' : ''),
+                'title' => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
                 'linkTitle' => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
-                'link'      => $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][0],
-                'href'      => ampersand(str_replace('/'.$strParam.'/%s', '', $strUrl)),
+                'link' => $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][0],
+                'href' => ampersand(str_replace('/'.$strParam.'/%s', '', $strUrl)),
             ];
 
             $count = 1;
-            $total++;
+            ++$total;
         }
 
-        $intLevel++;
+        ++$intLevel;
 
         // Render categories
         foreach ($categories as $category) {
@@ -198,25 +196,25 @@ class ModuleCategoriesMenu extends \Contao\Module
                 $strSubcategories = $this->renderCategories($category->id, $arrIds, $strUrl, $intLevel);
             }
 
-            $blnActive = ($this->objActiveCategory !== null) && ($this->objActiveCategory->id == $category->id);
-            $strClass  = ('cm_category_'.$category->id).($category->cssClass ? (' '.$category->cssClass) : '').((++$count == 1) ? ' first' : '').(($count == $total) ? ' last' : '').((($count % 2) == 0) ? ' odd' : ' even').($blnActive ? ' active' : '').(($strSubcategories != '') ? ' submenu' : '').(in_array($category->id, $this->arrCategoryTrail) ? ' trail' : '').(in_array(
+            $blnActive = (null !== $this->objActiveCategory) && ($this->objActiveCategory->id == $category->id);
+            $strClass = ('cm_category_'.$category->id).($category->cssClass ? (' '.$category->cssClass) : '').((1 == ++$count) ? ' first' : '').(($count == $total) ? ' last' : '').((0 == ($count % 2)) ? ' odd' : ' even').($blnActive ? ' active' : '').(('' != $strSubcategories) ? ' submenu' : '').(\in_array($category->id, $this->arrCategoryTrail) ? ' trail' : '').(\in_array(
                     $category->id,
                     $this->activeCategories
                 ) ? ' cm_trail' : '');
-            $strTitle  = $category->frontendTitle ?: $category->title;
+            $strTitle = $category->frontendTitle ?: $category->title;
 
             if (\System::getContainer()->get('translator')->getCatalogue()->has($strTitle)) {
                 $strTitle = \System::getContainer()->get('translator')->trans($strTitle);
             }
 
-            $arrRow              = $category->row();
-            $arrRow['isActive']  = $blnActive;
-            $arrRow['subitems']  = $strSubcategories;
-            $arrRow['class']     = $strClass;
-            $arrRow['title']     = StringUtil::specialchars($strTitle, true);
+            $arrRow = $category->row();
+            $arrRow['isActive'] = $blnActive;
+            $arrRow['subitems'] = $strSubcategories;
+            $arrRow['class'] = $strClass;
+            $arrRow['title'] = StringUtil::specialchars($strTitle, true);
             $arrRow['linkTitle'] = StringUtil::specialchars($strTitle, true);
-            $arrRow['link']      = $strTitle;
-            $arrRow['href']      = ampersand(sprintf($strUrl, ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias)));
+            $arrRow['link'] = $strTitle;
+            $arrRow['href'] = ampersand(sprintf($strUrl, ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias)));
 
             $arrCategories[] = $arrRow;
         }

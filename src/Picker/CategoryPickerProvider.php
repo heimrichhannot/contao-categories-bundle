@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Picker;
@@ -28,7 +28,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
      */
     public function supportsContext($context)
     {
-        return in_array($context, ['category'], true) && $this->getUser()->hasAccess('categories', 'modules');
+        return \in_array($context, ['category'], true) && $this->getUser()->hasAccess('categories', 'modules');
     }
 
     /**
@@ -68,7 +68,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
                 $attributes['preserveRecord'] = $source;
             }
 
-            if (is_array($rootNodes = $config->getExtra('rootNodes'))) {
+            if (\is_array($rootNodes = $config->getExtra('rootNodes'))) {
                 $attributes['rootNodes'] = $rootNodes;
             }
 

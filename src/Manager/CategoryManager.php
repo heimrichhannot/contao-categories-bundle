@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
@@ -26,8 +26,6 @@ class CategoryManager
 
     /**
      * Constructor.
-     *
-     * @param ContaoFrameworkInterface $framework
      */
     public function __construct(ContaoFrameworkInterface $framework)
     {
@@ -35,10 +33,6 @@ class CategoryManager
     }
 
     /**
-     * @param int $entity
-     * @param string $categoryField
-     * @param array $options
-     *
      * @return \Contao\Model\Collection|null
      */
     public function findByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = [])
@@ -55,9 +49,6 @@ class CategoryManager
     }
 
     /**
-     * @param string $categoryField
-     * @param array $options
-     *
      * @return \Contao\Model\Collection|null
      */
     public function findByCategoryFieldAndTable(string $categoryField, string $table, array $options = [])
@@ -76,12 +67,9 @@ class CategoryManager
     }
 
     /**
-     * Get categories by dca field in table filtered by pids
+     * Get categories by dca field in table filtered by pids.
      *
-     * @param string $categoryField
-     * @param string $table
      * @param array $pids Ids of parent categories
-     * @param array $options
      *
      * @return \Contao\Model\Collection|null
      */
@@ -97,10 +85,11 @@ class CategoryManager
             'order' => 'sorting ASC',
         ];
 
-        $ids     = $categoryAssociations->fetchEach('category');
-        $columns = ["tl_category.id IN(" . implode(',', array_map('\intval', $ids)) . ')'];
+        $ids = $categoryAssociations->fetchEach('category');
+        $columns = ['tl_category.id IN('.implode(',', array_map('\intval', $ids)).')'];
+
         if (!empty($pids)) {
-            $columns[] = 'tl_category.pid IN(' . implode(',', array_map('\intval', $pids)) . ')';
+            $columns[] = 'tl_category.pid IN('.implode(',', array_map('\intval', $pids)).')';
         }
 
         return $modelUtil->findModelInstancesBy(
@@ -111,13 +100,6 @@ class CategoryManager
         );
     }
 
-    /**
-     * @param int $entity
-     * @param string $categoryField
-     * @param array $options
-     *
-     * @return null|CategoryModel
-     */
     public function findOneByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = []): ?CategoryModel
     {
         $modelUtil = System::getContainer()->get('huh.utils.model');
@@ -144,7 +126,7 @@ class CategoryManager
      * -> see README.md for further info
      *
      * @param string $property The property defined in the category
-     * @param int $category The id of the category
+     * @param int    $category The id of the category
      *
      * @return mixed|null
      */
@@ -181,21 +163,21 @@ class CategoryManager
      *
      * -> see README.md for further info
      *
-     * @param string $property The property defined in the primary category or an associated category config
-     * @param object $contextObj The context object containing the field-context-mapping for deciding which category config is taken into account
-     * @param string $categoryField The field containing the category (categories)
-     * @param int $primaryCategory The id of the primary category
-     * @param bool $skipCache Skip caching
+     * @param string $property        The property defined in the primary category or an associated category config
+     * @param object $contextObj      The context object containing the field-context-mapping for deciding which category config is taken into account
+     * @param string $categoryField   The field containing the category (categories)
+     * @param int    $primaryCategory The id of the primary category
+     * @param bool   $skipCache       Skip caching
      *
      * @return mixed|null
      */
     public function getOverridableProperty(string $property, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
     {
         $categoryConfigManager = System::getContainer()->get('huh.categories.config_manager');
-        $relevantEntities      = [];
+        $relevantEntities = [];
 
         // compute context
-        $context      = $this->computeContext($contextObj, $categoryField);
+        $context = $this->computeContext($contextObj, $categoryField);
         $cacheManager = System::getContainer()->get('huh.categories.property_cache_manager');
 
         if (!$skipCache && null !== $context && $cacheManager->has($property, $categoryField, $primaryCategory, $context)) {
@@ -239,10 +221,7 @@ class CategoryManager
     /**
      * Computes the context string for a given field based on a context object.
      *
-     * @param        $contextObj
-     * @param string $categoryField
-     *
-     * @return null|int
+     * @param $contextObj
      */
     public function computeContext($contextObj, string $categoryField): ?int
     {
@@ -251,7 +230,7 @@ class CategoryManager
         if (!empty($categoryFieldContextMapping)) {
             foreach ($categoryFieldContextMapping as $mapping) {
                 if (isset($mapping['categoryField']) && $mapping['categoryField'] === $categoryField) {
-                    return (int)$mapping['context'];
+                    return (int) $mapping['context'];
                 }
             }
         }
@@ -262,11 +241,7 @@ class CategoryManager
     /**
      * Adds all overridable property to $category.
      *
-     * @param CategoryModel $category
      * @param $contextObj
-     * @param string $categoryField
-     * @param int $primaryCategory
-     * @param bool $skipCache
      */
     public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
     {
@@ -284,7 +259,6 @@ class CategoryManager
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|CategoryModel|null
      */
@@ -296,8 +270,6 @@ class CategoryManager
     /**
      * Adapter function for the model's findAll method.
      *
-     * @param array $options
-     *
      * @return \Contao\Model\Collection|CategoryModel|null
      */
     public function findAll(array $options = [])
@@ -307,9 +279,6 @@ class CategoryManager
 
     /**
      * Adapter function for the model's findMultipleByIds method.
-     *
-     * @param array $ids
-     * @param array $options
      *
      * @return \Contao\Model\Collection|CategoryModel|null
      */
@@ -323,7 +292,6 @@ class CategoryManager
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return CategoryModel|null
      */
@@ -335,9 +303,6 @@ class CategoryManager
     /**
      * Returns the parent categories of the category with the id $categoryId.
      * The order is from closest parent to root parent category.
-     *
-     * @param int $category
-     * @param bool $insertCurrent
      *
      * @return Collection
      */
@@ -369,11 +334,6 @@ class CategoryManager
     /**
      * Returns the parent categories' ids of the category with the id $categoryId.
      * The order is from closest parent to root parent category.
-     *
-     * @param int $category
-     * @param bool $insertCurrent
-     *
-     * @return array
      */
     public function getParentCategoryIds(int $category, bool $insertCurrent = false): array
     {
@@ -398,10 +358,6 @@ class CategoryManager
 
     /**
      * Removes all associations for a specific entity.
-     *
-     * @param int $entity
-     * @param string $categoryField
-     * @param string $table
      */
     public function removeAllAssociations(int $entity, string $categoryField, string $table): void
     {
@@ -415,27 +371,20 @@ class CategoryManager
 
     /**
      * Creates the association rows between entities and categories.
-     *
-     * @param int $entity
-     * @param string $categoryField
-     * @param string $table
-     * @param array $categories
-     * @param bool $cleanBeforehand
      */
     public function createAssociations(int $entity, string $categoryField, string $table, array $categories, bool $cleanBeforehand = false): void
     {
         // clean up beforehand
-        if ($cleanBeforehand)
-        {
+        if ($cleanBeforehand) {
             $this->removeAllAssociations($entity, $categoryField, $table);
         }
 
         foreach ($categories as $category) {
-            $association                = $this->framework->createInstance(CategoryAssociationModel::class);
-            $association->tstamp        = time();
-            $association->category      = $category;
-            $association->entity        = $entity;
-            $association->parentTable   = $table;
+            $association = $this->framework->createInstance(CategoryAssociationModel::class);
+            $association->tstamp = time();
+            $association->category = $category;
+            $association->entity = $entity;
+            $association->parentTable = $table;
             $association->categoryField = $categoryField;
             $association->save();
         }
@@ -443,10 +392,6 @@ class CategoryManager
 
     /**
      * Determines whether a category has children.
-     *
-     * @param int $category
-     *
-     * @return bool
      */
     public function hasChildren(int $category): bool
     {
@@ -454,9 +399,6 @@ class CategoryManager
     }
 
     /**
-     * @param string $parentTable
-     * @param int $categoryId
-     *
      * @return array
      */
     public function getAssociationsByParentTableAndCategory(int $categoryId, string $parentTable)
@@ -487,10 +429,9 @@ class CategoryManager
     }
 
     /**
-     * find category by id or alias
+     * find category by id or alias.
      *
      * @param int $id
-     * @param array $options
      *
      * @return CategoryModel|null
      */
@@ -500,20 +441,20 @@ class CategoryManager
     }
 
     /**
-     * Find category and subcategory news categories by parent ID and IDs
+     * Find category and subcategory news categories by parent ID and IDs.
      *
-     * @param integer $intPid The parent ID
+     * @param int   $intPid The parent ID
      * @param array $arrIds An array of categories
      *
      * @return \Model\Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
      */
     public function findCategoryAndSubcategoryByPidAndIds(int $pid, array $arrIds)
     {
-        if (!is_array($arrIds) || empty($arrIds)) {
+        if (!\is_array($arrIds) || empty($arrIds)) {
             return null;
         }
 
-        $objCategories = \Database::getInstance()->prepare("SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN (" . implode(',', array_map('intval', $arrIds)) . ")) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN (" . implode(',', array_map('intval', $arrIds)) . ")")->execute($pid);
+        $objCategories = \Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).')')->execute($pid);
 
         if ($objCategories->numRows < 1) {
             return null;
@@ -523,10 +464,7 @@ class CategoryManager
     }
 
     /**
-     * gets all entity ids by category and parent table
-     *
-     * @param string $category
-     * @param string $parenTable
+     * gets all entity ids by category and parent table.
      *
      * @return array|null
      */
@@ -534,7 +472,7 @@ class CategoryManager
     {
         $objCategory = $this->findByIdOrAlias($category);
 
-        if ($objCategory === null) {
+        if (null === $objCategory) {
             return null;
         }
 

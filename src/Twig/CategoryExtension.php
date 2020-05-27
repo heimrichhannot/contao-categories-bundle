@@ -1,13 +1,12 @@
 <?php
-/**
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+
+/*
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @author Rico Kaltofen <r.kaltofen@heimrich-hannot.de>
- * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Twig;
-
 
 use Contao\StringUtil;
 use Contao\System;
@@ -26,8 +25,10 @@ class CategoryExtension extends AbstractExtension
     }
 
     /**
-     * Get the category for a given category id
+     * Get the category for a given category id.
+     *
      * @param int $id
+     *
      * @return array|null
      */
     public function getCategory($id)
@@ -48,9 +49,7 @@ class CategoryExtension extends AbstractExtension
      *
      * @param $id
      * @param $contextObj
-     * @param string $categoryField
-     * @param int $primaryCategory
-     * @param bool $skipCache
+     *
      * @return array|null
      */
     public function getContextualCategory($id, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
@@ -69,8 +68,10 @@ class CategoryExtension extends AbstractExtension
     }
 
     /**
-     * Get the category for a given category id
+     * Get the category for a given category id.
+     *
      * @param string|array $ids
+     *
      * @return array|null
      */
     public function getCategories($ids)

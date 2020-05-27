@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Backend;
@@ -16,9 +16,7 @@ use Contao\Environment;
 use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Category extends Backend
 {
@@ -27,7 +25,7 @@ class Category extends Backend
     protected static $defaultPrimaryCategorySet = false;
 
     /**
-     * Add a breadcrumb menu to the page tree
+     * Add a breadcrumb menu to the page tree.
      *
      * @throws AccessDeniedException
      * @throws \RuntimeException
@@ -61,16 +59,16 @@ class Category extends Backend
             throw new \RuntimeException('Insecure path '.$intNode);
         }
 
-        $arrIds   = [];
+        $arrIds = [];
         $arrLinks = [];
 
         // Generate breadcrumb trail
         if ($intNode) {
-            $intId       = $intNode;
+            $intId = $intNode;
             $objDatabase = \Database::getInstance();
 
             do {
-                $objCategory = $objDatabase->prepare("SELECT * FROM tl_category WHERE id=?")->limit(1)->execute($intId);
+                $objCategory = $objDatabase->prepare('SELECT * FROM tl_category WHERE id=?')->limit(1)->execute($intId);
 
                 if ($objCategory->numRows < 1) {
                     // Currently selected page does not exist
@@ -114,7 +112,7 @@ class Category extends Backend
 
         // Add root link
         $arrLinks[] = \Image::getHtml('pagemounts.svg').' <a href="'.\Backend::addToUrl('cn=0').'" title="'.\StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">'.$GLOBALS['TL_LANG']['MSC']['filterAll'].'</a>';
-        $arrLinks   = array_reverse($arrLinks);
+        $arrLinks = array_reverse($arrLinks);
 
         // Insert breadcrumb menu
         $GLOBALS['TL_DCA']['tl_category']['list']['sorting']['breadcrumb'] .= '
@@ -137,27 +135,27 @@ class Category extends Backend
         \System::loadLanguageFile('tl_category');
 
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
-        $eval  = [
-            'tl_class'        => 'w50 autoheight',
-            'mandatory'       => true,
-            'fieldType'       => 'radio',
+        $eval = [
+            'tl_class' => 'w50 autoheight',
+            'mandatory' => true,
+            'fieldType' => 'radio',
             'isCategoryField' => true,
         ];
 
-        if (is_array($evalOverride)) {
+        if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
         }
 
         return [
-            'label'         => &$label,
-            'exclude'       => true,
-            'filter'        => true,
-            'inputType'     => 'categoryTree',
-            'foreignKey'    => 'tl_category.title',
+            'label' => &$label,
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'categoryTree',
+            'foreignKey' => 'tl_category.title',
             'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
             'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations']],
-            'eval'          => $eval,
-            'sql'           => "int(10) unsigned NOT NULL default '0'",
+            'eval' => $eval,
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
     }
 
@@ -174,35 +172,35 @@ class Category extends Backend
         \System::loadLanguageFile('tl_category');
 
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categories'];
-        $eval  = [
-            'tl_class'             => 'w50 autoheight clr',
-            'mandatory'            => true,
-            'multiple'             => true,
-            'fieldType'            => 'checkbox',
-            'addPrimaryCategory'   => true,
+        $eval = [
+            'tl_class' => 'w50 autoheight clr',
+            'mandatory' => true,
+            'multiple' => true,
+            'fieldType' => 'checkbox',
+            'addPrimaryCategory' => true,
             'forcePrimaryCategory' => true,
-            'isCategoryField'      => true,
+            'isCategoryField' => true,
         ];
 
-        if (is_array($evalOverride)) {
+        if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
         }
 
         \Controller::loadDataContainer($table);
 
         $GLOBALS['TL_DCA'][$table]['fields'][$name] = [
-            'label'         => &$label,
-            'exclude'       => true,
-            'filter'        => true,
-            'inputType'     => 'categoryTree',
-            'foreignKey'    => 'tl_category.title',
+            'label' => &$label,
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'categoryTree',
+            'foreignKey' => 'tl_category.title',
             'load_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'loadCategoriesFromAssociations']],
             'save_callback' => [
                 ['HeimrichHannot\CategoriesBundle\Backend\Category', 'storePrimaryCategory'],
                 ['HeimrichHannot\CategoriesBundle\Backend\Category', 'storeToCategoryAssociations'],
             ],
-            'eval'          => $eval,
-            'sql'           => 'blob NULL',
+            'eval' => $eval,
+            'sql' => 'blob NULL',
         ];
 
         if ($eval['addPrimaryCategory']) {
@@ -277,12 +275,12 @@ class Category extends Backend
 
         $primaryCategory = System::getContainer()->get('huh.request')->getGet('primaryCategory');
 
-        $isParentCategory              = System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
+        $isParentCategory = System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
         $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable'] || $category->selectable) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
 
         if ($checkAsDefaultPrimaryCategory || $row['id'] === \Input::get('primaryCategory')) {
             static::$defaultPrimaryCategorySet = true;
-            $checked                           = ' checked';
+            $checked = ' checked';
         }
 
         return '<input type="radio" name="primaryCategory" data-id="'.$row['id'].'" id="primaryCategory_'.$row['id'].'" value="primary_'.$row['id'].'"'.$checked.'>'.'<label style="margin-right: 6px" for="primaryCategory_'.$row['id'].'" title="'.$title.'" class="primarize">'.'<span class="icon primarized">'.\Image::getHtml('bundles/categories/img/icon_primarized.png').'</span>'.'<span class="icon unprimarized">'.\Image::getHtml('bundles/categories/img/icon_unprimarized.png').'</span>'.'</label>';
@@ -302,12 +300,12 @@ class Category extends Backend
 
                 // boolean field
                 $dca['fields'][$overrideFieldName] = [
-                    'label'         => &$GLOBALS['TL_LANG']['tl_category'][$overrideFieldName],
-                    'exclude'       => true,
-                    'inputType'     => 'checkbox',
+                    'label' => &$GLOBALS['TL_LANG']['tl_category'][$overrideFieldName],
+                    'exclude' => true,
+                    'inputType' => 'checkbox',
                     'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCachedPropertyValuesByCategoryAndPropertyBool']],
-                    'eval'          => ['tl_class' => 'w50', 'submitOnChange' => true],
-                    'sql'           => "char(1) NOT NULL default ''",
+                    'eval' => ['tl_class' => 'w50', 'submitOnChange' => true],
+                    'sql' => "char(1) NOT NULL default ''",
                 ];
 
                 // selector
@@ -319,15 +317,12 @@ class Category extends Backend
         }
     }
 
-    /**
-     * @param DataContainer $dc
-     */
     public function modifyDca(DataContainer $dc)
     {
         $modelUtil = System::getContainer()->get('huh.utils.model');
 
         $category = $modelUtil->findModelInstanceByPk('tl_category', $dc->id);
-        $dca      = &$GLOBALS['TL_DCA']['tl_category'];
+        $dca = &$GLOBALS['TL_DCA']['tl_category'];
 
         if ($category) {
             if ($category->pid) {
@@ -351,8 +346,7 @@ class Category extends Backend
     }
 
     /**
-     * @param mixed         $value
-     * @param DataContainer $dc
+     * @param mixed $value
      */
     public function storePrimaryCategory($value, DataContainer $dc)
     {
@@ -367,29 +361,28 @@ class Category extends Backend
     }
 
     /**
-     * @param mixed         $value
-     * @param DataContainer $dc
+     * @param mixed $value
      */
     public function storeToCategoryAssociations($value, DataContainer $dc)
     {
         $manager = \System::getContainer()->get('huh.categories.manager');
 
-        if ($value)
-        {
+        if ($value) {
             switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
                 case 'radio':
                     $manager->createAssociations($dc->id, $dc->field, $dc->table, [$value], true);
+
                     break;
+
                 case 'checkbox':
                     $manager->createAssociations($dc->id, $dc->field, $dc->table, StringUtil::deserialize($value, true), true);
 
                     // transform from int to string so that contao backend list filtering works
                     $value = serialize(array_map('strval', StringUtil::deserialize($value, true)));
+
                     break;
             }
-        }
-        else
-        {
+        } else {
             $manager->removeAllAssociations($dc->id, $dc->field, $dc->table);
         }
 
@@ -397,8 +390,7 @@ class Category extends Backend
     }
 
     /**
-     * @param mixed         $value
-     * @param DataContainer $dc
+     * @param mixed $value
      *
      * @return array|null
      */
@@ -420,6 +412,7 @@ class Category extends Backend
             switch ($GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field]['eval']['fieldType']) {
                 case 'radio':
                     return $categoryIds[0];
+
                 case 'checkbox':
                     return $categoryIds;
             }
@@ -429,8 +422,7 @@ class Category extends Backend
     }
 
     /**
-     * @param string        $varValue
-     * @param DataContainer $dc
+     * @param string $varValue
      *
      * @throws \Exception
      *
@@ -473,7 +465,7 @@ class Category extends Backend
         $disablePI = false;
 
         // Disable all buttons if there is a circular reference
-        if (false !== $arrClipboard && ('cut' === $arrClipboard['mode'] && (1 === $cr || $arrClipboard['id'] === $row['id']) || 'cutAll' === $arrClipboard['mode'] && (1 === $cr || in_array($row['id'], $arrClipboard['id'], true)))) {
+        if (false !== $arrClipboard && ('cut' === $arrClipboard['mode'] && (1 === $cr || $arrClipboard['id'] === $row['id']) || 'cutAll' === $arrClipboard['mode'] && (1 === $cr || \in_array($row['id'], $arrClipboard['id'], true)))) {
             $disablePA = true;
             $disablePI = true;
         }
@@ -482,13 +474,13 @@ class Category extends Backend
 
         // Return the buttons
         $imagePasteAfter = Image::getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
-        $imagePasteInto  = Image::getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
+        $imagePasteInto = Image::getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=1&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
+            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=1&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=2&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
+        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Controller::addToUrl('act='.$arrClipboard['mode'].'&mode=2&rt='.System::getContainer()->get('security.csrf.token_manager')->getToken(System::getContainer()->getParameter('contao.csrf_token_name'))->getValue().'&pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&id='.$arrClipboard['id'] : '')).'" title="'.specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
     /**
@@ -528,25 +520,25 @@ class Category extends Backend
         System::loadLanguageFile('tl_category');
 
         $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categoryFilterList'];
-        $eval  = [
+        $eval = [
             'tl_class' => 'w50 autoheight',
         ];
 
-        if (is_array($evalOverride)) {
+        if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
         }
 
         return [
-            'label'     => $label,
-            'exclude'   => true,
+            'label' => $label,
+            'exclude' => true,
             'inputType' => 'checkbox',
-            'eval'      => $eval,
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => $eval,
+            'sql' => "char(1) NOT NULL default ''",
         ];
     }
 
     /**
-     * Get the parameter name
+     * Get the parameter name.
      *
      * @param int $rootId
      *
@@ -558,11 +550,13 @@ class Category extends Backend
             global $objPage;
             $rootId = $objPage->rootId;
         }
+
         if (!$rootId) {
             return '';
         }
         $rootPage = \PageModel::findByPk($rootId);
-        if ($rootPage === null) {
+
+        if (null === $rootPage) {
             return '';
         }
 

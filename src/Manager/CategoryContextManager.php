@@ -1,9 +1,9 @@
 <?php
 
 /*
- * Copyright (c) 2017 Heimrich & Hannot GmbH
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @license LGPL-3.0+
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
@@ -20,8 +20,6 @@ class CategoryContextManager
 
     /**
      * Constructor.
-     *
-     * @param ContaoFrameworkInterface $framework
      */
     public function __construct(ContaoFrameworkInterface $framework)
     {
@@ -33,7 +31,6 @@ class CategoryContextManager
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return \Contao\Model\Collection|CategoryContextModel|null
      */
@@ -50,7 +47,6 @@ class CategoryContextManager
      *
      * @param mixed $column
      * @param mixed $value
-     * @param array $options
      *
      * @return CategoryContextModel|null
      */

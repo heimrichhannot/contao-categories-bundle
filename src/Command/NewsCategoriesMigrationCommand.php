@@ -1,13 +1,12 @@
 <?php
-/**
- * Copyright (c) 2018 Heimrich & Hannot GmbH
+
+/*
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * @author Rico Kaltofen <r.kaltofen@heimrich-hannot.de>
- * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
+ * @license LGPL-3.0-or-later
  */
 
 namespace HeimrichHannot\CategoriesBundle\Command;
-
 
 use Contao\CoreBundle\Command\AbstractLockedCommand;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
@@ -24,7 +23,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class NewsCategoriesMigrationCommand extends AbstractLockedCommand
 {
-
     /**
      * @var QueryBuilder
      */
@@ -55,26 +53,26 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
     protected $categoryIdMapping;
 
     /**
-     * tl_news category field name
+     * tl_news category field name.
+     *
      * @var string
      */
     protected $field;
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
 
     /**
      * @var bool
      */
     protected $dryRun = false;
+    /**
+     * @var ContaoFrameworkInterface
+     */
+    private $framework;
 
     public function __construct(ContaoFrameworkInterface $framework)
     {
         parent::__construct();
         $this->framework = $framework;
     }
-
 
     /**
      * {@inheritdoc}
@@ -88,7 +86,7 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
         $this->addArgument('field', InputArgument::OPTIONAL, 'What is the name of the category field in tl_news (default: categories)?', 'categories');
         $this->addOption('legacy-categories', 'i', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Only import categories with this ids and their children.');
         $this->addOption('exclude-legacy-categories', 'x', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Skip these categories and their children.');
-        $this->addOption('dry-run', null, InputOption::VALUE_NONE, "Performs a run without writing to datebase and copy templates.");
+        $this->addOption('dry-run', null, InputOption::VALUE_NONE, 'Performs a run without writing to datebase and copy templates.');
 
         parent::configure();
     }
@@ -101,37 +99,35 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
         $io = new SymfonyStyle($input, $output);
         $this->framework->initialize();
 
-        $io->title("Start contao-news_categories to contao-categorie-bundle migration");
+        $io->title('Start contao-news_categories to contao-categorie-bundle migration');
 
-        if ($input->hasOption('dry-run') && $input->getOption('dry-run'))
-        {
+        if ($input->hasOption('dry-run') && $input->getOption('dry-run')) {
             $this->dryRun = true;
-            $io->note("Dry run enabled, no data will be changed.");
+            $io->note('Dry run enabled, no data will be changed.');
             $io->newLine();
         }
 
-        $this->field   = $input->getArgument('field');
-        $this->input   = $input;
-        $this->output  = $output;
+        $this->field = $input->getArgument('field');
+        $this->input = $input;
+        $this->output = $output;
 
         if ($success = $this->migrateCategories($io)) {
             $this->migrateAssociations($io);
         }
 
         if ($success) {
-            $io->success("Finished news categories migration!");
+            $io->success('Finished news categories migration!');
         }
 
         return 0;
     }
 
-
     /**
-     * Migrate tl_news_category to tl_category
+     * Migrate tl_news_category to tl_category.
      */
     protected function migrateCategories(SymfonyStyle $io): bool
     {
-        $io->section("Start news category migration.");
+        $io->section('Start news category migration.');
 
         $db = Database::getInstance();
 
@@ -142,13 +138,14 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
         $qb = $this->getQueryBuilder()->select('c.*')->from('tl_news_category', 'c');
         $newsCategoriesIds = [];
 
-
         if (!empty($parentCategoryIds)) {
             foreach ($parentCategoryIds as $category) {
                 // Check if a category with given id exists, abort otherwise
-                $result = $db->prepare("SELECT id FROM tl_news_category WHERE id=?")->execute($category);
+                $result = $db->prepare('SELECT id FROM tl_news_category WHERE id=?')->execute($category);
+
                 if ($result->count() < 1) {
-                    $io->error("A legacy category with id ".$category." for import could not be found. Stopping migration to prevent data errors.");
+                    $io->error('A legacy category with id '.$category.' for import could not be found. Stopping migration to prevent data errors.');
+
                     return false;
                 }
             }
@@ -157,15 +154,17 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
             $newsCategoriesIds = array_merge($parentCategoryIds, $childCategories);
         }
 
-
         if ($this->input->hasOption('exclude-legacy-categories')) {
             $parentExcludeCategories = $this->input->getOption('exclude-legacy-categories');
+
             if (!empty($parentExcludeCategories)) {
                 foreach ($parentExcludeCategories as $category) {
                     // Check if a category with given id exists, abort otherwise
-                    $result = $db->prepare("SELECT id FROM tl_news_category WHERE id=?")->execute($category);
+                    $result = $db->prepare('SELECT id FROM tl_news_category WHERE id=?')->execute($category);
+
                     if ($result->count() < 1) {
-                        $io->error("A legacy category with id ".$category." to exclude could not be found. Stopping migration to prevent data errors.");
+                        $io->error('A legacy category with id '.$category.' to exclude could not be found. Stopping migration to prevent data errors.');
+
                         return false;
                     }
                 }
@@ -186,12 +185,13 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
         $newsCategories = $qb->execute()->fetchAll();
 
         if (empty($newsCategories)) {
-            $io->success("Found no categories. Finished!");
+            $io->success('Found no categories. Finished!');
+
             return false;
         }
 
-        $newscategoryCount = count($newsCategories);
-        $io->text("Found <fg=yellow>". $newscategoryCount ."</> categories.");
+        $newscategoryCount = \count($newsCategories);
+        $io->text('Found <fg=yellow>'.$newscategoryCount.'</> categories.');
         $io->newLine();
         $modelUtil = $this->getContainer()->get('huh.utils.model');
 
@@ -207,33 +207,34 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
 
             $categoryModel->setRow($newsCategory);
             $categoryModel->dateAdded = $newsCategory['tstamp'];
+
             if (!$this->dryRun) {
                 $categoryModel->save();
             }
 
             if ($categoryModel->id > 0 || $this->dryRun) {
                 if ($io->isVerbose()) {
-                    $io->text('<info>Successfully migrated category: "' . $categoryModel->title . '" (Legacy-ID: ' . $legacyId . ')</info>');
+                    $io->text('<info>Successfully migrated category: "'.$categoryModel->title.'" (Legacy-ID: '.$legacyId.')</info>');
                 }
                 $this->categories[$legacyId] = $categoryModel;
 
                 // store the id mapping
                 $this->categoryIdMapping[$legacyId] = $categoryModel->id;
             } else {
-                $io->error('Could not migrate category: "' . $categoryModel->title . '" (Legacy-ID: ' . $legacyId . ')');
+                $io->error('Could not migrate category: "'.$categoryModel->title.'" (Legacy-ID: '.$legacyId.')');
             }
         }
         $io->progressFinish();
 
         // set the correct pid
         foreach ($this->categoryIdMapping as $legacyId => $id) {
-            if (null === ($categoryModel = $modelUtil->findModelInstanceByPk('tl_category', $id)))
-            {
+            if (null === ($categoryModel = $modelUtil->findModelInstanceByPk('tl_category', $id))) {
                 continue;
             }
 
             if (isset($this->categoryIdMapping[$categoryModel->pid])) {
                 $categoryModel->pid = $this->categoryIdMapping[$categoryModel->pid];
+
                 if (!$this->dryRun) {
                     $categoryModel->save();
                 }
@@ -244,55 +245,59 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
     }
 
     /**
-     * Migrate tl_news_categories to tl_category_association
+     * Migrate tl_news_categories to tl_category_association.
      */
     protected function migrateAssociations(SymfonyStyle $io): bool
     {
-        $io->section("Start category news association migration.");
+        $io->section('Start category news association migration.');
 
         $qb = $this->getQueryBuilder();
-        $newsCategoryRelations = $qb->select('c.*')->from('tl_news_categories','c')
+        $newsCategoryRelations = $qb->select('c.*')->from('tl_news_categories', 'c')
             ->where($qb->expr()->in('c.category_id', ':cat'))
             ->groupBy('c.category_id,c.news_id')
             ->setParameter('cat', array_keys($this->categoryIdMapping), Connection::PARAM_INT_ARRAY)
             ->execute()->fetchAll();
 
-        if (!$newsCategoryRelations || count($newsCategoryRelations) < 0) {
-            $io->text("Found no category news associations.");
+        if (!$newsCategoryRelations || \count($newsCategoryRelations) < 0) {
+            $io->text('Found no category news associations.');
+
             return true;
         }
 
-        $io->text("Found <fg=yellow>".count($newsCategoryRelations)."</> news category associations.");
+        $io->text('Found <fg=yellow>'.\count($newsCategoryRelations).'</> news category associations.');
         $io->newLine();
 
         $modelUtil = $this->getContainer()->get('huh.utils.model');
 
-        $io->progressStart(count($newsCategoryRelations));
+        $io->progressStart(\count($newsCategoryRelations));
+
         foreach ($newsCategoryRelations as $newsCategoryRelation) {
             $io->progressAdvance();
 
             if (!$this->dryRun && (!isset($this->categories[$newsCategoryRelation['category_id']]) || !isset($this->categoryIdMapping[$newsCategoryRelation['category_id']]))) {
-                $io->error('Unable to migrate relation for news with ID:' . $newsCategoryRelation['news_id'] . ' and category ID:' . $newsCategoryRelation['category_id'] . ' because category does not exist.');
+                $io->error('Unable to migrate relation for news with ID:'.$newsCategoryRelation['news_id'].' and category ID:'.$newsCategoryRelation['category_id'].' because category does not exist.');
+
                 continue;
             }
 
-            $categoryAssociationModel                = $modelUtil->setDefaultsFromDca(new CategoryAssociationModel());
-            $categoryAssociationModel->tstamp        = time();
-            $categoryAssociationModel->category      = $this->categoryIdMapping[$newsCategoryRelation['category_id']];
-            $categoryAssociationModel->parentTable   = 'tl_news';
-            $categoryAssociationModel->entity        = $newsCategoryRelation['news_id'];
+            $categoryAssociationModel = $modelUtil->setDefaultsFromDca(new CategoryAssociationModel());
+            $categoryAssociationModel->tstamp = time();
+            $categoryAssociationModel->category = $this->categoryIdMapping[$newsCategoryRelation['category_id']];
+            $categoryAssociationModel->parentTable = 'tl_news';
+            $categoryAssociationModel->entity = $newsCategoryRelation['news_id'];
             $categoryAssociationModel->categoryField = $this->field;
+
             if (!$this->dryRun) {
                 $categoryAssociationModel->save();
             }
 
             if ($categoryAssociationModel->id > 0 || $this->dryRun) {
                 if ($io->isVerbose()) {
-                    $io->text('Successfully migrated category relation for field "' . $this->field . '" : "(news ID:' .$newsCategoryRelation['news_id'] . ')'. $this->categories[$newsCategoryRelation['category_id']]->title . '" (ID: ' . $categoryAssociationModel->category . ')');
+                    $io->text('Successfully migrated category relation for field "'.$this->field.'" : "(news ID:'.$newsCategoryRelation['news_id'].')'.$this->categories[$newsCategoryRelation['category_id']]->title.'" (ID: '.$categoryAssociationModel->category.')');
                 }
                 $this->categoryAssociations[] = $categoryAssociationModel;
             } else {
-                $io->error('Could not migrate category relation for field "' . $this->field . '" : "(news ID:' .$newsCategoryRelation['news_id'] . ')'. $this->categories[$newsCategoryRelation['category_id']]->title . '" (ID: ' . $categoryAssociationModel->category . ')');
+                $io->error('Could not migrate category relation for field "'.$this->field.'" : "(news ID:'.$newsCategoryRelation['news_id'].')'.$this->categories[$newsCategoryRelation['category_id']]->title.'" (ID: '.$categoryAssociationModel->category.')');
             }
         }
         $io->progressFinish();
