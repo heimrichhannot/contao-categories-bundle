@@ -10,6 +10,7 @@ namespace HeimrichHannot\CategoriesBundle\Filter\Choice;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\StringUtil;
+use Contao\System;
 use HeimrichHannot\CategoriesBundle\Manager\CategoryManager;
 use HeimrichHannot\FilterBundle\Choice\FieldOptionsChoice;
 use HeimrichHannot\FilterBundle\Model\FilterConfigElementModel;
@@ -46,9 +47,11 @@ class CategoriesChoice extends FieldOptionsChoice
             return $options;
         }
 
+        $isFrontend = System::getContainer()->get('huh.utils.container')->isFrontend();
+
         /** @var \HeimrichHannot\CategoriesBundle\Model\CategoryModel $category */
         foreach ($categories as $category) {
-            $options[] = ['label' => ($category->frontendTitle ?: $category->title).' (ID '.$category->id.')', 'value' => $category->id];
+            $options[] = ['label' => ($category->frontendTitle ?: $category->title).($isFrontend ? '' : ' (ID '.$category->id.')'), 'value' => $category->id];
         }
 
         return $options;
