@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta32] - 2020-06-15
+- fixed issues with news categories
+
 ## [1.0.0-beta31] - 2020-06-15
 - added support for news feeds based on categories
 

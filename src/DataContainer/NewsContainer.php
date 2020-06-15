@@ -92,9 +92,9 @@ class NewsContainer
         // Get the items
         $time = \Date::floorToMinute();
 
-        $query = 'SELECT * FROM tl_news n INNER JOIN tl_category_association a ON n.id = a.entity WHERE a.categoryField IN ('.implode(',', $arrFields).')'.
+        $query = 'SELECT n.* FROM tl_news n INNER JOIN tl_category_association a ON n.id = a.entity WHERE a.categoryField IN ('.implode(',', $arrFields).')'.
                     ' AND a.category IN ('.implode(',', $arrCategories).') AND n.pid IN ('.implode(',', $arrArchives).')'.
-                    " AND (n.start='' OR n.start<='$time') AND (n.stop='' OR n.stop>'".($time + 60)."') AND n.published='1'";
+                    " AND (n.start='' OR n.start<='$time') AND (n.stop='' OR n.stop>'".($time + 60)."') AND n.published='1' GROUP BY n.id ORDER BY date DESC";
 
         if ($arrFeed['maxItems'] > 0) {
             $query .= ' LIMIT '.$arrFeed['maxItems'];

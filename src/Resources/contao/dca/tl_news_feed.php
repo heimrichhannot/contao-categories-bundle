@@ -10,7 +10,7 @@ $dca['config']['onload_callback']['generateFeed_huhCategories'] = [\HeimrichHann
 /**
  * Palettes
  */
-$dca['palettes']['default'] = str_replace('},archives', '},archives,huhCategories,huhCategoriesFields,huhCategoriesShow', $dca['palettes']['default']);
+$dca['palettes']['default'] = str_replace('{config_legend', '{categories_legend},huhCategories,huhCategoriesFields,huhCategoriesShow;{config_legend', $dca['palettes']['default']);
 
 /**
  * Fields
