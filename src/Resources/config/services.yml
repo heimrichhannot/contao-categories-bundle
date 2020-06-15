@@ -35,6 +35,8 @@ services:
         tags:
             - {name: twig.extension}
 
+# Symfony 4
+    HeimrichHannot\CategoriesBundle\Manager\CategoryManager: "@huh.categories.manager"
 # Filter
 
     huh.categories.filter.choice:

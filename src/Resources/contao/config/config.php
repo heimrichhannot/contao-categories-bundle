@@ -31,8 +31,14 @@ $GLOBALS['BE_FFL']['categoryTree'] = 'HeimrichHannot\CategoriesBundle\Widget\Cat
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree']   = ['huh.categories.listener.hooks', 'reloadCategoryTree'];
-$GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = ['huh.categories.listener.hooks', 'adjustCategoryTree'];
+$GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree']       = ['huh.categories.listener.hooks', 'reloadCategoryTree'];
+$GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree']     = ['huh.categories.listener.hooks', 'adjustCategoryTree'];
+$GLOBALS['TL_HOOKS']['generateXmlFiles']['generateFeed_huhCategories'] = [\HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer::class, 'generateFeeds'];
+
+/**
+ * Crons
+ */
+$GLOBALS['TL_CRON']['daily']['generateFeed_huhCategories'] = [\HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer::class, 'generateFeeds'];
 
 /**
  * Assets

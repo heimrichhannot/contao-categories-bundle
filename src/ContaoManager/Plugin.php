@@ -14,6 +14,7 @@ use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Config\ContainerBuilder;
 use Contao\ManagerPlugin\Config\ExtensionPluginInterface;
+use Contao\NewsBundle\ContaoNewsBundle;
 use HeimrichHannot\CategoriesBundle\CategoriesBundle;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 
@@ -26,10 +27,15 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
     {
         $loadAfter = [
             ContaoCoreBundle::class,
+            ContaoNewsBundle::class,
         ];
 
         if (class_exists('HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle')) {
             $loadAfter[] = 'HeimrichHannot\FilterBundle\HeimrichHannotContaoFilterBundle';
+        }
+
+        if (class_exists('NewsCategories\NewsCategories')) {
+            $loadAfter[] = 'news_categories';
         }
 
         return [

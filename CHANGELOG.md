@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta31] - 2020-06-15
+- added support for news feeds based on categories
+
 ## [1.0.0-beta30] - 2020-06-02
 - fixed fe filter choice bug
 
