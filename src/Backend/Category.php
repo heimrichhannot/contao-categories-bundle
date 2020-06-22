@@ -151,7 +151,7 @@ class Category extends Backend
         // add the deletion callback on record level
         $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
 
-        $dca['config']['ondelete_callback']['deleteCategoryAssociations'] = [static::class, 'deleteCategoryAssociations'];
+        $dca['config']['ondelete_callback']['deleteEntityCategoryAssociations'] = [static::class, 'deleteEntityCategoryAssociations'];
 
         return [
             'label' => &$label,
@@ -209,7 +209,7 @@ class Category extends Backend
         // add the deletion callback on record level
         $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
 
-        $dca['config']['ondelete_callback']['deleteCategoryAssociations'] = [static::class, 'deleteCategoryAssociations'];
+        $dca['config']['ondelete_callback']['deleteEntityCategoryAssociations'] = [static::class, 'deleteEntityCategoryAssociations'];
     }
 
     /**
@@ -267,7 +267,7 @@ class Category extends Backend
         // add the deletion callback on record level
         $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
 
-        $dca['config']['ondelete_callback']['deleteCategoryAssociations'] = [static::class, 'deleteCategoryAssociations'];
+        $dca['config']['ondelete_callback']['deleteEntityCategoryAssociations'] = [static::class, 'deleteEntityCategoryAssociations'];
     }
 
     public static function deleteCachedPropertyValuesByCategoryAndProperty($value, DataContainer $dc)
@@ -406,6 +406,17 @@ class Category extends Backend
     }
 
     public function deleteCategoryAssociations(DataContainer $dc, $undoId)
+    {
+        if (!$dc->id) {
+            return;
+        }
+
+        System::getContainer()->get('huh.utils.database')->delete(
+            'tl_category_association', 'tl_category_association.category=?', [$dc->id]
+        );
+    }
+
+    public function deleteEntityCategoryAssociations(DataContainer $dc, $undoId)
     {
         $table = $dc->table;
 

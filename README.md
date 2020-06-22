@@ -53,6 +53,6 @@ tl_category_property_cache | Contains the resolved overridable property values
 
 [Concepts](docs/concepts.md)
 
-[Technical Introductions](docs/technical_intructions.md)
+[Technical instructions](docs/technical_intructions.md)
 
 [Guide: News categories field](docs/guide_news.md)

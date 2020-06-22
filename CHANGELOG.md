@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2020-06-22
+- added ondelete_callback in order to remove associations of a deleted category
+
 ## [1.0.0-beta33] - 2020-06-15
 - fixed localization
 
@@ -22,7 +25,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.0-beta27] - 2019-11-07
 
-* added migration command for contao-news_categories
+- added migration command for contao-news_categories
 
 ## [1.0.0-beta26] - 2019-10-23
 

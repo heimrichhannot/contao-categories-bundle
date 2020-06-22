@@ -12,6 +12,9 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'modifyDca'],
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'addBreadcrumb']
         ],
+        'ondelete_callback' => [
+            ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCategoryAssociations'],
+        ],
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],
         ],
