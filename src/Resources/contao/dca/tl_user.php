@@ -16,7 +16,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['categories'] = [
 $GLOBALS['TL_DCA']['tl_user']['fields']['categories_default'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_user']['categories_default'],
     'exclude'    => true,
-    'inputType'  => 'treePicker',
+    'inputType'  => 'categoryTree',
     'foreignKey' => 'tl_category.title',
     'eval'       => ['multiple' => true, 'fieldType' => 'checkbox', 'foreignTable' => 'tl_category', 'titleField' => 'title', 'searchField' => 'title', 'managerHref' => 'do=categories'],
     'sql'        => "blob NULL"

@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2020-07-23
+- fixed inputType for `categories_default` for user and user group permissions
+
 ## [1.0.1] - 2020-06-30
 - fixed request token issue for contao 4.9
 
