@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2020-08-25
+- fixed save issue if category is multilingual
+
 ## [1.0.2] - 2020-07-23
 - fixed inputType for `categories_default` for user and user group permissions
 

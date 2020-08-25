@@ -450,10 +450,9 @@ class Category extends Backend
     public function storePrimaryCategory($value, DataContainer $dc)
     {
         if ($primaryCategory = \Input::post($dc->field.static::PRIMARY_CATEGORY_SUFFIX)) {
-            if (null !== ($entity = System::getContainer()->get('huh.utils.model')->findModelInstanceByPk($dc->table, $dc->id))) {
-                $entity->{$dc->field.static::PRIMARY_CATEGORY_SUFFIX} = $primaryCategory;
-                $entity->save();
-            }
+            System::getContainer()->get('huh.utils.database')->update($dc->table, [
+                $dc->field.static::PRIMARY_CATEGORY_SUFFIX => $primaryCategory,
+            ], "$dc->table.id=?", [$dc->id]);
         }
 
         return $value;
