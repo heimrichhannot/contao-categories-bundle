@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2020-11-20
+- added CategoryModel::getChildCategories()
+- added CategoryModel::hasChildCategories()
+- added CategoryModel annotation
+- fixed imports in CategoryManager
+
 ## [1.0.3] - 2020-08-25
 - fixed save issue if category is multilingual
 
