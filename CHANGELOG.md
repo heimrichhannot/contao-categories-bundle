@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 - added parent category filter type
 - added CategoryModel::getChildCategories()
 - added CategoryModel::hasChildCategories()
+- added CategoryModel::getDescendantCategories()
 - added CategoryModel annotation
 - moved filter config element dca config to loadDataContainer hook
 - update some imports in CategoryManager
