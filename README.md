@@ -37,6 +37,26 @@ Single category picker with radio buttons (selecting parent categories is allowe
 
 Single category picker with checkboxes (selecting parent categories is disallowed; the yellow asterisk marks the primary category -> this attribute is stored to an automatically created field named `<categoriesFieldname>_primary`)
 
+## Usage
+
+### Install
+
+1. Install bundle with composer or contao manager
+
+   ```
+   composer require heimrichhannot/contao-categories-bundle
+   ```
+   
+1. Update database
+
+1. Add category support to the datacontainer you want, [e.g. news](docs/guide_news.md)
+
+### Filter bundle integration
+
+This bundle comes with two filter types:
+- CategoryChoiceType let you select categories to filter a list. 
+- ParentCategoryChoiceType is an inital filter to filter your list based on a parent category (means all elements are in a child category of the selected parent).
+
 ## Entity structure
 
 ![alt entities](docs/entities.png)

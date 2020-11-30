@@ -1,4 +1,11 @@
 services:
+
+    HeimrichHannot\CategoriesBundle\EventListener\:
+        resource: '../../EventListener/*'
+        exclude: '../../EventListener/{HookListener}'
+        autowire: true
+        public: true
+
     huh.categories.manager:
         class: HeimrichHannot\CategoriesBundle\Manager\CategoryManager
         public: true

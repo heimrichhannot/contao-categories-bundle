@@ -2,3 +2,4 @@ huh:
   filter:
     types:
       - {name: category_choice, class: HeimrichHannot\CategoriesBundle\Filter\Type\CategoryChoiceType, type: choice}
+      - {name: parent_category_choice, class: HeimrichHannot\CategoriesBundle\Filter\Type\ParentCategoryChoiceType, type: choice}

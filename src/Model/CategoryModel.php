@@ -8,6 +8,7 @@
 
 namespace HeimrichHannot\CategoriesBundle\Model;
 
+use Contao\Database;
 use Contao\Model;
 use Contao\Model\Collection;
 
@@ -35,11 +36,39 @@ class CategoryModel extends Model
      */
     public function getChildCategories()
     {
-        return static::findBy([static::$strTable.'.pid=?'], [$this->id]);
+        $result = Database::getInstance()->prepare('SELECT * FROM '.static::$strTable.' WHERE pid=?')->execute($this->id);
+
+        if ($result->count() < 1) {
+            return null;
+        }
+        $collection = Collection::createFromDbResult($result, static::$strTable);
+
+        return $collection;
     }
 
     public function hasChildCategories(): bool
     {
         return null !== $this->getChildCategories();
+    }
+
+    /**
+     * Return an one-dimensional list of all descendents of the current category.
+     *
+     * @return Collection|CategoryModel[]|CategoryModel|null $descendants
+     */
+    public function getDescendantCategories(array &$descendants = [])
+    {
+        $childs = $this->getChildCategories();
+
+        if (!$childs) {
+            return null;
+        }
+
+        foreach ($childs as $child) {
+            $descendants[] = $child;
+            $child->getDescendantCategories($descendants);
+        }
+
+        return new Collection($descendants, static::$strTable);
     }
 }
