@@ -33,7 +33,7 @@ class CategoryManager
     }
 
     /**
-     * @return \Contao\Model\Collection|null
+     * @return Collection|null
      */
     public function findByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = [])
     {
@@ -49,7 +49,7 @@ class CategoryManager
     }
 
     /**
-     * @return \Contao\Model\Collection|null
+     * @return Collection|null
      */
     public function findByCategoryFieldAndTable(string $categoryField, string $table, array $options = [])
     {
@@ -71,7 +71,7 @@ class CategoryManager
      *
      * @param array $pids Ids of parent categories
      *
-     * @return \Contao\Model\Collection|null
+     * @return Collection|null
      */
     public function findByCategoryFieldAndTableAndPids(string $categoryField, string $table, array $pids = [], array $options = [])
     {
@@ -260,7 +260,7 @@ class CategoryManager
      * @param mixed $column
      * @param mixed $value
      *
-     * @return \Contao\Model\Collection|CategoryModel|null
+     * @return Collection|CategoryModel|null
      */
     public function findBy($column, $value, array $options = [])
     {
@@ -270,7 +270,7 @@ class CategoryManager
     /**
      * Adapter function for the model's findAll method.
      *
-     * @return \Contao\Model\Collection|CategoryModel|null
+     * @return Collection|CategoryModel|null
      */
     public function findAll(array $options = [])
     {
@@ -280,7 +280,7 @@ class CategoryManager
     /**
      * Adapter function for the model's findMultipleByIds method.
      *
-     * @return \Contao\Model\Collection|CategoryModel|null
+     * @return Collection|CategoryModel|null
      */
     public function findMultipleByIds(array $ids, array $options = [])
     {
@@ -315,7 +315,7 @@ class CategoryManager
         }
 
         if (!$categoryObj->pid) {
-            return new \Contao\Model\Collection([$categoryObj], 'tl_category');
+            return new Collection([$categoryObj], 'tl_category');
         }
 
         if ($insertCurrent) {
@@ -328,7 +328,7 @@ class CategoryManager
             $categories = array_merge($categories, $parentCategories->getModels());
         }
 
-        return new \Contao\Model\Collection($categories, 'tl_category');
+        return new Collection($categories, 'tl_category');
     }
 
     /**
