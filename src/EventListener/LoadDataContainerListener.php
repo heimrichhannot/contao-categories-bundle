@@ -9,6 +9,9 @@
 namespace HeimrichHannot\CategoriesBundle\EventListener;
 
 use HeimrichHannot\CategoriesBundle\Backend\Category;
+use HeimrichHannot\CategoriesBundle\Filter\Type\CategoryChoiceType;
+use HeimrichHannot\CategoriesBundle\Filter\Type\ParentCategoryChoiceType;
+use HeimrichHannot\FilterBundle\Filter\Type\ChoiceType;
 
 /**
  * @Hook("loadDataContainer")
@@ -30,12 +33,12 @@ class LoadDataContainerListener
         }
         $dca = &$GLOBALS['TL_DCA']['tl_filter_config_element'];
 
-        $dca['palettes'][\HeimrichHannot\CategoriesBundle\Filter\Type\CategoryChoiceType::TYPE] = str_replace(
+        $dca['palettes'][CategoryChoiceType::TYPE] = str_replace(
             'field,',
             'field,parentCategories,',
-            $dca['palettes'][\HeimrichHannot\FilterBundle\Filter\Type\ChoiceType::TYPE]
+            $dca['palettes'][ChoiceType::TYPE]
         );
-        $dca['palettes'][\HeimrichHannot\CategoriesBundle\Filter\Type\ParentCategoryChoiceType::TYPE] =
+        $dca['palettes'][ParentCategoryChoiceType::TYPE] =
             '{general_legend},title,type;
             {config_legend},field,parentCategories;
             {publish_legend},published;';
