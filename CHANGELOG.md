@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2020-11-20
+## [1.1.0] - 2020-12-01
 - added parent category filter type
 - added CategoryModel::getChildCategories()
 - added CategoryModel::hasChildCategories()
