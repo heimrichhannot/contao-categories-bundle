@@ -24,9 +24,9 @@ class ParentCategoryChoiceType extends AbstractType
 
     public function buildQuery(FilterQueryBuilder $builder, FilterConfigElementModel $element)
     {
-        $parentCategorieIds = StringUtil::deserialize($element->parentCategories, true);
+        $parentCategoryIds = StringUtil::deserialize($element->parentCategories, true);
         /** @var CategoryModel[]|Collection|null $parentCategories */
-        $parentCategories = System::getContainer()->get('huh.utils.model')->findMultipleModelInstancesByIds('tl_category', $parentCategorieIds);
+        $parentCategories = System::getContainer()->get('huh.utils.model')->findMultipleModelInstancesByIds('tl_category', $parentCategoryIds);
 
         if (!$parentCategories) {
             return;
