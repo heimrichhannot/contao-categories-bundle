@@ -214,7 +214,7 @@ class ModuleCategoriesMenu extends \Contao\Module
             $arrRow['title'] = StringUtil::specialchars($strTitle, true);
             $arrRow['linkTitle'] = StringUtil::specialchars($strTitle, true);
             $arrRow['link'] = $strTitle;
-            $arrRow['href'] = ampersand(sprintf($strUrl, ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias)));
+            $arrRow['href'] = ampersand(str_replace('%s', ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias), $strUrl));
 
             $arrCategories[] = $arrRow;
         }

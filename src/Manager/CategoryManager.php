@@ -454,13 +454,13 @@ class CategoryManager
             return null;
         }
 
-        $objCategories = \Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).')')->execute($pid);
+        $objCategories = \Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).') ORDER BY sorting ASC')->execute($pid);
 
         if ($objCategories->numRows < 1) {
             return null;
         }
 
-        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');
+        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');  
     }
 
     /**
