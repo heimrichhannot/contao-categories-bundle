@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.1-DEV] - 2020-12-11
+- Fix missing field and palette problem in contao 4.9 (#9)
+
 ## [1.1.0] - 2020-12-01
 - added parent category filter type
 - added CategoryModel::getChildCategories()
