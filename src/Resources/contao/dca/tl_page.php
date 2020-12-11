@@ -1,30 +1,35 @@
 <?php
 
-/**
- * news_categories extension for Contao Open Source CMS
+/*
+ * Copyright (c) 2020 Heimrich & Hannot GmbH
  *
- * Copyright (C) 2011-2014 Codefog
- *
- * @package news_categories
- * @author  Webcontext <http://webcontext.com>
- * @author  Codefog <info@codefog.pl>
- * @author  Kamil Kuzminski <kamil.kuzminski@codefog.pl>
- * @license LGPL
+ * @license LGPL-3.0-or-later
  */
 
-
-/**
+/*
  * Extend the tl_page palettes
  */
-$GLOBALS['TL_DCA']['tl_page']['palettes']['root'] = str_replace('adminEmail;', 'adminEmail;{categoriesParam_legend:hide},categoriesParam;', $GLOBALS['TL_DCA']['tl_page']['palettes']['root']);
+$GLOBALS['TL_DCA']['tl_page']['palettes']['root'] = str_replace(
+    '{sitemap_legend',
+    '{categoriesParam_legend:hide},categoriesParam;{sitemap_legend',
+    $GLOBALS['TL_DCA']['tl_page']['palettes']['root']
+);
 
-/**
+if (isset($arrDca['palettes']['rootfallback'])) {
+    $arrDca['palettes']['rootfallback'] = str_replace(
+        '{sitemap_legend',
+        '{categoriesParam_legend:hide},categoriesParam;{sitemap_legend',
+        $GLOBALS['TL_DCA']['tl_page']['palettes']['root']
+    );
+}
+
+/*
  * Add fields to tl_page
  */
 $GLOBALS['TL_DCA']['tl_page']['fields']['categoriesParam'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_page']['categoriesParam'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_page']['categoriesParam'],
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 64, 'rgxp' => 'alias', 'tl_class' => 'w50'],
-    'sql'       => "varchar(64) NOT NULL default ''",
+    'eval' => ['maxlength' => 64, 'rgxp' => 'alias', 'tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
 ];
