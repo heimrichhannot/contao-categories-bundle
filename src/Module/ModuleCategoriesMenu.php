@@ -159,7 +159,7 @@ class ModuleCategoriesMenu extends \Contao\Module
         }
 
         $objTemplate = new FrontendTemplate($this->navigationTpl);
-        $objTemplate->type = \get_class($this);
+        $objTemplate->type = static::class;
         $objTemplate->cssID = $this->cssID;
         $objTemplate->level = 'level_'.$intLevel;
         $objTemplate->showQuantity = $this->cm_showQuantity;

@@ -460,7 +460,7 @@ class CategoryManager
             return null;
         }
 
-        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');  
+        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');
     }
 
     /**
