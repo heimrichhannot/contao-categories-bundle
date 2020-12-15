@@ -2,8 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [1.1.1] - 2020-12-11
-- fixed sorting in CategoriesMenu module
-- fixed calling urls with Umlaut
+- Fix categories sorting for categories menu module (#11)
+- Fix calling urls with umlauts (#11)
 - Fix missing field and palette problem in contao 4.9 (#9)
 
 ## [1.1.0] - 2020-12-01
