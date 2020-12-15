@@ -159,7 +159,7 @@ class ModuleCategoriesMenu extends \Contao\Module
         }
 
         $objTemplate = new FrontendTemplate($this->navigationTpl);
-        $objTemplate->type = \get_class($this);
+        $objTemplate->type = static::class;
         $objTemplate->cssID = $this->cssID;
         $objTemplate->level = 'level_'.$intLevel;
         $objTemplate->showQuantity = $this->cm_showQuantity;
@@ -214,7 +214,7 @@ class ModuleCategoriesMenu extends \Contao\Module
             $arrRow['title'] = StringUtil::specialchars($strTitle, true);
             $arrRow['linkTitle'] = StringUtil::specialchars($strTitle, true);
             $arrRow['link'] = $strTitle;
-            $arrRow['href'] = ampersand(sprintf($strUrl, ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias)));
+            $arrRow['href'] = ampersand(str_replace('%s', ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias), $strUrl));
 
             $arrCategories[] = $arrRow;
         }
