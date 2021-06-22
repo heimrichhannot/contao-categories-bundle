@@ -184,6 +184,7 @@ class Category extends Backend
             'tl_class' => 'w50 autoheight clr',
             'mandatory' => true,
             'fieldType' => 'radio',
+            'doNotCopy' => true,
             'isCategoryField' => true,
         ];
 
@@ -229,6 +230,7 @@ class Category extends Backend
         $eval = [
             'tl_class' => 'w50 autoheight clr',
             'mandatory' => true,
+            'doNotCopy' => true,
             'multiple' => true,
             'fieldType' => 'checkbox',
             'addPrimaryCategory' => true,
