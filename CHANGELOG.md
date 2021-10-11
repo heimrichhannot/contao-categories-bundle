@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2021-10-11
+
+- Added: php8 support
+
 ## [1.1.3] - 2021-04-27
 
 - added `doNotCopy` to category fields because else it might not be in sync with the association entity
