@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2022-01-12
+- Fixed: service not public
+
 ## [1.2.0] - 2021-10-11
 
 - Added: php8 support

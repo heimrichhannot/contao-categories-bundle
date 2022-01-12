@@ -43,7 +43,9 @@ services:
             - {name: twig.extension}
 
 # Symfony 4
-    HeimrichHannot\CategoriesBundle\Manager\CategoryManager: "@huh.categories.manager"
+    HeimrichHannot\CategoriesBundle\Manager\CategoryManager:
+        alias: huh.categories.manager
+        public: true
 # Filter
 
     huh.categories.filter.choice:
