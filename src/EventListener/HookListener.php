@@ -156,12 +156,12 @@ class HookListener
         });
 
         $objNode->filter('.tree_view input[name="primaryCategory"]')->each(function ($objElement) {
+            /** @var HtmlPageCrawler $objElement */
             $category = $objElement->getAttribute('data-id');
 
             if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
                 $objElement->removeAttribute('checked');
-
-                $objElement->siblings()->first()->attr('style', 'opacity: 0 !important');
+                $objElement->siblings()->first()->setAttribute('style', 'opacity: 0 !important');
             }
         });
 
