@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2022-01-13
+- Changed: allow wa72/htmlpagedom v2
+
 ## [1.2.1] - 2022-01-12
 - Fixed: service not public
 
