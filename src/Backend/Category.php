@@ -138,17 +138,11 @@ class Category extends Backend
         \System::loadLanguageFile('tl_category');
 
         $eval = [
-            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
             'tl_class' => 'w50 autoheight',
             'mandatory' => true,
             'fieldType' => 'radio',
             'isCategoryField' => true,
         ];
-
-        if ($label) {
-            unset($eval['label']);
-            $eval['label'] = $label;
-        }
 
         if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
@@ -159,8 +153,8 @@ class Category extends Backend
 
         $dca['config']['ondelete_callback']['deleteEntityCategoryAssociations'] = [static::class, 'deleteEntityCategoryAssociations'];
 
-        return [
-            'label' => &$label,
+        $data = [
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'categoryTree',
@@ -170,6 +164,13 @@ class Category extends Backend
             'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
+
+        if ($label) {
+            unset($data['label']);
+            $data['label'] = $label;
+        }
+
+        return $data;
     }
 
     /**
@@ -185,18 +186,12 @@ class Category extends Backend
         \System::loadLanguageFile('tl_category');
 
         $eval = [
-            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
             'tl_class' => 'w50 autoheight clr',
             'mandatory' => true,
             'fieldType' => 'radio',
             'doNotCopy' => true,
             'isCategoryField' => true,
         ];
-
-        if ($label) {
-            unset($eval['label']);
-            $eval['label'] = $label;
-        }
 
         if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
@@ -207,7 +202,7 @@ class Category extends Backend
         $dca = &$GLOBALS['TL_DCA'][$table];
 
         $dca['fields'][$name] = [
-            'label' => &$label,
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'categoryTree',
@@ -217,6 +212,11 @@ class Category extends Backend
             'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
+
+        if ($label) {
+            unset($dca['fields'][$name]['label']);
+            $dca['fields'][$name]['label'] = $label;
+        }
 
         // add the deletion callback on record level
         $dca['config']['ondelete_callback'] = isset($dca['config']['ondelete_callback']) && \is_array($dca['config']['ondelete_callback']) ? $dca['config']['ondelete_callback'] : [];
@@ -237,7 +237,6 @@ class Category extends Backend
         \System::loadLanguageFile('tl_category');
 
         $eval = [
-            'label' => &$GLOBALS['TL_LANG']['tl_category']['categories'],
             'tl_class' => 'w50 autoheight clr',
             'mandatory' => true,
             'doNotCopy' => true,
@@ -248,11 +247,6 @@ class Category extends Backend
             'isCategoryField' => true,
         ];
 
-        if ($label) {
-            unset($eval['label']);
-            $eval['label'] = $label;
-        }
-
         if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
         }
@@ -262,7 +256,7 @@ class Category extends Backend
         $dca = &$GLOBALS['TL_DCA'][$table];
 
         $dca['fields'][$name] = [
-            'label' => &$label,
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['categories'],
             'exclude' => true,
             'filter' => true,
             'inputType' => 'categoryTree',
@@ -275,6 +269,11 @@ class Category extends Backend
             'eval' => $eval,
             'sql' => 'blob NULL',
         ];
+
+        if ($label) {
+            unset($dca['fields'][$name]['label']);
+            $dca['fields'][$name]['label'] = $label;
+        }
 
         if ($eval['addPrimaryCategory']) {
             $dca['fields'][$name.static::PRIMARY_CATEGORY_SUFFIX] = [
