@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -23,10 +23,8 @@ class CategoryContext extends Backend
         System::loadLanguageFile('tl_category_context');
         Controller::loadDataContainer($table);
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category_context'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD];
-
         $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD] = [
-            'label' => &$label,
+            'label' => &$GLOBALS['TL_LANG']['tl_category_context'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD],
             'exclude' => true,
             'inputType' => 'multiColumnEditor',
             'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\CategoryContext', 'deleteCachedPropertyValuesByFieldOrContext']],
@@ -52,6 +50,11 @@ class CategoryContext extends Backend
             ],
             'sql' => 'blob NULL',
         ];
+
+        if ($label) {
+            unset($GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD]['label']);
+            $GLOBALS['TL_DCA'][$table]['fields'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD]['label'] = $label;
+        }
     }
 
     public static function deleteCachedPropertyValuesByFieldOrContext($value, DataContainer $dc)

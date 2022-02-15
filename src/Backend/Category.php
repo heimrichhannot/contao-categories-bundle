@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -137,13 +137,18 @@ class Category extends Backend
     {
         \System::loadLanguageFile('tl_category');
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
         $eval = [
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
             'tl_class' => 'w50 autoheight',
             'mandatory' => true,
             'fieldType' => 'radio',
             'isCategoryField' => true,
         ];
+
+        if ($label) {
+            unset($eval['label']);
+            $eval['label'] = $label;
+        }
 
         if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
@@ -179,14 +184,19 @@ class Category extends Backend
     {
         \System::loadLanguageFile('tl_category');
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['category'];
         $eval = [
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['category'],
             'tl_class' => 'w50 autoheight clr',
             'mandatory' => true,
             'fieldType' => 'radio',
             'doNotCopy' => true,
             'isCategoryField' => true,
         ];
+
+        if ($label) {
+            unset($eval['label']);
+            $eval['label'] = $label;
+        }
 
         if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
@@ -226,8 +236,8 @@ class Category extends Backend
     {
         \System::loadLanguageFile('tl_category');
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categories'];
         $eval = [
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['categories'],
             'tl_class' => 'w50 autoheight clr',
             'mandatory' => true,
             'doNotCopy' => true,
@@ -237,6 +247,11 @@ class Category extends Backend
             'forcePrimaryCategory' => true,
             'isCategoryField' => true,
         ];
+
+        if ($label) {
+            unset($eval['label']);
+            $eval['label'] = $label;
+        }
 
         if (\is_array($evalOverride)) {
             $eval = array_merge($eval, $evalOverride);
@@ -358,7 +373,7 @@ class Category extends Backend
 
         // add overridable fields
         foreach ($dca['fields'] as $field => $data) {
-            if ($data['eval']['overridable']) {
+            if ($data['eval']['overridable'] ?? false) {
                 $overrideFieldName = 'override'.ucfirst($field);
 
                 // boolean field
@@ -621,7 +636,6 @@ class Category extends Backend
     {
         System::loadLanguageFile('tl_category');
 
-        $label = $label ?: $GLOBALS['TL_LANG']['tl_category']['categoryFilterList'];
         $eval = [
             'tl_class' => 'w50 autoheight',
         ];
@@ -630,13 +644,20 @@ class Category extends Backend
             $eval = array_merge($eval, $evalOverride);
         }
 
-        return [
-            'label' => $label,
+        $data = [
+            'label' => &$GLOBALS['TL_LANG']['tl_category']['categoryFilterList'],
             'exclude' => true,
             'inputType' => 'checkbox',
             'eval' => $eval,
             'sql' => "char(1) NOT NULL default ''",
         ];
+
+        if ($label) {
+            unset($data['label']);
+            $data['label'] = $label;
+        }
+
+        return $data;
     }
 
     /**
