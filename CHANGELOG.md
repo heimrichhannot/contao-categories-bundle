@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Changed: enhanced technical introductions
 - Changed: some small refactoring
 - Fixed: some old namespaces and deprecations
+- Fixed: added some missing translations
 
 ## [1.3.2] - 2022-02-15
 
