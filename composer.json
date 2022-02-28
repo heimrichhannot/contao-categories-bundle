@@ -4,18 +4,12 @@
   "description": "This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.",
   "license": "LGPL-3.0-or-later",
   "require": {
-    "php": "^7.0||^8.0",
+    "php": "^7.4||^8.0",
     "contao/core-bundle": "^4.4",
-    "heimrichhannot/contao-utils-bundle": "^2.185",
+    "heimrichhannot/contao-utils-bundle": "^2.210",
     "heimrichhannot/contao-multi-column-editor-bundle": "^2.0",
     "wa72/htmlpagedom": "^1.3 || ^2.0",
     "heimrichhannot/contao-request-bundle": "^1.0"
-  },
-  "require-dev": {
-    "contao/manager-plugin": "^2.0",
-    "friendsofphp/php-cs-fixer": "^2.2",
-    "phpunit/phpunit": "^6.0",
-    "satooshi/php-coveralls": "^1.0"
   },
   "autoload": {
     "psr-4": {
@@ -30,14 +24,6 @@
       "src/Resources/contao/languages/",
       "src/Resources/contao/templates/"
     ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "HeimrichHannot\\CategoriesBundle\\Test\\": "tests/"
-    }
-  },
-  "config": {
-    "preferred-install": "dist"
   },
   "extra": {
     "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"

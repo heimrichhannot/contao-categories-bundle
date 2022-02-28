@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2022-02-28
+- Added: rootNodesUnselectable eval option
+- Changed: minimum php version is now 7.4
+- Changed: raised minimum utils bundle version
+- Changed: removed unnecessary composer.json content
+- Changed: enhanced technical introductions
+- Changed: some small refactoring
+- Fixed: some old namespaces and deprecations
+
 ## [1.3.2] - 2022-02-15
 
 - Fixed: array index issues in php 8+

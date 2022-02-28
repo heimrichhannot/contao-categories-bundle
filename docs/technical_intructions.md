@@ -6,28 +6,40 @@ The instructions here illustrate the example described in the example above.
 
 Do this using one of the following calls:
 
-```
-$GLOBALS['TL_DCA']['tl_my_dca']['fields']['category'] = \HeimrichHannot\CategoriesBundle\Backend\Category::getCategoryFieldDca(
-    [
-        'addPrimaryCategory'   => false, // default false for single category widgets
-        'forcePrimaryCategory' => false, // default false for single category widgets
-        'parentsUnselectable'  => true, // default false; you can alternatively set "selectable" via Contao backend for single parent categories
-        // you can also set optional Contao DCA picker options here:
-        'rootNodes'            => [77] // if set, the available categories are limited to the children categories of the category defined here
-    ]
-);
+```php
+use HeimrichHannot\CategoriesBundle\Backend\Category;
 
+// Single category widget
+// Usage 
+Category::addSingleCategoryFieldToDca(string $table, string $fieldName, array $evalOverride => null, array $label = null);
+// Example
+Category::addSingleCategoryFieldToDca('tl_calendar_events', 'category', [
+    'addPrimaryCategory'   => false,
+    'rootNodes'            => [77]
+]);
+
+// Multiple category widget
 // this call automatically adds the field "<categoriesFieldname>_primary" which is a simple integer field that contains the reference to the category marked as primary
-\HeimrichHannot\CategoriesBundle\Backend\Category::addMultipleCategoriesFieldToDca('tl_seminar', 'categories',
-    [
-        'addPrimaryCategory'   => true, // default true for multiple category widgets
-        'forcePrimaryCategory' => true, // default true for multiple category widgets
-        'parentsUnselectable'  => true, // default false; you can alternatively set "selectable" via Contao backend for single parent categories
-        // you can also set optional Contao DCA picker options here:
-        'rootNodes'            => [77] // if set, the available categories are limited to the children categories of the category defined here
-    ]
-);
+// Usage:
+Category::addMultipleCategoriesFieldToDca(string $table, string $name, array $evalOverride = null, array $label = null);
+Category::addMultipleCategoriesFieldToDca('tl_seminar', 'categories', [
+    'addPrimaryCategory'   => true,
+    'forcePrimaryCategory' => true,
+    'parentsUnselectable'  => true,
+    'rootNodes'            => [77],
+]);
 ```
+
+### Eval options
+
+| Options               | Type  | Description                                                                                                  |
+|-----------------------|-------|--------------------------------------------------------------------------------------------------------------|
+| addPrimaryCategory    | bool  | Default false for single category widgets, default true for multiple category widgets.                       |
+| forcePrimaryCategory  | bool  | Default false for single category widgets, default true for multiple category widgets.                       |
+| parentsUnselectable   | bool  | You can alternatively set "selectable" via Contao backend for single parent categories. Default true.        |
+| rootNodes             | array | Available categories are limited to the children categories of the category defined here                     |
+| rootNodesUnselectable | bool  | Root nodes set in rootNodes option are not selectable. This currently only works in single category widgets. |
+
 
 ## Use category configs
 

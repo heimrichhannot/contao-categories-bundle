@@ -197,7 +197,7 @@ class Category extends Backend
             $eval = array_merge($eval, $evalOverride);
         }
 
-        \Controller::loadDataContainer($table);
+        Controller::loadDataContainer($table);
 
         $dca = &$GLOBALS['TL_DCA'][$table];
 
@@ -234,7 +234,7 @@ class Category extends Backend
      */
     public static function addMultipleCategoriesFieldToDca($table, $name, $evalOverride = null, $label = null)
     {
-        \System::loadLanguageFile('tl_category');
+        System::loadLanguageFile('tl_category');
 
         $eval = [
             'tl_class' => 'w50 autoheight clr',
@@ -251,7 +251,7 @@ class Category extends Backend
             $eval = array_merge($eval, $evalOverride);
         }
 
-        \Controller::loadDataContainer($table);
+        Controller::loadDataContainer($table);
 
         $dca = &$GLOBALS['TL_DCA'][$table];
 

@@ -2,7 +2,6 @@ services:
 
     HeimrichHannot\CategoriesBundle\EventListener\:
         resource: '../../EventListener/*'
-        exclude: '../../EventListener/{HookListener}'
         autowire: true
         public: true
 

@@ -1,10 +1,13 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
+
+use HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer;
+use HeimrichHannot\CategoriesBundle\EventListener\HookListener;
 
 $GLOBALS['BE_MOD']['content']['categories'] = [
     'tables' => ['tl_category', 'tl_category_config', 'tl_category_context'],
@@ -34,16 +37,16 @@ $GLOBALS['BE_FFL']['categoryTree'] = 'HeimrichHannot\CategoriesBundle\Widget\Cat
 /*
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree'] = ['huh.categories.listener.hooks', 'reloadCategoryTree'];
-$GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = ['huh.categories.listener.hooks', 'adjustCategoryTree'];
-$GLOBALS['TL_HOOKS']['generateXmlFiles']['generateFeed_huhCategories'] = [\HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer::class, 'generateFeeds'];
+$GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree'] = [HookListener::class, 'reloadCategoryTree'];
+$GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = [HookListener::class, 'adjustCategoryTree'];
+$GLOBALS['TL_HOOKS']['generateXmlFiles']['generateFeed_huhCategories'] = [NewsContainer::class, 'generateFeeds'];
 $GLOBALS['TL_HOOKS']['loadDataContainer']['huh_categories'] = [
     \HeimrichHannot\CategoriesBundle\EventListener\LoadDataContainerListener::class, '__invoke', ];
 
 /*
  * Crons
  */
-$GLOBALS['TL_CRON']['daily']['generateFeed_huhCategories'] = [\HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer::class, 'generateFeeds'];
+$GLOBALS['TL_CRON']['daily']['generateFeed_huhCategories'] = [NewsContainer::class, 'generateFeeds'];
 
 /*
  * Assets

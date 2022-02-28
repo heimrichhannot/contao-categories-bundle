@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -10,15 +10,17 @@ namespace HeimrichHannot\CategoriesBundle\EventListener;
 
 use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\StringUtil;
 use Contao\System;
+use HeimrichHannot\CategoriesBundle\Manager\CategoryManager;
+use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
 use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -27,21 +29,20 @@ use Wa72\HtmlPageDom\HtmlPageCrawler;
 class HookListener
 {
     /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-    /**
      * @var Request
      */
     private $request;
+    private Utils           $utils;
+    private CategoryManager $categoryManager;
 
     /**
      * HookListener constructor.
      */
-    public function __construct(ContaoFrameworkInterface $framework, Request $request)
+    public function __construct(Request $request, Utils $utils, CategoryManager $categoryManager)
     {
-        $this->framework = $framework;
         $this->request = $request;
+        $this->utils = $utils;
+        $this->categoryManager = $categoryManager;
     }
 
     public function adjustCategoryTree($buffer, $template)
@@ -61,6 +62,14 @@ class HookListener
             }
 
             $buffer = $this->hideUnselectableCheckboxes($buffer, $selectedableCategories);
+        }
+
+        if ($dcaEval['rootNodesUnselectable'] && (isset($dcaEval['rootNodes']) && !empty($dcaEval['rootNodes']) && \is_array($dcaEval['rootNodes']))) {
+            $rootNodes = $this->utils->model()->findMultipleModelInstancesByIds(CategoryModel::getTable(), $dcaEval['rootNodes']);
+
+            if ($rootNodes) {
+                $buffer = $this->hideUnselectableRadioInputs($buffer, $rootNodes->fetchEach('id'));
+            }
         }
 
         return $buffer;
@@ -159,9 +168,24 @@ class HookListener
             /** @var HtmlPageCrawler $objElement */
             $category = $objElement->getAttribute('data-id');
 
-            if (\System::getContainer()->get('huh.categories.manager')->hasChildren($category)) {
+            if ($this->categoryManager->hasChildren($category)) {
                 $objElement->removeAttribute('checked');
                 $objElement->siblings()->first()->setAttribute('style', 'opacity: 0 !important');
+            }
+        });
+
+        return $objNode->saveHTML();
+    }
+
+    protected function hideUnselectableRadioInputs(string $buffer, array $categoriesToHide = [])
+    {
+        $objNode = new HtmlPageCrawler($buffer);
+
+        $objNode->filter('.tree_view input.tl_tree_radio[name="picker"]')->each(function ($objElement) use ($categoriesToHide) {
+            $categoryId = $objElement->getAttribute('value');
+
+            if (\in_array($categoryId, $categoriesToHide)) {
+                $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
             }
         });
 
