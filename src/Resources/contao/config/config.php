@@ -8,6 +8,7 @@
 
 use HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer;
 use HeimrichHannot\CategoriesBundle\EventListener\HookListener;
+use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
 
 $GLOBALS['BE_MOD']['content']['categories'] = [
     'tables' => ['tl_category', 'tl_category_config', 'tl_category_context'],
@@ -32,7 +33,13 @@ if (System::getContainer()->get('huh.utils.container')->isBackend()) {
 /*
  * Backend form fields
  */
-$GLOBALS['BE_FFL']['categoryTree'] = 'HeimrichHannot\CategoriesBundle\Widget\CategoryTree';
+$GLOBALS['BE_FFL']['categoryTree'] = CategoryTree::class;
+
+/*
+ * Frontend form fields
+ */
+
+$GLOBALS['TL_FFL']['categoryTree'] = CategoryTree::class;
 
 /*
  * Hooks
