@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2022-11-04
+- Fixed: palette handling for tl_page
+- Fixed: missing translations for tl_page fields
+
 ## [1.4.0] - 2022-02-28
 - Added: rootNodesUnselectable eval option
 - Changed: minimum php version is now 7.4

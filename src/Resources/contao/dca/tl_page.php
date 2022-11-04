@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -9,19 +9,14 @@
 /*
  * Extend the tl_page palettes
  */
-$GLOBALS['TL_DCA']['tl_page']['palettes']['root'] = str_replace(
-    '{sitemap_legend',
-    '{categoriesParam_legend:hide},categoriesParam;{sitemap_legend',
-    $GLOBALS['TL_DCA']['tl_page']['palettes']['root']
-);
 
-if (isset($arrDca['palettes']['rootfallback'])) {
-    $arrDca['palettes']['rootfallback'] = str_replace(
-        '{sitemap_legend',
-        '{categoriesParam_legend:hide},categoriesParam;{sitemap_legend',
-        $GLOBALS['TL_DCA']['tl_page']['palettes']['root']
-    );
-}
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+
+PaletteManipulator::create()
+    ->addLegend('categories_legend', 'sitemap_legend', PaletteManipulator::POSITION_AFTER, true)
+    ->addField('categoriesParam', 'categories_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('root', 'tl_page')
+    ->applyToPalette('rootfallback', 'tl_page');
 
 /*
  * Add fields to tl_page
