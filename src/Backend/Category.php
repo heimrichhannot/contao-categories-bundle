@@ -14,6 +14,7 @@ use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\Image;
+use Contao\PageModel;
 use Contao\RequestToken;
 use Contao\StringUtil;
 use Contao\System;
@@ -676,7 +677,7 @@ class Category extends Backend
         if (!$rootId) {
             return '';
         }
-        $rootPage = \PageModel::findByPk($rootId);
+        $rootPage = PageModel::findByPk($rootId);
 
         if (null === $rootPage) {
             return '';
