@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2021 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -116,7 +116,7 @@ class CategoryTree extends Widget
             }
 
             $return .= '
-	<p>'.($dca['eval']['disabled'] || $dca['eval']['readonly'] ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
+	<p>'.(($dca['eval']['disabled'] ?? false) || $dca['eval']['readonly'] ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
 	<script>
 	  $("pt_'.$this->strName.'").addEvent("click", function(e) {
 		e.preventDefault();
