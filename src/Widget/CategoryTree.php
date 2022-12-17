@@ -115,8 +115,10 @@ class CategoryTree extends Widget
                 $extras['rootNodes'] = array_values($this->rootNodes);
             }
 
+            $readonly = $dca['eval']['readonly'] ?? false;
+
             $return .= '
-	<p>'.(($dca['eval']['disabled'] ?? false) || $dca['eval']['readonly'] ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
+	<p>'.(($dca['eval']['disabled'] ?? false) || $readonly ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
 	<script>
 	  $("pt_'.$this->strName.'").addEvent("click", function(e) {
 		e.preventDefault();

@@ -51,10 +51,10 @@ class HookListener
             return $buffer;
         }
 
-        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'];
+        $dcaEval = $GLOBALS['TL_DCA'][$table]['fields'][$field]['eval'] ?? [];
 
         // hide unselectable checkboxes
-        if ($dcaEval['parentsUnselectable']) {
+        if ($dcaEval['parentsUnselectable'] ?? false) {
             $selectedableCategories = [];
 
             if (null !== ($categories = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['tl_category.selectable=?'], [true]))) {
@@ -64,7 +64,7 @@ class HookListener
             $buffer = $this->hideUnselectableCheckboxes($buffer, $selectedableCategories);
         }
 
-        if ($dcaEval['rootNodesUnselectable'] && (isset($dcaEval['rootNodes']) && !empty($dcaEval['rootNodes']) && \is_array($dcaEval['rootNodes']))) {
+        if (($dcaEval['rootNodesUnselectable'] ?? false) && (isset($dcaEval['rootNodes']) && !empty($dcaEval['rootNodes']) && \is_array($dcaEval['rootNodes']))) {
             $rootNodes = $this->utils->model()->findMultipleModelInstancesByIds(CategoryModel::getTable(), $dcaEval['rootNodes']);
 
             if ($rootNodes) {
