@@ -2,15 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.3] - 2022-12-17
+
+- Fixed: implicit dependency to news bundle in `tl_news_feed`
+
 ## [1.4.2] - 2022-11-04
+
 Same as 1.4.1
 
 ## [1.4.1] - 2022-11-04
+
 - Fixed: palette handling for tl_page
 - Fixed: missing translations for tl_page fields
 - Fixed: warning in CategoryTree widget ([#16])
 
 ## [1.4.0] - 2022-02-28
+
 - Added: rootNodesUnselectable eval option
 - Changed: minimum php version is now 7.4
 - Changed: raised minimum utils bundle version
