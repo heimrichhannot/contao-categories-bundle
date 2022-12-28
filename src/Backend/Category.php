@@ -449,7 +449,7 @@ class Category extends Backend
         $dca = &$GLOBALS['TL_DCA'][$table];
 
         foreach ($dca['fields'] as $field => $data) {
-            if ('categoryTree' === $data['inputType']) {
+            if ('categoryTree' === ($data['inputType'] ?? '')) {
                 $categoryFields[] = $field;
             }
         }
