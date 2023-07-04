@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -12,11 +12,14 @@
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
-PaletteManipulator::create()
+$pm = PaletteManipulator::create()
     ->addLegend('categories_legend', 'sitemap_legend', PaletteManipulator::POSITION_AFTER, true)
     ->addField('categoriesParam', 'categories_legend', PaletteManipulator::POSITION_APPEND)
-    ->applyToPalette('root', 'tl_page')
-    ->applyToPalette('rootfallback', 'tl_page');
+    ->applyToPalette('root', 'tl_page');
+
+if (isset($GLOBALS['TL_DCA']['tl_page']['palettes']['rootfallback'])) {
+    $pm->applyToPalette('rootfallback', 'tl_page');
+}
 
 /*
  * Add fields to tl_page

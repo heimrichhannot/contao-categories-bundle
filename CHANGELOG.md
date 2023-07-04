@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.6] - 2023-07-04
+- Fixed: compatibility issue with contao 4.4
+
 ## [1.4.5] - 2022-12-28
 
 - Fixed: php8 issues
