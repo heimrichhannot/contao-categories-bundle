@@ -356,7 +356,7 @@ class Category extends Backend
         $isParentCategory = System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
         $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable'] || $category->selectable) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
 
-        if ($checkAsDefaultPrimaryCategory || $row['id'] === \Input::get('primaryCategory')) {
+        if ($checkAsDefaultPrimaryCategory || (string) $row['id'] === \Input::get('primaryCategory')) {
             static::$defaultPrimaryCategorySet = true;
             $checked = ' checked';
         }
