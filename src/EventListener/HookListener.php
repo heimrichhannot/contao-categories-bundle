@@ -19,35 +19,33 @@ use Contao\System;
 use HeimrichHannot\CategoriesBundle\Manager\CategoryManager;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
-use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use HeimrichHannot\UtilsBundle\Util\Utils;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Wa72\HtmlPageDom\HtmlPageCrawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class HookListener
 {
     /**
-     * @var Request
-     */
-    private $request;
-    private Utils           $utils;
-    private CategoryManager $categoryManager;
-
-    /**
      * HookListener constructor.
      */
-    public function __construct(Request $request, Utils $utils, CategoryManager $categoryManager)
+    public function __construct(
+        private RequestStack $requestStack,
+        private Utils $utils,
+        private CategoryManager $categoryManager
+    ) {}
+
+    protected function getRequest(): ?Request
     {
-        $this->request = $request;
-        $this->utils = $utils;
-        $this->categoryManager = $categoryManager;
+        return $this->requestStack->getCurrentRequest();
     }
 
     public function adjustCategoryTree($buffer, $template)
     {
-        if (!$this->request->getGet('picker') || !($field = $this->request->getGet('category_field')) || !($table = $this->request->getGet('category_table'))) {
+        if (!$this->getRequest()?->query->get('picker') || !($field = $this->getRequest()?->query->get('category_field')) || !($table = $this->getRequest()?->query->get('category_table'))) {
             return $buffer;
         }
 
@@ -79,11 +77,11 @@ class HookListener
     {
         switch ($action) {
             case 'reloadCategoryTree':
-                $id = $this->request->getGet('id');
+                $id = $this->getRequest()?->query->get('id');
                 $field = $dc->inputName = $this->request->getPost('name');
 
                 // Handle the keys in "edit multiple" mode
-                if ('editAll' === $this->request->getGet('act')) {
+                if ('editAll' === $this->getRequest()?->query->get('act')) {
                     $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
                     $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
                 }
@@ -101,7 +99,7 @@ class HookListener
                 $value = null;
 
                 // Load the value
-                if ('overrideAll' !== $this->request->getGet('act')) {
+                if ('overrideAll' !== $this->getRequest()?->query->get('act')) {
                     if ('File' === $GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer']) {
                         $value = Config::get($field);
                     } elseif ($id > 0 && Database::getInstance()->tableExists($dc->table)) {

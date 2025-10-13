@@ -17,7 +17,7 @@ use Contao\ManagerPlugin\Config\ExtensionPluginInterface;
 use HeimrichHannot\CategoriesBundle\CategoriesBundle;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 
-class Plugin implements BundlePluginInterface, ExtensionPluginInterface
+class Plugin implements BundlePluginInterface
 {
     /**
      * {@inheritdoc}
@@ -32,22 +32,5 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
                 'news_categories',
             ]),
         ];
-    }
-
-    /**
-     * Allows a plugin to override extension configuration.
-     *
-     * @param string $extensionName
-     *
-     * @return array
-     */
-    public function getExtensionConfig($extensionName, array $extensionConfigs, ContainerBuilder $container)
-    {
-        return ContainerUtil::mergeConfigFile(
-            'huh_filter',
-            $extensionName,
-            $extensionConfigs,
-            __DIR__.'/../Resources/config/huh_filter.yml'
-        );
     }
 }

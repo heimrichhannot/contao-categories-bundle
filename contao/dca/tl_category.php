@@ -5,8 +5,9 @@
  *
  * @license LGPL-3.0-or-later
  */
+use Contao\System;
 
-\System::loadLanguageFile('tl_news_archive');
+System::loadLanguageFile('tl_news_archive');
 
 $GLOBALS['TL_DCA']['tl_category'] = [
     'config' => [

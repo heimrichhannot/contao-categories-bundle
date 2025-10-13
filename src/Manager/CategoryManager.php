@@ -9,6 +9,7 @@
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Model\Collection;
 use Contao\StringUtil;
@@ -16,20 +17,13 @@ use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\CategoryContext;
 use HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class CategoryManager
 {
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    protected $framework;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(private ContaoFramework $framework, private Utils $utils)
     {
-        $this->framework = $framework;
+        $this->framework->initialize();
     }
 
     /**
@@ -37,7 +31,7 @@ class CategoryManager
      */
     public function findByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = [])
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.entity=?', 'tl_category_association.parentTable=?'], [$categoryField, $entity, $table], $options))) {
             return null;

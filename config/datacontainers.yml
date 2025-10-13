@@ -4,4 +4,4 @@ services:
     autowire: true
 
   HeimrichHannot\CategoriesBundle\DataContainer\:
-    resource: '../../DataContainer/*'
+    resource: '../src/DataContainer/*'

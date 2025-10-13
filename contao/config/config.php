@@ -8,6 +8,8 @@
 
 use HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer;
 use HeimrichHannot\CategoriesBundle\EventListener\HookListener;
+use Contao\System;
+use Contao\ArrayUtil;
 
 $GLOBALS['BE_MOD']['content']['categories'] = [
     'tables' => ['tl_category', 'tl_category_config', 'tl_category_context'],
@@ -16,7 +18,7 @@ $GLOBALS['BE_MOD']['content']['categories'] = [
 /*
  * Front end modules
  */
-array_insert($GLOBALS['FE_MOD'], 2, [
+$GLOBALS['FE_MOD'] = ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'categoriesBundle' => [
         'categoriesMenu' => 'HeimrichHannot\CategoriesBundle\Module\ModuleCategoriesMenu',
     ],
@@ -25,7 +27,7 @@ array_insert($GLOBALS['FE_MOD'], 2, [
 /*
  * JavaScript
  */
-if (System::getContainer()->get('huh.utils.container')->isBackend()) {
+if ('BE' === $GLOBALS['TL_MODE']) {
     $GLOBALS['TL_JAVASCRIPT']['contao-categories-bundle'] = 'bundles/categories/js/contao-categories-bundle.be.min.js|static';
 }
 
@@ -51,7 +53,7 @@ $GLOBALS['TL_CRON']['daily']['generateFeed_huhCategories'] = [NewsContainer::cla
 /*
  * Assets
  */
-if (System::getContainer()->get('huh.utils.container')->isBackend()) {
+if ('BE' === $GLOBALS['TL_MODE']) {
     $GLOBALS['TL_CSS']['contao-categories-bundle'] = 'bundles/categories/css/contao-categories-bundle.be.css|static';
 }
 

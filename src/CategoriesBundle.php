@@ -16,8 +16,13 @@ class CategoriesBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function getContainerExtension()
+    public function getContainerExtension(): CategoriesExtension|\Symfony\Component\DependencyInjection\Extension\ExtensionInterface|null
     {
         return new CategoriesExtension();
+    }
+
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
     }
 }

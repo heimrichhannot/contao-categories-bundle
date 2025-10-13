@@ -9,27 +9,17 @@
 namespace HeimrichHannot\CategoriesBundle\DataContainer;
 
 use Contao\Controller;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\Database;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
-use HeimrichHannot\UtilsBundle\Model\ModelUtil;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class NewsContainer
 {
-    /**
-     * @var \HeimrichHannot\UtilsBundle\String\StringUtil
-     */
-    private $stringUtil;
-    /**
-     * @var ModelUtil
-     */
-    private $modelUtil;
-
-    public function __construct(\HeimrichHannot\UtilsBundle\String\StringUtil $stringUtil, ModelUtil $modelUtil)
+    public function __construct(private InsertTagParser $parser, private Utils $utils)
     {
-        $this->stringUtil = $stringUtil;
-        $this->modelUtil = $modelUtil;
     }
 
     public function generateFeeds()
@@ -59,6 +49,7 @@ class NewsContainer
     public function generateFiles($arrFeed)
     {
         $arrArchives = StringUtil::deserialize($arrFeed['archives']);
+        $modelUtil = $this->utils->model();
 
         if (!\is_array($arrArchives) || empty($arrArchives)) {
             return;
@@ -113,7 +104,7 @@ class NewsContainer
             $arrUrls = [];
 
             while ($objArticle->next()) {
-                if (null === ($archive = $this->modelUtil->findModelInstanceByPk('tl_news_archive', $objArticle->pid))) {
+                if (null === ($archive = $modelUtil->findModelInstanceByPk('tl_news_archive', $objArticle->pid))) {
                     continue;
                 }
 
@@ -146,7 +137,7 @@ class NewsContainer
                     $arrCategories = [];
                     $ids = StringUtil::deserialize($objArticle->categories, true);
 
-                    if (null !== ($objCategories = $this->modelUtil->findMultipleModelInstancesByIds('tl_category', $ids))) {
+                    if (null !== ($objCategories = $modelUtil->findMultipleModelInstancesByIds('tl_category', $ids))) {
                         $arrCategories = $objCategories->fetchEach('title');
                     }
                 }
@@ -196,7 +187,7 @@ class NewsContainer
                     }
                 }
 
-                $strDescription = $this->stringUtil->replaceInsertTags($strDescription, false);
+                $strDescription = $this->parser->replace($strDescription);
                 $objItem->description = Controller::convertRelativeUrls($strDescription, $strLink);
 
                 // Add the article image as enclosure
@@ -229,9 +220,9 @@ class NewsContainer
 
         // Create the file
         if (class_exists('Contao\CoreBundle\ContaoCoreBundle')) {
-            \File::putContent('web/share/'.$strFile.'.xml', $this->stringUtil->replaceInsertTags($objFeed->$strType(), false));
+            \File::putContent('web/share/'.$strFile.'.xml', $this->parser->replace($objFeed->$strType()));
         } else {
-            \File::putContent('share/'.$strFile.'.xml', $this->stringUtil->replaceInsertTags($objFeed->$strType(), false));
+            \File::putContent('share/'.$strFile.'.xml', $this->parser->replace($objFeed->$strType()));
         }
     }
 

@@ -18,7 +18,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'categoryPicker';
     }
@@ -26,7 +26,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function supportsContext($context)
+    public function supportsContext($context): bool
     {
         return \in_array($context, ['category'], true) && $this->getUser()->hasAccess('categories', 'modules');
     }
@@ -34,7 +34,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function supportsValue(PickerConfig $config)
+    public function supportsValue(PickerConfig $config): bool
     {
         if ('category' === $config->getContext()) {
             return is_numeric($config->getValue());
@@ -46,7 +46,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function getDcaTable()
+    public function getDcaTable(PickerConfig|null $config = null): string
     {
         return 'tl_category';
     }
@@ -54,7 +54,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function getDcaAttributes(PickerConfig $config)
+    public function getDcaAttributes(PickerConfig $config): array
     {
         $value = $config->getValue();
         $attributes = ['fieldType' => 'radio'];
@@ -89,7 +89,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function convertDcaValue(PickerConfig $config, $value)
+    public function convertDcaValue(PickerConfig $config, mixed $value): string|int
     {
         if ('category' === $config->getContext()) {
             return (int) $value;
@@ -101,7 +101,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    protected function getRouteParameters(PickerConfig $config = null)
+    protected function getRouteParameters(PickerConfig $config = null): array
     {
         return [
             'do' => 'categories',
