@@ -5,10 +5,11 @@
  *
  * @license LGPL-3.0-or-later
  */
+use Contao\DC_Table;
 
 $GLOBALS['TL_DCA']['tl_category_context'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'onsubmit_callback' => [
             ['huh.utils.dca', 'setDateAdded'],

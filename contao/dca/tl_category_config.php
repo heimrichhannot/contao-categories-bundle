@@ -10,7 +10,7 @@ use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_category_config'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'ptable' => 'tl_category',
         'onsubmit_callback' => [

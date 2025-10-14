@@ -8,7 +8,6 @@
 
 use HeimrichHannot\CategoriesBundle\DataContainer\NewsContainer;
 use HeimrichHannot\CategoriesBundle\EventListener\HookListener;
-use Contao\System;
 use Contao\ArrayUtil;
 
 $GLOBALS['BE_MOD']['content']['categories'] = [
@@ -42,8 +41,7 @@ $GLOBALS['BE_FFL']['categoryTree'] = 'HeimrichHannot\CategoriesBundle\Widget\Cat
 $GLOBALS['TL_HOOKS']['executePostActions']['reloadCategoryTree'] = [HookListener::class, 'reloadCategoryTree'];
 $GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = [HookListener::class, 'adjustCategoryTree'];
 $GLOBALS['TL_HOOKS']['generateXmlFiles']['generateFeed_huhCategories'] = [NewsContainer::class, 'generateFeeds'];
-$GLOBALS['TL_HOOKS']['loadDataContainer']['huh_categories'] = [
-    \HeimrichHannot\CategoriesBundle\EventListener\LoadDataContainerListener::class, '__invoke', ];
+
 
 /*
  * Crons
