@@ -28,6 +28,5 @@ class CategoriesExtension extends Extension implements PrependExtensionInterface
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__) . '/../config'));
 
         $loader->load('services.yml');
-        $loader->load('datacontainers.yml');
     }
 }

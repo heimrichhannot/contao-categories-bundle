@@ -35,4 +35,7 @@ return RectorConfig::configure()
         ContaoLevelSetList::UP_TO_CONTAO_53,
         ContaoSetList::FQCN,
         ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES,
+    ])
+    ->withSkip([
+        \Rector\Php81\Rector\Array_\FirstClassCallableRector::class
     ]);

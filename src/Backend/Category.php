@@ -33,6 +33,7 @@ class Category extends Backend
     {
         parent::__construct();
         $this->utils = System::getContainer()->get(Utils::class);
+        $this->request = System::getContainer()->get('request_stack')->getCurrentRequest();
     }
 
     /**
@@ -49,13 +50,13 @@ class Category extends Backend
         $objSession = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend');
 
         // Set a new node
-        if (System::getContainer()->get('huh.request')->hasGet('cn')) {
+        if ($this->request && $this->request->query->has('cn')) {
             // Check the path
-            if (Validator::isInsecurePath(System::getContainer()->get('huh.request')->getGet('cn', true))) {
-                throw new \RuntimeException('Insecure path '.System::getContainer()->get('huh.request')->getGet('cn', true));
+            if (Validator::isInsecurePath(htmlspecialchars($this->request->get('cn')))) {
+                throw new \RuntimeException('Insecure path '.htmlspecialchars($this->request->get('cn')));
             }
 
-            $objSession->set($strKey, System::getContainer()->get('huh.request')->getGet('cn', true));
+            $objSession->set($strKey, htmlspecialchars($this->request->get('cn')));
             Controller::redirect(preg_replace('/&cn=[^&]*/', '', (string) Environment::get('request')));
         }
 
@@ -169,8 +170,8 @@ class Category extends Backend
             'filter' => true,
             'inputType' => 'categoryTree',
             'foreignKey' => 'tl_category.title',
-            'load_callback' => [Category::loadCategoriesFromAssociations(...)],
-            'save_callback' => [Category::storeToCategoryAssociations(...)],
+            'load_callback' => [Category::class, 'loadCategoriesFromAssociations'],
+            'save_callback' => [Category::class, 'storeToCategoryAssociations'],
             'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
@@ -217,8 +218,8 @@ class Category extends Backend
             'filter' => true,
             'inputType' => 'categoryTree',
             'foreignKey' => 'tl_category.title',
-            'load_callback' => [Category::loadCategoriesFromAssociations(...)],
-            'save_callback' => [Category::storeToCategoryAssociations(...)],
+            'load_callback' => [Category::class,'loadCategoriesFromAssociations'],
+            'save_callback' => [Category::class,'storeToCategoryAssociations'],
             'eval' => $eval,
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ];
@@ -271,10 +272,10 @@ class Category extends Backend
             'filter' => true,
             'inputType' => 'categoryTree',
             'foreignKey' => 'tl_category.title',
-            'load_callback' => [Category::loadCategoriesFromAssociations(...)],
+            'load_callback' => [Category::class,'loadCategoriesFromAssociations'],
             'save_callback' => [
-                Category::storePrimaryCategory(...),
-                Category::storeToCategoryAssociations(...),
+                [Category::class, 'storePrimaryCategory'],
+                [Category::class, 'storeToCategoryAssociations'],
             ],
             'eval' => $eval,
             'sql' => 'blob NULL',
@@ -299,8 +300,9 @@ class Category extends Backend
 
     public static function deleteCachedPropertyValuesByCategoryAndProperty($value, DataContainer $dc)
     {
+        $utils = System::getContainer()->get(Utils::class);
 
-        if (null !== ($instance = $this->utils->model()->findModelInstanceByPk($dc->table, $dc->id))) {
+        if (null !== ($instance = $utils->model()->findModelInstanceByPk($dc->table, $dc->id))) {
             $valueOld = $instance->{$dc->field};
 
             if ($value != $valueOld) {
@@ -322,7 +324,9 @@ class Category extends Backend
 
     public static function deleteCachedPropertyValuesByCategoryAndPropertyBool($value, DataContainer $dc)
     {
-        if (null !== ($instance = $this->utils->model()->findModelInstanceByPk($dc->table, $dc->id))) {
+        $utils = System::getContainer()->get(Utils::class);
+
+        if (null !== ($instance = $utils->model()->findModelInstanceByPk($dc->table, $dc->id))) {
             // compute name of the field being overridden
             $overrideField = lcfirst(str_replace('override', '', $dc->field));
 
@@ -361,7 +365,7 @@ class Category extends Backend
             return '';
         }
 
-        $primaryCategory = System::getContainer()->get('huh.request')->getGet('primaryCategory');
+        $primaryCategory = $this->request->get('primaryCategory');
 
         $isParentCategory = System::getContainer()->get('huh.categories.manager')->hasChildren($row['id']);
         $checkAsDefaultPrimaryCategory = (!$isParentCategory || !$dcaEval['parentsUnselectable'] || $category->selectable) && !$primaryCategory && $dcaEval['forcePrimaryCategory'] && !static::$defaultPrimaryCategorySet;
@@ -391,7 +395,7 @@ class Category extends Backend
                     'label' => &$GLOBALS['TL_LANG']['tl_category'][$overrideFieldName],
                     'exclude' => true,
                     'inputType' => 'checkbox',
-                    'save_callback' => [Category::deleteCachedPropertyValuesByCategoryAndPropertyBool(...)],
+                    'save_callback' => [[Category::class, 'deleteCachedPropertyValuesByCategoryAndPropertyBool']],
                     'eval' => ['tl_class' => 'w50', 'submitOnChange' => true],
                     'sql' => "char(1) NOT NULL default ''",
                 ];
@@ -555,7 +559,9 @@ class Category extends Backend
      */
     public static function generateAlias($varValue, DataContainer $dc)
     {
-        if (null === ($category = $this->utils->model()->findModelInstanceByPk('tl_category', $dc->id))) {
+        $utils = System::getContainer()->get(Utils::class);
+
+        if (null === ($category = $utils->model()->findModelInstanceByPk('tl_category', $dc->id))) {
             return '';
         }
 
@@ -627,7 +633,7 @@ class Category extends Backend
         // add category breadcrumb link
         $label = ' <a href="'.Backend::addToUrl('cn='.$this->urlEncode($row['id'])).'" title="'.StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$label.'</a>';
 
-        if ('edit' !== System::getContainer()->get('huh.request')->getGet('act') && null !== (System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
+        if ('edit' !== $this->request->query->get('act') && null !== (System::getContainer())->get('huh.categories.config_manager')->findBy(['tl_category_config.pid=?'], [$row['id']])) {
             $label .= '<span style="padding-left:3px;color:#b3b3b3;">– '.$GLOBALS['TL_LANG']['MSC']['categoriesBundle']['configsAvailable'].'</span>';
         }
 

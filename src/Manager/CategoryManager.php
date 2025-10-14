@@ -47,7 +47,7 @@ class CategoryManager
      */
     public function findByCategoryFieldAndTable(string $categoryField, string $table, array $options = [])
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
             return null;
@@ -69,7 +69,7 @@ class CategoryManager
      */
     public function findByCategoryFieldAndTableAndPids(string $categoryField, string $table, array $pids = [], array $options = [])
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
             return null;
@@ -96,7 +96,7 @@ class CategoryManager
 
     public function findOneByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = []): ?CategoryModel
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findOneModelInstanceBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$entity, $categoryField, $table], $options))) {
             return null;
@@ -390,7 +390,8 @@ class CategoryManager
      */
     public function hasChildren(int $category): bool
     {
-        return null !== System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['tl_category.pid=?'], [$category]);
+        $modelUtil = $this->utils->model();
+        return null !== $modelUtil->findModelInstancesBy('tl_category', ['tl_category.pid=?'], [$category]);
     }
 
     /**
