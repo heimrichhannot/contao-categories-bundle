@@ -32,16 +32,6 @@ class CategoryTree extends Widget
      */
     protected $strTemplate = 'be_widget';
 
-    /**
-     * Load the database object.
-     *
-     * @param array $arrAttributes
-     */
-    public function __construct($arrAttributes = null)
-    {
-//        $this->import('Database'); // ?
-        parent::__construct($arrAttributes);
-    }
 
     /**
      * Generate the widget and return it as string.

@@ -11,10 +11,14 @@ namespace HeimrichHannot\CategoriesBundle\Picker;
 use Contao\CoreBundle\Picker\AbstractPickerProvider;
 use Contao\CoreBundle\Picker\DcaPickerProviderInterface;
 use Contao\CoreBundle\Picker\PickerConfig;
+use Contao\Input;
 use Contao\System;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CategoryPickerProvider extends AbstractPickerProvider implements DcaPickerProviderInterface
 {
+    private TokenStorageInterface $tokenStorage;
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +32,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
      */
     public function supportsContext($context): bool
     {
-        return \in_array($context, ['category'], true) && $this->getUser()->hasAccess('categories', 'modules');
+        return \in_array($context, ['category'], true) && $this->tokenStorage->getToken()?->getUser()->hasAccess('categories', 'modules');
     }
 
     /**
@@ -98,6 +102,11 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
         return '{{category_url::'.$value.'}}';
     }
 
+    public function setTokenStorage(TokenStorageInterface $storage): void
+    {
+        $this->tokenStorage = $storage;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -105,10 +114,10 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     {
         return [
             'do' => 'categories',
-            'category_field' => System::getContainer()->get('huh.request')->getGet('category_field'),
-            'category_table' => System::getContainer()->get('huh.request')->getGet('category_table'),
-            'primaryCategory' => System::getContainer()->get('huh.request')->getGet('primaryCategory'),
-            'usePrimaryCategory' => System::getContainer()->get('huh.request')->getGet('usePrimaryCategory'),
+            'category_field' => Input::get('category_field'),
+            'category_table' => Input::get('category_table'),
+            'primaryCategory' => Input::get('primaryCategory'),
+            'usePrimaryCategory' => Input::get('usePrimaryCategory'),
         ];
     }
 }
