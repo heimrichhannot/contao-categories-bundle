@@ -48,14 +48,6 @@ services:
   HeimrichHannot\CategoriesBundle\Manager\CategoryManager:
     alias: huh.categories.manager
     public: true
-  # Filter
-
-  huh.categories.filter.choice:
-    class: HeimrichHannot\CategoriesBundle\Filter\Choice\CategoriesChoice
-    public: true
-    arguments:
-      - "@contao.framework"
-      - '@huh.categories.manager'
 
   # Commands
 
