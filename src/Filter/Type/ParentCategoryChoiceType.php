@@ -22,7 +22,7 @@ class ParentCategoryChoiceType extends AbstractType
 {
     const TYPE = 'parent_category_choice';
 
-    public function buildQuery(FilterQueryBuilder $builder, FilterConfigElementModel $element)
+    public function buildQuery(FilterQueryBuilder $builder, FilterConfigElementModel $element): void
     {
         $parentCategoryIds = StringUtil::deserialize($element->parentCategories, true);
         /** @var CategoryModel[]|Collection|null $parentCategories */

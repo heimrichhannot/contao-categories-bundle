@@ -8,7 +8,8 @@
 
 namespace HeimrichHannot\CategoriesBundle\Filter\Choice;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Manager\CategoryManager;
@@ -17,15 +18,9 @@ use HeimrichHannot\FilterBundle\Model\FilterConfigElementModel;
 
 class CategoriesChoice extends FieldOptionsChoice
 {
-    /**
-     * @var CategoryManager
-     */
-    private $categoryManager;
-
-    public function __construct(ContaoFrameworkInterface $framework, CategoryManager $categoryManager)
+    public function __construct(ContaoFramework $framework, private readonly CategoryManager $categoryManager)
     {
         parent::__construct($framework);
-        $this->categoryManager = $categoryManager;
     }
 
     /**
@@ -49,7 +44,7 @@ class CategoriesChoice extends FieldOptionsChoice
 
         $isFrontend = System::getContainer()->get('huh.utils.container')->isFrontend();
 
-        /** @var \HeimrichHannot\CategoriesBundle\Model\CategoryModel $category */
+        /** @var CategoryModel $category */
         foreach ($categories as $category) {
             $options[] = ['label' => ($category->frontendTitle ?: $category->title).($isFrontend ? '' : ' (ID '.$category->id.')'), 'value' => $category->id];
         }

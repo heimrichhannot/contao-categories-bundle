@@ -6,6 +6,8 @@
  * @license LGPL-3.0-or-later
  */
 
+use Contao\System;
+
 $GLOBALS['TL_DCA']['tl_category_config'] = [
     'config' => [
         'dataContainer' => 'Table',

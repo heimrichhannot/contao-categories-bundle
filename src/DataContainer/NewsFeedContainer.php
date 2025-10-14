@@ -10,17 +10,11 @@ namespace HeimrichHannot\CategoriesBundle\DataContainer;
 
 class NewsFeedContainer
 {
-    /**
-     * @var NewsContainer
-     */
-    private $newsContainer;
-
-    public function __construct(NewsContainer $newsContainer)
+    public function __construct(private readonly NewsContainer $newsContainer)
     {
-        $this->newsContainer = $newsContainer;
     }
 
-    public function generateFeed()
+    public function generateFeed(): void
     {
         $this->newsContainer->generateFeeds();
     }

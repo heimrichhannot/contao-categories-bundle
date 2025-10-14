@@ -40,7 +40,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
             return is_numeric($config->getValue());
         }
 
-        return false !== strpos($config->getValue(), '{{category_url::');
+        return str_contains($config->getValue(), '{{category_url::');
     }
 
     /**
@@ -79,7 +79,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
             return $attributes;
         }
 
-        if ($value && false !== strpos($value, '{{category_url::')) {
+        if ($value && str_contains($value, '{{category_url::')) {
             $attributes['value'] = str_replace(['{{category_url::', '}}'], '', $value);
         }
 

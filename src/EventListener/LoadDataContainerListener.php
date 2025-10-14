@@ -8,19 +8,17 @@
 
 namespace HeimrichHannot\CategoriesBundle\EventListener;
 
-use Contao\CoreBundle\ServiceAnnotation\Hook;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
 use HeimrichHannot\CategoriesBundle\Filter\Type\CategoryChoiceType;
 use HeimrichHannot\CategoriesBundle\Filter\Type\ParentCategoryChoiceType;
 use HeimrichHannot\FilterBundle\Filter\Type\ChoiceType;
 
-/**
- * @Hook("loadDataContainer")
- */
+#[AsHook('loadDataContainer')]
 class LoadDataContainerListener
 {
-    public function __invoke(string $table)
+    public function __invoke(string $table): void
     {
         switch ($table) {
             case 'tl_filter_config_element':

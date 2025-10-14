@@ -12,7 +12,7 @@ System::loadLanguageFile('tl_news_archive');
 $GLOBALS['TL_DCA']['tl_category'] = [
     'config' => [
         'label' => &$GLOBALS['TL_LANG']['tl_news_archive']['categories'][0],
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'onload_callback' => [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'checkPermission'],

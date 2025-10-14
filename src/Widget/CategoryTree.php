@@ -8,6 +8,7 @@
 
 namespace HeimrichHannot\CategoriesBundle\Widget;
 
+use Contao\Image;
 use Contao\FormHidden;
 use Contao\StringUtil;
 use Contao\System;
@@ -81,7 +82,7 @@ class CategoryTree extends Widget
             if (null !== $objCategories) {
                 while ($objCategories->next()) {
                     $arrSet[] = $objCategories->id;
-                    $arrValues[$objCategories->id] = \Image::getHtml('iconPLAIN.svg').' '.$objCategories->title;
+                    $arrValues[$objCategories->id] = Image::getHtml('iconPLAIN.svg').' '.$objCategories->title;
                 }
             }
         }
@@ -118,7 +119,7 @@ class CategoryTree extends Widget
             $readonly = $dca['eval']['readonly'] ?? false;
 
             $return .= '
-	<p>'.(($dca['eval']['disabled'] ?? false) || $readonly ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
+	<p>'.(($dca['eval']['disabled'] ?? false) || $readonly ? '<button style="cursor: not-allowed" disabled class="tl_submit">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</button>' : '<a href="'.StringUtil::ampersand(System::getContainer()->get('contao.picker.builder')->getUrl('category', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a>').'</p>
 	<script>
 	  $("pt_'.$this->strName.'").addEvent("click", function(e) {
 		e.preventDefault();
@@ -133,7 +134,7 @@ class CategoryTree extends Widget
 				$("ctrl_'.$this->strId.'").getParent("div").set("html", json.content);
 				json.javascript && Browser.exec(json.javascript);
 			  }
-			}).post({"action":"reloadCategoryTree", "name":"'.$this->strId.'", "value":value.join("\t"), "REQUEST_TOKEN":"'.REQUEST_TOKEN.'"});
+			}).post({"action":"reloadCategoryTree", "name":"'.$this->strId.'", "value":value.join("\t"), "REQUEST_TOKEN":"'.System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue().'"});
 		  }
 		});
 	  });
@@ -167,10 +168,10 @@ class CategoryTree extends Widget
             }
 
             return '';
-        } elseif (false === strpos($varInput, ',')) {
+        } elseif (!str_contains((string) $varInput, ',')) {
             return $this->multiple ? [(int) $varInput] : (int) $varInput;
         }
-        $arrValue = array_map('intval', array_filter(explode(',', $varInput)));
+        $arrValue = array_map('intval', array_filter(explode(',', (string) $varInput)));
 
         return $this->multiple ? $arrValue : $arrValue[0];
     }

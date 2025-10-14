@@ -8,9 +8,9 @@
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
+use Contao\Database;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
@@ -21,7 +21,7 @@ use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class CategoryManager
 {
-    public function __construct(private ContaoFramework $framework, private Utils $utils)
+    public function __construct(private readonly ContaoFramework $framework, private readonly Utils $utils)
     {
         $this->framework->initialize();
     }
@@ -237,7 +237,7 @@ class CategoryManager
      *
      * @param $contextObj
      */
-    public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
+    public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false): void
     {
         Controller::loadDataContainer('tl_category');
 
@@ -446,7 +446,7 @@ class CategoryManager
      * @param int   $intPid The parent ID
      * @param array $arrIds An array of categories
      *
-     * @return \Model\Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
+     * @return Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
      */
     public function findCategoryAndSubcategoryByPidAndIds(int $pid, array $arrIds)
     {
@@ -454,13 +454,13 @@ class CategoryManager
             return null;
         }
 
-        $objCategories = \Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).') ORDER BY sorting ASC')->execute($pid);
+        $objCategories = Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).') ORDER BY sorting ASC')->execute($pid);
 
         if ($objCategories->numRows < 1) {
             return null;
         }
 
-        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');
+        return Collection::createFromDbResult($objCategories, 'tl_category');
     }
 
     /**

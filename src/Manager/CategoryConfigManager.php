@@ -8,20 +8,21 @@
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Model\Collection;
 use HeimrichHannot\CategoriesBundle\Model\CategoryConfigModel;
 
 class CategoryConfigManager
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     protected $framework;
 
     /**
      * Constructor.
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
@@ -32,7 +33,7 @@ class CategoryConfigManager
      * @param mixed $column
      * @param mixed $value
      *
-     * @return \Contao\Model\Collection|CategoryConfigModel|null
+     * @return Collection|CategoryConfigModel|null
      */
     public function findBy($column, $value, array $options = [])
     {

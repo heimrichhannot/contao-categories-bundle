@@ -8,6 +8,19 @@
 
 namespace HeimrichHannot\CategoriesBundle\DataContainer;
 
+use Psr\Log\LogLevel;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\Environment;
+use Contao\Feed;
+use Contao\Date;
+use Contao\Config;
+use Contao\FeedItem;
+use Contao\ContentModel;
+use Contao\FilesModel;
+use Contao\File;
+use Contao\ArticleModel;
+use Contao\NewsFeedModel;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\Controller;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\Database;
@@ -18,23 +31,23 @@ use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class NewsContainer
 {
-    public function __construct(private InsertTagParser $parser, private Utils $utils)
+    public function __construct(private readonly InsertTagParser $parser, private readonly Utils $utils)
     {
     }
 
-    public function generateFeeds()
+    public function generateFeeds(): void
     {
         if (!class_exists('Contao\NewsFeedModel')) {
             return;
         }
 
-        $objFeed = \Contao\NewsFeedModel::findAll();
+        $objFeed = NewsFeedModel::findAll();
 
         if (null !== $objFeed) {
             while ($objFeed->next()) {
                 $objFeed->feedName = $objFeed->alias ?: 'news'.$objFeed->id;
                 $this->generateFiles($objFeed->row());
-                System::log('Generated news feed "'.$objFeed->feedName.'.xml"', __METHOD__, TL_CRON);
+                System::getContainer()->get('monolog.logger.contao')->log(LogLevel::INFO, 'Generated news feed "'.$objFeed->feedName.'.xml"', ['contao' => new ContaoContext(__METHOD__, ContaoContext::CRON)]);
             }
         }
     }
@@ -46,7 +59,7 @@ class NewsContainer
      *
      * @throws \Exception
      */
-    public function generateFiles($arrFeed)
+    public function generateFiles($arrFeed): void
     {
         $arrArchives = StringUtil::deserialize($arrFeed['archives']);
         $modelUtil = $this->utils->model();
@@ -67,15 +80,13 @@ class NewsContainer
             return;
         }
 
-        $arrFields = array_map(function ($val) {
-            return '"'.$val.'"';
-        }, $arrFields);
+        $arrFields = array_map(fn($val) => '"'.$val.'"', $arrFields);
 
         $strType = ('atom' == $arrFeed['format']) ? 'generateAtom' : 'generateRss';
-        $strLink = $arrFeed['feedBase'] ?: \Environment::get('base');
+        $strLink = $arrFeed['feedBase'] ?: Environment::get('base');
         $strFile = $arrFeed['feedName'];
 
-        $objFeed = new \Feed($strFile);
+        $objFeed = new Feed($strFile);
         $objFeed->link = $strLink;
         $objFeed->title = $arrFeed['title'];
         $objFeed->description = $arrFeed['description'];
@@ -85,7 +96,7 @@ class NewsContainer
         $db = Database::getInstance();
 
         // Get the items
-        $time = \Date::floorToMinute();
+        $time = Date::floorToMinute();
 
         $query = 'SELECT n.* FROM tl_news n INNER JOIN tl_category_association a ON n.id = a.entity WHERE a.categoryField IN ('.implode(',', $arrFields).')'.
                     ' AND a.category IN ('.implode(',', $arrCategories).') AND n.pid IN ('.implode(',', $arrArchives).')'.
@@ -117,13 +128,13 @@ class NewsContainer
 
                 // Get the jumpTo URL
                 if (!isset($arrUrls[$jumpTo])) {
-                    $objParent = \PageModel::findWithDetails($jumpTo);
+                    $objParent = PageModel::findWithDetails($jumpTo);
 
                     // A jumpTo page is set but does no longer exist (see #5781)
                     if (null === $objParent) {
                         $arrUrls[$jumpTo] = false;
                     } else {
-                        $arrUrls[$jumpTo] = $objParent->getAbsoluteUrl((\Config::get('useAutoItem') && !\Config::get('disableAlias')) ? '/%s' : '/items/%s');
+                        $arrUrls[$jumpTo] = $objParent->getAbsoluteUrl((Config::get('useAutoItem') && !Config::get('disableAlias')) ? '/%s' : '/items/%s');
                     }
                 }
 
@@ -143,7 +154,7 @@ class NewsContainer
                 }
 
                 $strUrl = $arrUrls[$jumpTo];
-                $objItem = new \FeedItem();
+                $objItem = new FeedItem();
 
                 // Add the categories to the title
                 if ('title' == $arrFeed['categories_show']) {
@@ -159,18 +170,18 @@ class NewsContainer
                 // Prepare the description
                 if ('source_text' == $arrFeed['source']) {
                     $strDescription = '';
-                    $objElement = \ContentModel::findPublishedByPidAndTable($objArticle->id, 'tl_news');
+                    $objElement = ContentModel::findPublishedByPidAndTable($objArticle->id, 'tl_news');
 
                     if (null !== $objElement) {
                         // Overwrite the request (see #7756)
-                        $strRequest = \Environment::get('request');
-                        \Environment::set('request', $objItem->link);
+                        $strRequest = Environment::get('request');
+                        Environment::set('request', $objItem->link);
 
                         while ($objElement->next()) {
                             $strDescription .= Controller::getContentElement($objElement->current());
                         }
 
-                        \Environment::set('request', $strRequest);
+                        Environment::set('request', $strRequest);
                     }
                 } else {
                     $strDescription = $objArticle->teaser;
@@ -192,7 +203,7 @@ class NewsContainer
 
                 // Add the article image as enclosure
                 if ($objArticle->addImage) {
-                    $objFile = \FilesModel::findByUuid($objArticle->singleSRC);
+                    $objFile = FilesModel::findByUuid($objArticle->singleSRC);
 
                     if (null !== $objFile) {
                         $objItem->addEnclosure($objFile->path, $strLink);
@@ -204,7 +215,7 @@ class NewsContainer
                     $arrEnclosure = StringUtil::deserialize($objArticle->enclosure, true);
 
                     if (\is_array($arrEnclosure)) {
-                        $objFile = \FilesModel::findMultipleByUuids($arrEnclosure);
+                        $objFile = FilesModel::findMultipleByUuids($arrEnclosure);
 
                         if (null !== $objFile) {
                             while ($objFile->next()) {
@@ -219,10 +230,10 @@ class NewsContainer
         }
 
         // Create the file
-        if (class_exists('Contao\CoreBundle\ContaoCoreBundle')) {
-            \File::putContent('web/share/'.$strFile.'.xml', $this->parser->replace($objFeed->$strType()));
+        if (class_exists(ContaoCoreBundle::class)) {
+            File::putContent('web/share/'.$strFile.'.xml', $this->parser->replace($objFeed->$strType()));
         } else {
-            \File::putContent('share/'.$strFile.'.xml', $this->parser->replace($objFeed->$strType()));
+            File::putContent('share/'.$strFile.'.xml', $this->parser->replace($objFeed->$strType()));
         }
     }
 
@@ -257,20 +268,20 @@ class NewsContainer
 
             // Link to an article
             case 'article':
-                if (null !== ($objArticle = \ArticleModel::findByPk($objItem->articleId, ['eager' => true])) && ($objPid = $objArticle->getRelated('pid')) instanceof PageModel) {
+                if (null !== ($objArticle = ArticleModel::findByPk($objItem->articleId, ['eager' => true])) && ($objPid = $objArticle->getRelated('pid')) instanceof PageModel) {
                     /* @var PageModel $objPid */
-                    return ampersand($objPid->getAbsoluteUrl('/articles/'.($objArticle->alias ?: $objArticle->id)));
+                    return StringUtil::ampersand($objPid->getAbsoluteUrl('/articles/'.($objArticle->alias ?: $objArticle->id)));
                 }
 
                 break;
         }
 
         // Backwards compatibility (see #8329)
-        if ('' != $strBase && !preg_match('#^https?://#', $strUrl)) {
+        if ('' != $strBase && !preg_match('#^https?://#', (string) $strUrl)) {
             $strUrl = $strBase.$strUrl;
         }
 
         // Link to the default page
-        return sprintf(preg_replace('/%(?!s)/', '%%', $strUrl), ($objItem->alias ?: $objItem->id));
+        return sprintf(preg_replace('/%(?!s)/', '%%', (string) $strUrl), ($objItem->alias ?: $objItem->id));
     }
 }

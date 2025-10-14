@@ -8,6 +8,7 @@
 
 namespace HeimrichHannot\CategoriesBundle;
 
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use HeimrichHannot\CategoriesBundle\DependencyInjection\CategoriesExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -16,7 +17,7 @@ class CategoriesBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function getContainerExtension(): CategoriesExtension|\Symfony\Component\DependencyInjection\Extension\ExtensionInterface|null
+    public function getContainerExtension(): CategoriesExtension|ExtensionInterface|null
     {
         return new CategoriesExtension();
     }

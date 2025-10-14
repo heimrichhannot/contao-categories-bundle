@@ -18,7 +18,7 @@ class CategoryContext extends Backend
 {
     const CATEGORY_FIELD_CONTEXT_MAPPING_FIELD = 'categoryFieldContextMapping';
 
-    public static function addFieldContextMappingFieldToDca($table, $categoryFieldTable, $label = null)
+    public static function addFieldContextMappingFieldToDca($table, $categoryFieldTable, $label = null): void
     {
         System::loadLanguageFile('tl_category_context');
         Controller::loadDataContainer($table);
@@ -27,7 +27,7 @@ class CategoryContext extends Backend
             'label' => &$GLOBALS['TL_LANG']['tl_category_context'][static::CATEGORY_FIELD_CONTEXT_MAPPING_FIELD],
             'exclude' => true,
             'inputType' => 'multiColumnEditor',
-            'save_callback' => [['HeimrichHannot\CategoriesBundle\Backend\CategoryContext', 'deleteCachedPropertyValuesByFieldOrContext']],
+            'save_callback' => [CategoryContext::deleteCachedPropertyValuesByFieldOrContext(...)],
             'eval' => [
                 'tl_class' => 'long clr',
                 'multiColumnEditor' => [
@@ -42,7 +42,7 @@ class CategoryContext extends Backend
                         'context' => [
                             'label' => &$GLOBALS['TL_LANG']['tl_category_context']['context'],
                             'inputType' => 'select',
-                            'options_callback' => ['HeimrichHannot\CategoriesBundle\Backend\CategoryConfig', 'getContextsAsOptions'],
+                            'options_callback' => CategoryConfig::getContextsAsOptions(...),
                             'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'groupStyle' => 'width: 200px'],
                         ],
                     ],

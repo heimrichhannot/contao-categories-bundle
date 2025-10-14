@@ -33,9 +33,9 @@ class HookListener
      * HookListener constructor.
      */
     public function __construct(
-        private RequestStack $requestStack,
-        private Utils $utils,
-        private CategoryManager $categoryManager
+        private readonly RequestStack $requestStack,
+        private readonly Utils $utils,
+        private readonly CategoryManager $categoryManager
     ) {}
 
     protected function getRequest(): ?Request
@@ -73,7 +73,7 @@ class HookListener
         return $buffer;
     }
 
-    public function reloadCategoryTree($action, DataContainer $dc)
+    public function reloadCategoryTree($action, DataContainer $dc): void
     {
         switch ($action) {
             case 'reloadCategoryTree':
@@ -82,15 +82,15 @@ class HookListener
 
                 // Handle the keys in "edit multiple" mode
                 if ('editAll' === $this->getRequest()?->query->get('act')) {
-                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
-                    $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
+                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', (string) $field);
+                    $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', (string) $field);
                 }
 
                 $dc->field = $field;
 
                 // The field does not exist
                 if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
-                    System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]);
+                    System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)]);
 
                     throw new BadRequestHttpException('Bad request');
                 }
@@ -107,7 +107,7 @@ class HookListener
 
                         // The record does not exist
                         if ($row->numRows < 1) {
-                            System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]);
+                            System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)]);
 
                             throw new BadRequestHttpException('Bad request');
                         }
@@ -157,7 +157,7 @@ class HookListener
         $objNode->filter('.tree_view input[name="picker[]"]')->each(function ($objElement) use ($selectableCategories) {
             $categoryId = $objElement->getAttribute('value');
 
-            if (\System::getContainer()->get('huh.categories.manager')->hasChildren($categoryId) && !\in_array($categoryId, $selectableCategories)) {
+            if (System::getContainer()->get('huh.categories.manager')->hasChildren($categoryId) && !\in_array($categoryId, $selectableCategories)) {
                 $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
             }
         });
@@ -197,9 +197,7 @@ class HookListener
     {
         $router = System::getContainer()->get('router');
 
-        $generate = function ($route) use ($router) {
-            return substr($router->generate($route), \strlen(Environment::get('path')) + 1);
-        };
+        $generate = (fn($route) => substr((string) $router->generate($route), \strlen((string) Environment::get('path')) + 1));
 
         $arrMapper = [
             'contao/confirm.php' => $generate('contao_backend_confirm'),

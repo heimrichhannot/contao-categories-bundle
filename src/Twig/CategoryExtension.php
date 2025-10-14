@@ -18,9 +18,9 @@ class CategoryExtension extends AbstractExtension
     public function getFilters()
     {
         return [
-            new TwigFilter('category', [$this, 'getCategory']),
-            new TwigFilter('contextualCategory', [$this, 'getContextualCategory']),
-            new TwigFilter('categories', [$this, 'getCategories']),
+            new TwigFilter('category', $this->getCategory(...)),
+            new TwigFilter('contextualCategory', $this->getContextualCategory(...)),
+            new TwigFilter('categories', $this->getCategories(...)),
         ];
     }
 
