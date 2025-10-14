@@ -39,7 +39,7 @@ class CategoryTree extends Widget
      */
     public function __construct($arrAttributes = null)
     {
-        $this->import('Database');
+//        $this->import('Database'); // ?
         parent::__construct($arrAttributes);
     }
 

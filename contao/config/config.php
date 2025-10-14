@@ -17,11 +17,11 @@ $GLOBALS['BE_MOD']['content']['categories'] = [
 /*
  * Front end modules
  */
-$GLOBALS['FE_MOD'] = ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
-    'categoriesBundle' => [
-        'categoriesMenu' => 'HeimrichHannot\CategoriesBundle\Module\ModuleCategoriesMenu',
-    ],
-]);
+//$GLOBALS['FE_MOD'] = ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
+//    'categoriesBundle' => [
+//        'categoriesMenu' => 'HeimrichHannot\CategoriesBundle\Module\ModuleCategoriesMenu',
+//    ],
+//]);
 
 /*
  * JavaScript
