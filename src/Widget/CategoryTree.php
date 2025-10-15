@@ -50,11 +50,11 @@ class CategoryTree extends Widget
 
         if (!empty($this->varValue)) { // can be an array
             if ($usePrimaryCategory) {
-                if ('reloadCategoryTree' === System::getContainer()->get('huh.request')->getPost('action')) {
+                if ('reloadCategoryTree' === System::getContainer()->get('request_stack')->getCurrentRequest()->request->get('action')) {
                     $value = [];
 
                     foreach ($this->varValue as $category) {
-                        if (System::getContainer()->get('huh.utils.string')->startsWith($category, 'primary_')) {
+                        if (str_starts_with($category, 'primary_')) {
                             $primaryCategory = str_replace('primary_', '', $category);
                         } else {
                             $value[] = $category;
