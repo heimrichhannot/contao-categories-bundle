@@ -1,9 +1,4 @@
 services:
-  HeimrichHannot\CategoriesBundle\DataContainer\:
-    resource: '../src/DataContainer/*'
-    public: true
-    autowire: true
-
   HeimrichHannot\CategoriesBundle\EventListener\:
     resource: '../src/EventListener/*'
     autowire: true
