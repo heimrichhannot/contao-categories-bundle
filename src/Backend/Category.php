@@ -443,9 +443,8 @@ class Category extends Backend
             return;
         }
 
-        System::getContainer()->get('huh.utils.database')->delete(
-            'tl_category_association', 'tl_category_association.category=?', [$dc->id]
-        );
+        Database::getInstance()->prepare('DELETE FROM tl_category_association WHERE category=?')
+            ->execute($dc->id);
     }
 
     public function deleteEntityCategoryAssociations(DataContainer $dc, $undoId): void
@@ -481,9 +480,8 @@ class Category extends Backend
     public function storePrimaryCategory($value, DataContainer $dc)
     {
         if ($primaryCategory = Input::post($dc->field.static::PRIMARY_CATEGORY_SUFFIX)) {
-            System::getContainer()->get('huh.utils.database')->update($dc->table, [
-                $dc->field.static::PRIMARY_CATEGORY_SUFFIX => $primaryCategory,
-            ], "$dc->table.id=?", [$dc->id]);
+            Database::getInstance()->prepare("UPDATE $dc->table SET ".$dc->field.static::PRIMARY_CATEGORY_SUFFIX."=? WHERE id=?")
+                ->execute($primaryCategory, $dc->id);
         }
 
         return $value;

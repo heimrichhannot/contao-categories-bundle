@@ -13,6 +13,7 @@ use Contao\Controller;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use Contao\System;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class CategoryContext extends Backend
 {
@@ -93,7 +94,7 @@ class CategoryContext extends Backend
 
     public static function deleteCachedPropertyValuesByContext($value, DataContainer $dc)
     {
-        if (System::getContainer()->get('huh.utils.model')->hasValueChanged($value, $dc)) {
+        if (System::getContainer()->get(Utils::class)->model()->hasValueChanged($value, $dc)) {
             $fields = [];
             $contexts = [];
 

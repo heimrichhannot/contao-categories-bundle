@@ -78,7 +78,7 @@ class HookListener
         switch ($action) {
             case 'reloadCategoryTree':
                 $id = $this->getRequest()?->query->get('id');
-                $field = $dc->inputName = $this->request->getPost('name');
+                $field = $dc->inputName = $this->getRequest()?->request->get('name');
 
                 // Handle the keys in "edit multiple" mode
                 if ('editAll' === $this->getRequest()?->query->get('act')) {
@@ -130,7 +130,7 @@ class HookListener
                 }
 
                 // Set the new value
-                $value = $this->request->getPost('value', true);
+                $value = $this->getRequest()?->request->get('value');
                 $key = 'categoryTree';
 
                 // Convert the selected values
@@ -197,7 +197,14 @@ class HookListener
     {
         $router = System::getContainer()->get('router');
 
-        $generate = (fn($route) => substr((string) $router->generate($route), \strlen((string) Environment::get('path')) + 1));
+        $generate = function($route) use ($router) {
+            try {
+                return substr((string) $router->generate($route), \strlen((string) Environment::get('path')) + 1);
+            } catch (\Exception $e) {
+                // Fallback für nicht existierende Routen
+                return $route;
+            }
+        };
 
         $arrMapper = [
             'contao/confirm.php' => $generate('contao_backend_confirm'),
@@ -213,5 +220,6 @@ class HookListener
         ];
 
         return str_replace(array_keys($arrMapper), array_values($arrMapper), $strContext);
+
     }
 }

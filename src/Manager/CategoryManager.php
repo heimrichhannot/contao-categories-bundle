@@ -258,7 +258,7 @@ class CategoryManager
      */
     public function findBy($column, $value, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', $column, $value, $options);
+        return $this->utils->model()->findModelInstancesBy('tl_category', $column, $value, $options);
     }
 
     /**
@@ -268,7 +268,7 @@ class CategoryManager
      */
     public function findAll(array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findAllModelInstances('tl_category', $options);
+        return $this->utils->model()->findAllModelInstances('tl_category', $options);
     }
 
     /**
@@ -278,7 +278,7 @@ class CategoryManager
      */
     public function findMultipleByIds(array $ids, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findMultipleModelInstancesByIds('tl_category', $ids, $options);
+        return $this->utils->model()->findMultipleModelInstancesByIds('tl_category', $ids, $options);
     }
 
     /**
@@ -291,7 +291,7 @@ class CategoryManager
      */
     public function findOneBy($column, $value, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findOneModelInstanceBy('tl_category', $column, $value, $options);
+        return $this->utils->model()->findOneModelInstanceBy('tl_category', $column, $value, $options);
     }
 
     /**
@@ -356,7 +356,7 @@ class CategoryManager
     public function removeAllAssociations(int $entity, string $categoryField, string $table): void
     {
         // clean up beforehand
-        if (null !== ($categoryAssociations = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
+        if (null !== ($categoryAssociations = $this->utils->model()->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
             while ($categoryAssociations->next()) {
                 $categoryAssociations->delete();
             }
@@ -426,7 +426,7 @@ class CategoryManager
 
     public function findAssociationsByParentTableAndEntityAndField(string $parentTable, int $entityId, string $field)
     {
-        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.parentTable=?', 'tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$parentTable, $entityId, $field]);
+        return $this->utils->model()->findModelInstancesBy('tl_category_association', ['tl_category_association.parentTable=?', 'tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$parentTable, $entityId, $field]);
     }
 
     /**
@@ -438,7 +438,7 @@ class CategoryManager
      */
     public function findByIdOrAlias($idOrAlias, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findModelInstanceByIdOrAlias('tl_category', $idOrAlias, $options);
+        return $this->utils->model()->findModelInstanceByIdOrAlias('tl_category', $idOrAlias, $options);
     }
 
     /**
