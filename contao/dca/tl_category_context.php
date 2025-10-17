@@ -6,14 +6,14 @@
  * @license LGPL-3.0-or-later
  */
 use Contao\DC_Table;
+use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
+
+DateAddedField::register('tl_category_context');
 
 $GLOBALS['TL_DCA']['tl_category_context'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
-        'onsubmit_callback' => [
-            ['huh.utils.dca', 'setDateAdded'],
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -73,13 +73,6 @@ $GLOBALS['TL_DCA']['tl_category_context'] = [
         ],
         'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_category_context']['tstamp'],
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'dateAdded' => [
-            'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
-            'sorting' => true,
-            'flag' => 6,
-            'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [

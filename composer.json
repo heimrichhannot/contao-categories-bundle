@@ -5,24 +5,15 @@
   "license": "LGPL-3.0-or-later",
   "require": {
     "php": "^8.1",
-    "contao/core-bundle": "^5.0",
-    "heimrichhannot/contao-utils-bundle": "^3.0",
+    "contao/core-bundle": "^5.3",
+    "heimrichhannot/contao-utils-bundle": "^3.9",
     "heimrichhannot/contao-multi-column-editor-bundle": "^2.0",
     "wa72/htmlpagedom": "^3.0"
   },
   "autoload": {
     "psr-4": {
       "HeimrichHannot\\CategoriesBundle\\": "src/"
-    },
-    "classmap": [
-      "src/"
-    ],
-    "exclude-from-classmap": [
-      "src/Resources/contao/config/",
-      "src/Resources/contao/dca/",
-      "src/Resources/contao/languages/",
-      "src/Resources/contao/templates/"
-    ]
+    }
   },
   "extra": {
     "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"

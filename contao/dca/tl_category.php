@@ -5,14 +5,19 @@
  *
  * @license LGPL-3.0-or-later
  */
+
+use Contao\DC_Table;
 use Contao\System;
+use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
+
+DateAddedField::register('tl_category');
 
 System::loadLanguageFile('tl_news_archive');
 
 $GLOBALS['TL_DCA']['tl_category'] = [
     'config' => [
         'label' => &$GLOBALS['TL_LANG']['tl_news_archive']['categories'][0],
-        'dataContainer' => \Contao\DC_Table::class,
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'onload_callback' => [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'checkPermission'],
@@ -21,9 +26,6 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         ],
         'ondelete_callback' => [
             ['\HeimrichHannot\CategoriesBundle\Backend\Category', 'deleteCategoryAssociations'],
-        ],
-        'onsubmit_callback' => [
-            ['huh.utils.dca', 'setDateAdded'],
         ],
         'sql' => [
             'keys' => [
@@ -129,13 +131,6 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'tstamp' => [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'dateAdded' => [
-            'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
-            'sorting' => true,
-            'flag' => 6,
-            'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [
