@@ -11,6 +11,7 @@ namespace HeimrichHannot\CategoriesBundle\Manager;
 use Contao\Database;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Model;
 use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
@@ -432,11 +433,9 @@ class CategoryManager
     /**
      * find category by id or alias.
      *
-     * @param int $id
-     *
      * @return CategoryModel|null
      */
-    public function findByIdOrAlias($idOrAlias, array $options = [])
+    public function findByIdOrAlias(int|string $idOrAlias, array $options = []): ?Model
     {
         return $this->utils->model()->findModelInstanceByIdOrAlias('tl_category', $idOrAlias, $options);
     }
