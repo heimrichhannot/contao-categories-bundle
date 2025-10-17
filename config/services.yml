@@ -1,4 +1,10 @@
 services:
+
+  HeimrichHannot\CategoriesBundle\:
+    resource: '../src/{Twig}/*'
+    autowire: true
+    autoconfigure: true
+
   HeimrichHannot\CategoriesBundle\EventListener\:
     resource: '../src/EventListener/*'
     autowire: true
@@ -34,11 +40,6 @@ services:
       - [ setTokenStorage, [ "@security.token_storage" ] ]
     tags:
       - { name: contao.picker_provider, priority: 512 }
-  huh.categories.twig_extension:
-    class: HeimrichHannot\CategoriesBundle\Twig\CategoryExtension
-    public: false
-    tags:
-      - { name: twig.extension }
 
   # Symfony 4
   HeimrichHannot\CategoriesBundle\Manager\CategoryManager:
