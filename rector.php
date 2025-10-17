@@ -8,17 +8,19 @@ use Rector\Config\RectorConfig;
 use Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
+use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/src',
-//        __DIR__ . '/contao',
+        __DIR__ . '/contao',
 
     ])
+    ->withPhpVersion(PhpVersion::PHP_84)
     ->withRules([
         AddVoidReturnTypeWhereNoReturnRector::class,
         # In Vorbereitung für PHP 8.4:
-        // ExplicitNullableParamTypeRector::class
+         ExplicitNullableParamTypeRector::class
     ])
 
     ->withImportNames(
