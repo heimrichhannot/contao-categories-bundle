@@ -1,32 +1,35 @@
 {
-  "name": "heimrichhannot/contao-categories-bundle",
-  "type": "contao-bundle",
-  "description": "This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.",
-  "license": "LGPL-3.0-or-later",
-  "require": {
-    "php": "^8.2",
-    "contao/core-bundle": "^5.3",
-    "heimrichhannot/contao-utils-bundle": "^3.9",
-    "heimrichhannot/contao-multi-column-editor-bundle": "^2.0",
-    "wa72/htmlpagedom": "^3.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "HeimrichHannot\\CategoriesBundle\\": "src/"
+    "name": "heimrichhannot/contao-categories-bundle",
+    "type": "contao-bundle",
+    "description": "This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.",
+    "license": "LGPL-3.0-or-later",
+    "require": {
+        "php": "^8.2",
+        "contao/core-bundle": "^5.3",
+        "heimrichhannot/contao-utils-bundle": "^3.9",
+        "heimrichhannot/contao-multi-column-editor-bundle": "^2.0",
+        "wa72/htmlpagedom": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HeimrichHannot\\CategoriesBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"
+    },
+    "suggest": {
+        "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle."
+    },
+    "require-dev": {
+        "rector/rector": "^2.2",
+        "contao/contao-rector": "dev-main",
+        "symplify/easy-coding-standard": "^12.6",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-symfony": "^2.0",
+        "contao/manager-plugin": "^2.13"
+    },
+    "conflict": {
+        "heimrichhannot/contao-categories-multilingual-bundle": "*"
     }
-  },
-  "extra": {
-    "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"
-  },
-  "suggest": {
-    "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle."
-  },
-  "require-dev": {
-    "rector/rector": "^2.2",
-    "contao/contao-rector": "dev-main",
-    "symplify/easy-coding-standard": "^12.6",
-    "phpstan/phpstan": "^2.1",
-    "phpstan/phpstan-symfony": "^2.0",
-    "contao/manager-plugin": "^2.13"
-  }
 }
