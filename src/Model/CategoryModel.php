@@ -9,7 +9,6 @@
 namespace HeimrichHannot\CategoriesBundle\Model;
 
 use Contao\Database;
-use Contao\Model;
 use Contao\Model\Collection;
 
 /**
@@ -27,7 +26,7 @@ use Contao\Model\Collection;
  * @property string      $jumpTo;
  * @property string|bool $selectable;
  */
-class CategoryModel extends Model
+class CategoryModel extends AbstractModel
 {
     protected static $strTable = 'tl_category';
 

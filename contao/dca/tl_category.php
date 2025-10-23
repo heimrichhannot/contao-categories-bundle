@@ -115,9 +115,6 @@ $GLOBALS['TL_DCA']['tl_category'] = [
         ],
     ],
     'palettes' => [
-        '__selector__' => [
-            'type',
-        ],
         'default' => '{general_legend},title,alias,frontendTitle,cssClass,selectable;{redirect_legend},jumpTo;',
     ],
     'fields' => [

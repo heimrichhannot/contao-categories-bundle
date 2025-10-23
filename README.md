@@ -10,7 +10,7 @@ This bundle allows to assign nestable categories to arbitrary entities in Contao
 - the module is done in a generic way, i.e. you can assign category/categories field(s) to arbitrary DCAs
 - conveniently add single category fields (radio button) or multiple categories fields (checkbox) via a simple function call
 - specify overridable properties in categories and compute the correct result depending on the given context easily
-- multilanguage support via [heimrichhannot/contao-categories-multilingual-bundle](https://github.com/heimrichhannot/contao-categories-multilingual-bundle)
+- [DC_Multilingual](https://github.com/terminal42/contao-DC_Multilingual) support
 - categories filter type for [Contao Filter Bundle](https://github.com/heimrichhannot/contao-filter-bundle)
 
 ## Impressions
@@ -56,6 +56,19 @@ Single category picker with checkboxes (selecting parent categories is disallowe
 This bundle comes with two filter types:
 - CategoryChoiceType let you select categories to filter a list. 
 - ParentCategoryChoiceType is an inital filter to filter your list based on a parent category (means all elements are in a child category of the selected parent).
+
+### DC_Multilingual
+
+This bundle is prepared to work with DC_Multilingual. 
+If you have DC_Multilingual installed, you'll only have to activate it by setting the translatable languages for the tl_category table.
+
+Example:
+
+```php
+$dca['config']['languages']     = ['de', 'en', 'pl'];
+# Optional: set fallback language (default is en)
+$dca['config']['fallbackLang']  = 'de';
+```
 
 ## Entity structure
 
