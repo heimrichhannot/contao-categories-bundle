@@ -30,6 +30,18 @@ class CategoryModel extends AbstractModel
 {
     protected static $strTable = 'tl_category';
 
+    public static function findByPids(array $pids, array $options = []): ?Collection
+    {
+        $t = static::getTable();
+        $parents = implode(',', array_map('intval', $pids));
+
+        return static::findBy(
+            ["$t.pid IN (".$parents.")",],
+            [],
+            $options
+        );
+    }
+
     /**
      * @return CategoryModel|CategoryModel[]|Collection|null
      */

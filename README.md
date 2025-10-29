@@ -11,7 +11,7 @@ This bundle allows to assign nestable categories to arbitrary entities in Contao
 - conveniently add single category fields (radio button) or multiple categories fields (checkbox) via a simple function call
 - specify overridable properties in categories and compute the correct result depending on the given context easily
 - [DC_Multilingual](https://github.com/terminal42/contao-DC_Multilingual) support
-- categories filter type for [Contao Filter Bundle](https://github.com/heimrichhannot/contao-filter-bundle)
+- [Flare Bundle](https://github.com/heimrichhannot/contao-flare-bundle) support 
 
 ## Impressions
 

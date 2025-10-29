@@ -8,22 +8,24 @@
 
 namespace HeimrichHannot\CategoriesBundle;
 
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use HeimrichHannot\CategoriesBundle\DependencyInjection\CategoriesExtension;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Composer\InstalledVersions;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-class CategoriesBundle extends Bundle
+class CategoriesBundle extends AbstractBundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getContainerExtension(): CategoriesExtension|ExtensionInterface|null
-    {
-        return new CategoriesExtension();
-    }
-
     public function getPath(): string
     {
         return \dirname(__DIR__);
+    }
+
+    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $builder): void
+    {
+        $configurator->import('../config/services.yaml');
+
+        if (InstalledVersions::isInstalled('heimrichhannot/contao-flare-bundle')) {
+            $configurator->import('../config/flare.yaml');
+        }
     }
 }

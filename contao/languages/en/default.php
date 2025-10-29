@@ -6,6 +6,8 @@
  * @license LGPL-3.0-or-later
  */
 
+use HeimrichHannot\CategoriesBundle\Flare\FilterElement\ParentCategoryFilterElement;
+
 $GLOBALS['TL_LANG']['MSC']['categoriesBundle'] = [
     'configsAvailable' => 'Configuration available',
     'primaryCategory' => 'Primary category',
@@ -16,3 +18,6 @@ $GLOBALS['TL_LANG']['MSC']['categoriesBundle'] = [
  */
 $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'] = ['All categories', 'Show news from all categories'];
 $GLOBALS['TL_LANG']['MSC']['categoryPicker'] = 'Categories';
+
+$flare['filter'][ParentCategoryFilterElement::TYPE][0] = 'Parent Category (child categories of the selected category)';
+$flare['filter'][ParentCategoryFilterElement::TYPE][1] = 'Filters entries by the child categories of the selected category.';
