@@ -19,5 +19,5 @@ $GLOBALS['TL_LANG']['MSC']['categoriesBundle'] = [
 $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'] = ['All categories', 'Show news from all categories'];
 $GLOBALS['TL_LANG']['MSC']['categoryPicker'] = 'Categories';
 
-$flare['filter'][ParentCategoryFilterElement::TYPE][0] = 'Parent Category (child categories of the selected category)';
-$flare['filter'][ParentCategoryFilterElement::TYPE][1] = 'Filters entries by the child categories of the selected category.';
+$GLOBALS['TL_LANG']['FLARE']['filter'][ParentCategoryFilterElement::TYPE][0] = 'Parent Category (child categories of the selected category)';
+$GLOBALS['TL_LANG']['FLARE']['filter'][ParentCategoryFilterElement::TYPE][1] = 'Filters entries by the child categories of the selected category.';

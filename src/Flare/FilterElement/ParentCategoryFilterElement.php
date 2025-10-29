@@ -48,7 +48,10 @@ class ParentCategoryFilterElement extends AbstractFilterElement
             return $options;
         }
 
-        $categories = CategoryModel::findByPids($categoryIds);
+        $categories = CategoryModel::findByPids(
+            $categoryIds,
+            ['order' => 'title ASC']
+        );
 
         while ($categories->next()) {
             $options['choices'][$categories->title] = (string) $categories->id;
