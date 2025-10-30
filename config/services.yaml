@@ -8,6 +8,7 @@ services:
   HeimrichHannot\CategoriesBundle\EventListener\:
     resource: '../src/EventListener/*'
     autowire: true
+    autoconfigure: true
     public: true
 
   huh.categories.manager:
