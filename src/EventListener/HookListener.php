@@ -55,7 +55,7 @@ class HookListener
         if ($dcaEval['parentsUnselectable'] ?? false) {
             $selectedableCategories = [];
 
-            if (null !== ($categories = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['tl_category.selectable=?'], [true]))) {
+            if (null !== ($categories = $this->utils->model()->findModelInstancesBy('tl_category', ['tl_category.selectable=?'], [true]))) {
                 $selectedableCategories = $categories->fetchEach('id');
             }
 
