@@ -82,4 +82,9 @@ class CategoryModel extends AbstractModel
 
         return new Collection($descendants, static::$strTable);
     }
+
+    public function getFrontendTitle(): string
+    {
+        return $this->frontendTitle ?: $this->title;
+    }
 }
