@@ -26,7 +26,7 @@ $GLOBALS['BE_MOD']['content']['categories'] = [
 /*
  * JavaScript
  */
-if ('BE' === $GLOBALS['TL_MODE']) {
+if (($GLOBALS['TL_MODE'] ?? '') === 'BE') {
     $GLOBALS['TL_JAVASCRIPT']['contao-categories-bundle'] = 'bundles/categories/js/contao-categories-bundle.be.min.js|static';
 }
 
@@ -44,7 +44,7 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate']['adjustCategoryTree'] = [HookListen
 /*
  * Assets
  */
-if ('BE' === $GLOBALS['TL_MODE']) {
+if (($GLOBALS['TL_MODE'] ?? '') === 'BE') {
     $GLOBALS['TL_CSS']['contao-categories-bundle'] = 'bundles/categories/css/contao-categories-bundle.be.css|static';
 }
 

@@ -30,7 +30,9 @@ class ParentCategoryFilterElement extends AbstractFilterElement
             $qb->abort();
         }
 
-        $qb->where($qb->expr()->like($targetField, ':category'))
+        $colField = $qb->column($targetField);
+
+        $qb->where($qb->expr()->like($colField, ':category'))
             ->setParameter('category', '%"' . $context->getSubmittedData() . '"%');
     }
 
