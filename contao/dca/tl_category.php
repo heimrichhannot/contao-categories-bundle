@@ -8,9 +8,6 @@
 
 use Contao\DC_Table;
 use Contao\System;
-use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
-
-DateAddedField::register('tl_category');
 
 System::loadLanguageFile('tl_news_archive');
 
@@ -128,6 +125,15 @@ $GLOBALS['TL_DCA']['tl_category'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ],
+        'dateAdded' => [
+            'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => 6,
+            'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [

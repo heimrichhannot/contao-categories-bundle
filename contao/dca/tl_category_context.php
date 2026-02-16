@@ -6,9 +6,6 @@
  * @license LGPL-3.0-or-later
  */
 use Contao\DC_Table;
-use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
-
-DateAddedField::register('tl_category_context');
 
 $GLOBALS['TL_DCA']['tl_category_context'] = [
     'config' => [
@@ -73,6 +70,15 @@ $GLOBALS['TL_DCA']['tl_category_context'] = [
         ],
         'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_category_context']['tstamp'],
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ],
+        'dateAdded' => [
+            'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => 6,
+            'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [

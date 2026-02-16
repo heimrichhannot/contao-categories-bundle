@@ -7,9 +7,6 @@
  */
 
 use Contao\DC_Table;
-use HeimrichHannot\UtilsBundle\Dca\DateAddedField;
-
-DateAddedField::register('tl_category_config');
 
 $GLOBALS['TL_DCA']['tl_category_config'] = [
     'config' => [
@@ -80,6 +77,15 @@ $GLOBALS['TL_DCA']['tl_category_config'] = [
         ],
         'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_category_config']['tstamp'],
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ],
+        'dateAdded' => [
+            'label' => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
+            'flag' => 6,
+            'eval' => ['rgxp' => 'datim', 'doNotCopy' => true],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'context' => [
