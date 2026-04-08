@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 #[AsFilterElement(
     alias: self::TYPE,
-    palette: '{fieldGeneric_legend},fieldGeneric,filterCategory;{form_legend},placeholder',
+    palette: '{fieldGeneric_legend},fieldGeneric,filterCategory;{form_legend},isMandatory,placeholder',
     formType: ChoiceType::class,
 )]
 class ParentCategoryFilterElement extends AbstractFilterElement
@@ -42,6 +42,7 @@ class ParentCategoryFilterElement extends AbstractFilterElement
             $context,
             ['placeholder' => true]
         );
+        $options['required'] = (bool)$context->getFilterModel()->isMandatory;
         $options['choices'] = [];
 
         $categoryIds = StringUtil::deserialize($context->getFilterModel()->filterCategory, true);
