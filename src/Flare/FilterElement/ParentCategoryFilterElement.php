@@ -5,14 +5,14 @@ namespace HeimrichHannot\CategoriesBundle\Flare\FilterElement;
 use Contao\StringUtil;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\FlareBundle\DependencyInjection\Attribute\AsFilterElement;
-use HeimrichHannot\FlareBundle\Filter\FilterContext;
-use HeimrichHannot\FlareBundle\Filter\FilterQueryBuilder;
+use HeimrichHannot\FlareBundle\Event\FilterElementFormTypeOptionsEvent;
+use HeimrichHannot\FlareBundle\Filter\FilterInvocation;
 use HeimrichHannot\FlareBundle\FilterElement\AbstractFilterElement;
-use HeimrichHannot\FlareBundle\Form\ChoicesBuilder;
+use HeimrichHannot\FlareBundle\Query\FilterQueryBuilder;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 #[AsFilterElement(
-    alias: self::TYPE,
+    type: self::TYPE,
     palette: '{fieldGeneric_legend},fieldGeneric,filterCategory;{form_legend},isMandatory,placeholder',
     formType: ChoiceType::class,
 )]
@@ -20,46 +20,42 @@ class ParentCategoryFilterElement extends AbstractFilterElement
 {
     public const TYPE = 'parent_category';
 
-    public function __invoke(FilterContext $context, FilterQueryBuilder $qb): void
+    public function __invoke(FilterInvocation $inv, FilterQueryBuilder $qb): void
     {
-        if (!$context->getSubmittedData()) {
+        if (!$value = (int) $inv->getValue()) {
             return;
         }
 
-        if (!$targetField = $context->getFilterModel()->fieldGeneric) {
+        if (!$targetField = $inv->filter->fieldGeneric) {
             $qb->abort();
         }
 
         $colField = $qb->column($targetField);
 
         $qb->where($qb->expr()->like($colField, ':category'))
-            ->setParameter('category', '%"' . $context->getSubmittedData() . '"%');
+            ->setParameter('category', '%"' . $value . '"%');
     }
 
-    public function getFormTypeOptions(FilterContext $context, ChoicesBuilder $choices): array
+    public function handleFormTypeOptions(FilterElementFormTypeOptionsEvent $event): void
     {
-        $options = $this->defaultFormTypeOptions(
-            $context,
-            ['placeholder' => true]
-        );
-        $options['required'] = (bool)$context->getFilterModel()->isMandatory;
-        $options['choices'] = [];
+        $filter = $event->filter;
 
-        $categoryIds = StringUtil::deserialize($context->getFilterModel()->filterCategory, true);
+        $event->options = $this->defaultFormTypeOptions($event->filter, ['placeholder' => true]);
+        $event->options['required'] = (bool) $filter->isMandatory;
+        $event->options['choices'] = [];
 
-        if (empty($categoryIds)) {
-            return $options;
+        if (!$categoryIds = StringUtil::deserialize($filter->filterCategory, true)) {
+            return;
         }
 
-        $categories = CategoryModel::findByPids(
-            $categoryIds,
-            ['order' => 'title ASC']
-        );
+        if (!$categories = CategoryModel::findByPids($categoryIds, ['order' => 'title ASC'])) {
+            return;
+        }
 
         while ($categories->next()) {
-            $options['choices'][$categories->title] = (string) $categories->id;
+            if ($title = $categories->title) {
+                $event->options['choices'][$title] = (string) $categories->id;
+            }
         }
-
-        return $options;
     }
 }

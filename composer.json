@@ -32,6 +32,6 @@
     },
     "conflict": {
         "heimrichhannot/contao-categories-multilingual-bundle": "*",
-        "heimrichhannot/contao-flare-bundle": ">=0.1.0"
+        "heimrichhannot/contao-flare-bundle": "<0.1.0"
     }
 }
