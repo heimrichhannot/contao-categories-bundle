@@ -19,7 +19,8 @@
         "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"
     },
     "suggest": {
-        "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle."
+        "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle.",
+        "heimrichhannot/contao-flare-bundle": "Integrated with a custom categories filter for flare."
     },
     "require-dev": {
         "rector/rector": "^2.2",
@@ -30,6 +31,7 @@
         "contao/manager-plugin": "^2.13"
     },
     "conflict": {
-        "heimrichhannot/contao-categories-multilingual-bundle": "*"
+        "heimrichhannot/contao-categories-multilingual-bundle": "*",
+        "heimrichhannot/contao-flare-bundle": ">=0.1.0"
     }
 }
