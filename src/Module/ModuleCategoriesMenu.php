@@ -8,6 +8,8 @@
 
 namespace HeimrichHannot\CategoriesBundle\Module;
 
+use Symfony\Component\HttpFoundation\Request;
+use Contao\Module;
 use Contao\BackendTemplate;
 use Contao\FrontendTemplate;
 use Contao\PageModel;
@@ -15,7 +17,7 @@ use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\Category;
 
-class ModuleCategoriesMenu extends \Contao\Module
+class ModuleCategoriesMenu extends Module
 {
     /**
      * Template.
@@ -52,7 +54,7 @@ class ModuleCategoriesMenu extends \Contao\Module
      */
     public function generate()
     {
-        if (TL_MODE == 'BE') {
+        if (System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''))) {
             $objTemplate = new BackendTemplate('be_wildcard');
 
             $objTemplate->wildcard = '### CATEGORIES MENU ###';
@@ -178,7 +180,7 @@ class ModuleCategoriesMenu extends \Contao\Module
                 'title' => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
                 'linkTitle' => StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][1]),
                 'link' => $GLOBALS['TL_LANG']['MSC']['cm_resetCategories'][0],
-                'href' => ampersand(str_replace('/'.$strParam.'/%s', '', $strUrl)),
+                'href' => StringUtil::ampersand(str_replace('/'.$strParam.'/%s', '', $strUrl)),
             ];
 
             $count = 1;
@@ -203,8 +205,8 @@ class ModuleCategoriesMenu extends \Contao\Module
                 ) ? ' cm_trail' : '');
             $strTitle = $category->frontendTitle ?: $category->title;
 
-            if (\System::getContainer()->get('translator')->getCatalogue()->has($strTitle)) {
-                $strTitle = \System::getContainer()->get('translator')->trans($strTitle);
+            if (System::getContainer()->get('translator')->getCatalogue()->has($strTitle)) {
+                $strTitle = System::getContainer()->get('translator')->trans($strTitle);
             }
 
             $arrRow = $category->row();
@@ -214,7 +216,7 @@ class ModuleCategoriesMenu extends \Contao\Module
             $arrRow['title'] = StringUtil::specialchars($strTitle, true);
             $arrRow['linkTitle'] = StringUtil::specialchars($strTitle, true);
             $arrRow['link'] = $strTitle;
-            $arrRow['href'] = ampersand(str_replace('%s', ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias), $strUrl));
+            $arrRow['href'] = StringUtil::ampersand(str_replace('%s', ($GLOBALS['TL_CONFIG']['disableAlias'] ? $category->id : $category->alias), $strUrl));
 
             $arrCategories[] = $arrRow;
         }

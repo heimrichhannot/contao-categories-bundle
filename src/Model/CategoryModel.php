@@ -9,7 +9,6 @@
 namespace HeimrichHannot\CategoriesBundle\Model;
 
 use Contao\Database;
-use Contao\Model;
 use Contao\Model\Collection;
 
 /**
@@ -27,9 +26,21 @@ use Contao\Model\Collection;
  * @property string      $jumpTo;
  * @property string|bool $selectable;
  */
-class CategoryModel extends Model
+class CategoryModel extends AbstractModel
 {
     protected static $strTable = 'tl_category';
+
+    public static function findByPids(array $pids, array $options = []): ?Collection
+    {
+        $t = static::getTable();
+        $parents = implode(',', array_map('intval', $pids));
+
+        return static::findBy(
+            ["$t.pid IN (".$parents.")",],
+            [],
+            $options
+        );
+    }
 
     /**
      * @return CategoryModel|CategoryModel[]|Collection|null
@@ -70,5 +81,10 @@ class CategoryModel extends Model
         }
 
         return new Collection($descendants, static::$strTable);
+    }
+
+    public function getFrontendTitle(): string
+    {
+        return $this->frontendTitle ?: $this->title;
     }
 }

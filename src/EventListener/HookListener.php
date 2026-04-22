@@ -19,35 +19,33 @@ use Contao\System;
 use HeimrichHannot\CategoriesBundle\Manager\CategoryManager;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
 use HeimrichHannot\CategoriesBundle\Widget\CategoryTree;
-use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use HeimrichHannot\UtilsBundle\Util\Utils;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Wa72\HtmlPageDom\HtmlPageCrawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class HookListener
 {
     /**
-     * @var Request
-     */
-    private $request;
-    private Utils           $utils;
-    private CategoryManager $categoryManager;
-
-    /**
      * HookListener constructor.
      */
-    public function __construct(Request $request, Utils $utils, CategoryManager $categoryManager)
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly Utils $utils,
+        private readonly CategoryManager $categoryManager
+    ) {}
+
+    protected function getRequest(): ?Request
     {
-        $this->request = $request;
-        $this->utils = $utils;
-        $this->categoryManager = $categoryManager;
+        return $this->requestStack->getCurrentRequest();
     }
 
     public function adjustCategoryTree($buffer, $template)
     {
-        if (!$this->request->getGet('picker') || !($field = $this->request->getGet('category_field')) || !($table = $this->request->getGet('category_table'))) {
+        if (!$this->getRequest()?->query->get('picker') || !($field = $this->getRequest()?->query->get('category_field')) || !($table = $this->getRequest()?->query->get('category_table'))) {
             return $buffer;
         }
 
@@ -57,7 +55,7 @@ class HookListener
         if ($dcaEval['parentsUnselectable'] ?? false) {
             $selectedableCategories = [];
 
-            if (null !== ($categories = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['tl_category.selectable=?'], [true]))) {
+            if (null !== ($categories = $this->utils->model()->findModelInstancesBy('tl_category', ['tl_category.selectable=?'], [true]))) {
                 $selectedableCategories = $categories->fetchEach('id');
             }
 
@@ -75,24 +73,24 @@ class HookListener
         return $buffer;
     }
 
-    public function reloadCategoryTree($action, DataContainer $dc)
+    public function reloadCategoryTree($action, DataContainer $dc): void
     {
         switch ($action) {
             case 'reloadCategoryTree':
-                $id = $this->request->getGet('id');
-                $field = $dc->inputName = $this->request->getPost('name');
+                $id = $this->getRequest()?->query->get('id');
+                $field = $dc->inputName = $this->getRequest()?->request->get('name');
 
                 // Handle the keys in "edit multiple" mode
-                if ('editAll' === $this->request->getGet('act')) {
-                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
-                    $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
+                if ('editAll' === $this->getRequest()?->query->get('act')) {
+                    $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', (string) $field);
+                    $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', (string) $field);
                 }
 
                 $dc->field = $field;
 
                 // The field does not exist
                 if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
-                    System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]);
+                    System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'Field "'.$field.'" does not exist in DCA "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)]);
 
                     throw new BadRequestHttpException('Bad request');
                 }
@@ -101,7 +99,7 @@ class HookListener
                 $value = null;
 
                 // Load the value
-                if ('overrideAll' !== $this->request->getGet('act')) {
+                if ('overrideAll' !== $this->getRequest()?->query->get('act')) {
                     if ('File' === $GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer']) {
                         $value = Config::get($field);
                     } elseif ($id > 0 && Database::getInstance()->tableExists($dc->table)) {
@@ -109,7 +107,7 @@ class HookListener
 
                         // The record does not exist
                         if ($row->numRows < 1) {
-                            System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]);
+                            System::getContainer()->get('monolog.logger.contao')->log(LogLevel::ERROR, 'A record with the ID "'.$id.'" does not exist in table "'.$dc->table.'"', ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)]);
 
                             throw new BadRequestHttpException('Bad request');
                         }
@@ -132,7 +130,7 @@ class HookListener
                 }
 
                 // Set the new value
-                $value = $this->request->getPost('value', true);
+                $value = $this->getRequest()?->request->get('value');
                 $key = 'categoryTree';
 
                 // Convert the selected values
@@ -159,7 +157,7 @@ class HookListener
         $objNode->filter('.tree_view input[name="picker[]"]')->each(function ($objElement) use ($selectableCategories) {
             $categoryId = $objElement->getAttribute('value');
 
-            if (\System::getContainer()->get('huh.categories.manager')->hasChildren($categoryId) && !\in_array($categoryId, $selectableCategories)) {
+            if (System::getContainer()->get('huh.categories.manager')->hasChildren($categoryId) && !\in_array($categoryId, $selectableCategories)) {
                 $objElement->replaceWith('<div class="dummy" style="display: inline-block; width: 22px; height: 13px;"></div>');
             }
         });
@@ -199,8 +197,13 @@ class HookListener
     {
         $router = System::getContainer()->get('router');
 
-        $generate = function ($route) use ($router) {
-            return substr($router->generate($route), \strlen(Environment::get('path')) + 1);
+        $generate = function($route) use ($router) {
+            try {
+                return substr((string) $router->generate($route), \strlen((string) Environment::get('path')) + 1);
+            } catch (\Exception $e) {
+                // Fallback für nicht existierende Routen
+                return $route;
+            }
         };
 
         $arrMapper = [
@@ -217,5 +220,6 @@ class HookListener
         ];
 
         return str_replace(array_keys($arrMapper), array_values($arrMapper), $strContext);
+
     }
 }

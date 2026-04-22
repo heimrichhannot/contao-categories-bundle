@@ -8,28 +8,23 @@
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
+use Contao\Database;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Model;
 use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
 use HeimrichHannot\CategoriesBundle\Backend\CategoryContext;
 use HeimrichHannot\CategoriesBundle\Model\CategoryAssociationModel;
 use HeimrichHannot\CategoriesBundle\Model\CategoryModel;
+use HeimrichHannot\UtilsBundle\Util\Utils;
 
 class CategoryManager
 {
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    protected $framework;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(private readonly ContaoFramework $framework, private readonly Utils $utils)
     {
-        $this->framework = $framework;
+        $this->framework->initialize();
     }
 
     /**
@@ -37,7 +32,7 @@ class CategoryManager
      */
     public function findByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = [])
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.entity=?', 'tl_category_association.parentTable=?'], [$categoryField, $entity, $table], $options))) {
             return null;
@@ -53,7 +48,7 @@ class CategoryManager
      */
     public function findByCategoryFieldAndTable(string $categoryField, string $table, array $options = [])
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
             return null;
@@ -75,7 +70,7 @@ class CategoryManager
      */
     public function findByCategoryFieldAndTableAndPids(string $categoryField, string $table, array $pids = [], array $options = [])
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findModelInstancesBy('tl_category_association', ['tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$categoryField, $table], $options))) {
             return null;
@@ -102,7 +97,7 @@ class CategoryManager
 
     public function findOneByEntityAndCategoryFieldAndTable(int $entity, string $categoryField, string $table, array $options = []): ?CategoryModel
     {
-        $modelUtil = System::getContainer()->get('huh.utils.model');
+        $modelUtil = $this->utils->model();
 
         if (null === ($categoryAssociations = $modelUtil->findOneModelInstanceBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.categoryField=?', 'tl_category_association.parentTable=?'], [$entity, $categoryField, $table], $options))) {
             return null;
@@ -243,7 +238,7 @@ class CategoryManager
      *
      * @param $contextObj
      */
-    public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false)
+    public function addOverridablePropertiesToCategory(CategoryModel $category, $contextObj, string $categoryField, int $primaryCategory, bool $skipCache = false): void
     {
         Controller::loadDataContainer('tl_category');
 
@@ -264,7 +259,7 @@ class CategoryManager
      */
     public function findBy($column, $value, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', $column, $value, $options);
+        return $this->utils->model()->findModelInstancesBy('tl_category', $column, $value, $options);
     }
 
     /**
@@ -274,7 +269,7 @@ class CategoryManager
      */
     public function findAll(array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findAllModelInstances('tl_category', $options);
+        return $this->utils->model()->findAllModelInstances('tl_category', $options);
     }
 
     /**
@@ -284,7 +279,7 @@ class CategoryManager
      */
     public function findMultipleByIds(array $ids, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findMultipleModelInstancesByIds('tl_category', $ids, $options);
+        return $this->utils->model()->findMultipleModelInstancesByIds('tl_category', $ids, $options);
     }
 
     /**
@@ -297,7 +292,7 @@ class CategoryManager
      */
     public function findOneBy($column, $value, array $options = [])
     {
-        return System::getContainer()->get('huh.utils.model')->findOneModelInstanceBy('tl_category', $column, $value, $options);
+        return $this->utils->model()->findOneModelInstanceBy('tl_category', $column, $value, $options);
     }
 
     /**
@@ -362,7 +357,7 @@ class CategoryManager
     public function removeAllAssociations(int $entity, string $categoryField, string $table): void
     {
         // clean up beforehand
-        if (null !== ($categoryAssociations = System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
+        if (null !== ($categoryAssociations = $this->utils->model()->findModelInstancesBy('tl_category_association', ['tl_category_association.entity=?', 'tl_category_association.parentTable=?', 'tl_category_association.categoryField=?'], [$entity, $table, $categoryField]))) {
             while ($categoryAssociations->next()) {
                 $categoryAssociations->delete();
             }
@@ -396,7 +391,8 @@ class CategoryManager
      */
     public function hasChildren(int $category): bool
     {
-        return null !== System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category', ['tl_category.pid=?'], [$category]);
+        $modelUtil = $this->utils->model();
+        return null !== $modelUtil->findModelInstancesBy('tl_category', ['tl_category.pid=?'], [$category]);
     }
 
     /**
@@ -431,19 +427,17 @@ class CategoryManager
 
     public function findAssociationsByParentTableAndEntityAndField(string $parentTable, int $entityId, string $field)
     {
-        return System::getContainer()->get('huh.utils.model')->findModelInstancesBy('tl_category_association', ['tl_category_association.parentTable=?', 'tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$parentTable, $entityId, $field]);
+        return $this->utils->model()->findModelInstancesBy('tl_category_association', ['tl_category_association.parentTable=?', 'tl_category_association.entity=?', 'tl_category_association.categoryField=?'], [$parentTable, $entityId, $field]);
     }
 
     /**
      * find category by id or alias.
      *
-     * @param int $id
-     *
      * @return CategoryModel|null
      */
-    public function findByIdOrAlias($idOrAlias, array $options = [])
+    public function findByIdOrAlias(int|string $idOrAlias, array $options = []): ?Model
     {
-        return System::getContainer()->get('huh.utils.model')->findModelInstanceByIdOrAlias('tl_category', $idOrAlias, $options);
+        return $this->utils->model()->findModelInstanceByIdOrAlias('tl_category', $idOrAlias, $options);
     }
 
     /**
@@ -452,7 +446,7 @@ class CategoryManager
      * @param int   $intPid The parent ID
      * @param array $arrIds An array of categories
      *
-     * @return \Model\Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
+     * @return Collection|CategoryModel[]|CategoryModel|null A collection of models or null if there are no categories
      */
     public function findCategoryAndSubcategoryByPidAndIds(int $pid, array $arrIds)
     {
@@ -460,13 +454,13 @@ class CategoryManager
             return null;
         }
 
-        $objCategories = \Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).') ORDER BY sorting ASC')->execute($pid);
+        $objCategories = Database::getInstance()->prepare('SELECT c1.*, (SELECT COUNT(*) FROM tl_category  c2 WHERE c2.pid=c1.id AND c2.id IN ('.implode(',', array_map('intval', $arrIds)).')) AS subcategories FROM tl_category c1 WHERE c1.pid=? AND c1.id IN ('.implode(',', array_map('intval', $arrIds)).') ORDER BY sorting ASC')->execute($pid);
 
         if ($objCategories->numRows < 1) {
             return null;
         }
 
-        return \Model\Collection::createFromDbResult($objCategories, 'tl_category');
+        return Collection::createFromDbResult($objCategories, 'tl_category');
     }
 
     /**

@@ -1,34 +1,37 @@
 {
-  "name": "heimrichhannot/contao-categories-bundle",
-  "type": "contao-bundle",
-  "description": "This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.",
-  "license": "LGPL-3.0-or-later",
-  "require": {
-    "php": "^7.4 || ^8.0",
-    "contao/core-bundle": "^4.4",
-    "heimrichhannot/contao-utils-bundle": "^2.210",
-    "heimrichhannot/contao-multi-column-editor-bundle": "^2.0",
-    "wa72/htmlpagedom": "^1.3 || ^2.0",
-    "heimrichhannot/contao-request-bundle": "^1.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "HeimrichHannot\\CategoriesBundle\\": "src/"
+    "name": "heimrichhannot/contao-categories-bundle",
+    "type": "contao-bundle",
+    "description": "This bundle allows to assign nestable categories to arbitrary entities in Contao-driven systems.",
+    "license": "LGPL-3.0-or-later",
+    "require": {
+        "php": "^8.2",
+        "contao/core-bundle": "^5.3",
+        "heimrichhannot/contao-utils-bundle": "^3.9",
+        "heimrichhannot/contao-multi-column-editor-bundle": "^2.0",
+        "wa72/htmlpagedom": "^3.0"
     },
-    "classmap": [
-      "src/"
-    ],
-    "exclude-from-classmap": [
-      "src/Resources/contao/config/",
-      "src/Resources/contao/dca/",
-      "src/Resources/contao/languages/",
-      "src/Resources/contao/templates/"
-    ]
-  },
-  "extra": {
-    "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"
-  },
-  "suggest": {
-    "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle."
-  }
+    "autoload": {
+        "psr-4": {
+            "HeimrichHannot\\CategoriesBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "HeimrichHannot\\CategoriesBundle\\ContaoManager\\Plugin"
+    },
+    "suggest": {
+        "heimrichhannot/contao-categories-multilingual-bundle": "Adds multilanguage support for categories bundle.",
+        "heimrichhannot/contao-flare-bundle": "Integrated with a custom categories filter for flare."
+    },
+    "require-dev": {
+        "rector/rector": "^2.2",
+        "contao/contao-rector": "dev-main",
+        "symplify/easy-coding-standard": "^12.6",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-symfony": "^2.0",
+        "contao/manager-plugin": "^2.13"
+    },
+    "conflict": {
+        "heimrichhannot/contao-categories-multilingual-bundle": "*",
+        "heimrichhannot/contao-flare-bundle": "<0.1.0"
+    }
 }

@@ -8,20 +8,21 @@
 
 namespace HeimrichHannot\CategoriesBundle\Manager;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Model\Collection;
 use HeimrichHannot\CategoriesBundle\Model\CategoryPropertyCacheModel;
 
 class CategoryPropertyCacheManager
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     protected $framework;
 
     /**
      * Constructor.
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
@@ -32,7 +33,7 @@ class CategoryPropertyCacheManager
      * @param mixed $column
      * @param mixed $value
      *
-     * @return \Contao\Model\Collection|CategoryPropertyCacheModel|null
+     * @return Collection|CategoryPropertyCacheModel|null
      */
     public function findBy($column, $value, array $options = [])
     {
@@ -65,7 +66,7 @@ class CategoryPropertyCacheManager
     }
 
     /**
-     * @return \Contao\Model\Collection|CategoryPropertyCacheModel|null
+     * @return Collection|CategoryPropertyCacheModel|null
      */
     public function get(string $property, string $categoryField, int $category, int $context)
     {

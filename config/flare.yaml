@@ -1,0 +1,5 @@
+services:
+  HeimrichHannot\CategoriesBundle\Flare\:
+    resource: '../src/Flare/*'
+    autowire: true
+    autoconfigure: true

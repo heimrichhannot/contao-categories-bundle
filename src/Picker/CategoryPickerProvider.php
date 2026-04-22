@@ -11,14 +11,18 @@ namespace HeimrichHannot\CategoriesBundle\Picker;
 use Contao\CoreBundle\Picker\AbstractPickerProvider;
 use Contao\CoreBundle\Picker\DcaPickerProviderInterface;
 use Contao\CoreBundle\Picker\PickerConfig;
+use Contao\Input;
 use Contao\System;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CategoryPickerProvider extends AbstractPickerProvider implements DcaPickerProviderInterface
 {
+    private TokenStorageInterface $tokenStorage;
+
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'categoryPicker';
     }
@@ -26,27 +30,27 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function supportsContext($context)
+    public function supportsContext($context): bool
     {
-        return \in_array($context, ['category'], true) && $this->getUser()->hasAccess('categories', 'modules');
+        return \in_array($context, ['category'], true) && $this->tokenStorage->getToken()?->getUser()->hasAccess('categories', 'modules');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsValue(PickerConfig $config)
+    public function supportsValue(PickerConfig $config): bool
     {
         if ('category' === $config->getContext()) {
             return is_numeric($config->getValue());
         }
 
-        return false !== strpos($config->getValue(), '{{category_url::');
+        return str_contains($config->getValue(), '{{category_url::');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDcaTable()
+    public function getDcaTable(PickerConfig|null $config = null): string
     {
         return 'tl_category';
     }
@@ -54,7 +58,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function getDcaAttributes(PickerConfig $config)
+    public function getDcaAttributes(PickerConfig $config): array
     {
         $value = $config->getValue();
         $attributes = ['fieldType' => 'radio'];
@@ -79,7 +83,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
             return $attributes;
         }
 
-        if ($value && false !== strpos($value, '{{category_url::')) {
+        if ($value && str_contains($value, '{{category_url::')) {
             $attributes['value'] = str_replace(['{{category_url::', '}}'], '', $value);
         }
 
@@ -89,7 +93,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    public function convertDcaValue(PickerConfig $config, $value)
+    public function convertDcaValue(PickerConfig $config, mixed $value): string|int
     {
         if ('category' === $config->getContext()) {
             return (int) $value;
@@ -98,17 +102,22 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
         return '{{category_url::'.$value.'}}';
     }
 
+    public function setTokenStorage(TokenStorageInterface $storage): void
+    {
+        $this->tokenStorage = $storage;
+    }
+
     /**
      * {@inheritdoc}
      */
-    protected function getRouteParameters(PickerConfig $config = null)
+    protected function getRouteParameters(?PickerConfig $config = null): array
     {
         return [
             'do' => 'categories',
-            'category_field' => System::getContainer()->get('huh.request')->getGet('category_field'),
-            'category_table' => System::getContainer()->get('huh.request')->getGet('category_table'),
-            'primaryCategory' => System::getContainer()->get('huh.request')->getGet('primaryCategory'),
-            'usePrimaryCategory' => System::getContainer()->get('huh.request')->getGet('usePrimaryCategory'),
+            'category_field' => Input::get('category_field'),
+            'category_table' => Input::get('category_table'),
+            'primaryCategory' => Input::get('primaryCategory'),
+            'usePrimaryCategory' => Input::get('usePrimaryCategory'),
         ];
     }
 }

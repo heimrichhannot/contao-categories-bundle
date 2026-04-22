@@ -8,8 +8,8 @@
 
 namespace HeimrichHannot\CategoriesBundle\Command;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Command\AbstractLockedCommand;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -63,15 +63,10 @@ class NewsCategoriesMigrationCommand extends AbstractLockedCommand
      * @var bool
      */
     protected $dryRun = false;
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
 
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(private readonly ContaoFramework $framework)
     {
         parent::__construct();
-        $this->framework = $framework;
     }
 
     /**
