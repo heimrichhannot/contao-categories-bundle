@@ -110,7 +110,7 @@ class CategoryPickerProvider extends AbstractPickerProvider implements DcaPicker
     /**
      * {@inheritdoc}
      */
-    protected function getRouteParameters(PickerConfig $config = null): array
+    protected function getRouteParameters(?PickerConfig $config = null): array
     {
         return [
             'do' => 'categories',
